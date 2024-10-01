@@ -278,7 +278,211 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'                
+                $ref: '#/components/schemas/AppError'
+  /channels/history/{channelId}?limit={limit}&offset={offset}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Channel
+      summary: get messages of a channel
+      description: Returns a list of messages, with a limit and offset to do pagination
+      parameters:
+        - name: channelId
+          in: path
+          description: channel identifier
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: number of messages to return
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: offset
+          in: query
+          description: number of messages to skip
+          required: false
+          schema:
+            type: integer
+            example: 0
+
+      responses:
+        '200':
+          description: Messages found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesDto'
+        '400':
+          description: Invalid channel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
+  /channel/{channelId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Channels
+      summary: Get details of a channel
+      description: Returns a single channel
+      parameters:
+        - name: channelId
+          in: path
+          description: Channel identifier
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Channel found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDto'
+        '400':
+          description: Invalid channel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
+  /channel/:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Channels
+      summary: Create a new channel
+      description: Create a new channel given a name and a visibility
+      requestBody:
+        description: Channel data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: channel name
+                  example: DevPT
+                visibility:
+                  type: string
+                  description: channel visibility
+                  enum: [PUBLIC, PRIVATE]
+                  example: PUBLIC
+      responses:
+        '201':
+          description: Channel created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDto'
+        '400':
+          description: Invalid channel data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
+
+  /message/:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Messages
+      summary: Send new message
+      description: Create a new message given a sender, a channel, a content and a timestamp
+      requestBody:
+        description: Message data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageIn'
+      responses:
+        '201':
+          description: Message created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+        '400':
+          description: Invalid message data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
 
 components:
   securitySchemes:
