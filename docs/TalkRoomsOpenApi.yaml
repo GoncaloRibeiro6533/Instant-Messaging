@@ -9,7 +9,7 @@ tags:
   - name: Users
   - name: Channel
   - name: Messages
-  - name: Invites
+  - name: Invitation
 
 
 paths:
@@ -391,7 +391,7 @@ paths:
                 $ref: '#/components/schemas/AppError'
 
   /channel/:
-    post:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
@@ -443,7 +443,7 @@ paths:
 
 
   /message/:
-    post:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
@@ -502,7 +502,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Invites
+        - Invitation
       summary: Create a new invitation
       description: Create a new invitation given a sender, a receiver, a channel and a timestamp
       requestBody:
@@ -555,7 +555,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Invites
+        - Invitation
       summary: Get details of a invitation
       description: Returns a single invitation
       parameters:
