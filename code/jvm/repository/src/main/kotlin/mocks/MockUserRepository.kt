@@ -1,9 +1,10 @@
 package mocks
 
+import Channel
+import Invitation
+import User
 import UsersRepository
-import pt.isel.talkRooms.domain.Channel
-import pt.isel.talkRooms.domain.Invitation
-import pt.isel.talkRooms.domain.User
+
 
 class UserRepositoryMock : UsersRepository {
 
