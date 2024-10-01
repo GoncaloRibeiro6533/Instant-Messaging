@@ -7,7 +7,7 @@ info:
 
 tags:
   - name: Users
-  - name: Channels
+  - name: Channel
   - name: Messages
   - name: Invites
 
@@ -279,7 +279,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppError'
-  /channels/history/{channelId}?limit={limit}&offset={offset}:
+  /channel/history/{channelId}?limit={limit}&offset={offset}:
     get:
       security:
         - bearerAuth: [ ]
@@ -347,7 +347,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Channels
+        - Channel
       summary: Get details of a channel
       description: Returns a single channel
       parameters:
@@ -395,7 +395,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Channels
+        - Channel
       summary: Create a new channel
       description: Create a new channel given a name and a visibility
       requestBody:
@@ -456,14 +456,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageIn'
+              type: object
+              properties:
+                sender:
+                  $ref: '#/components/schemas/UserDto'
+                channel:
+                  $ref: '#/components/schemas/ChannelOut'
+                content:
+                  type: string
+                  description: message content
+                  example: Hello, world!
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Time the message was sent
+                  example: "2024-10-01T12:00:00Z"
       responses:
         '201':
           description: Message created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/MessageIn'
         '400':
           description: Invalid message data
           content:
@@ -472,6 +486,107 @@ paths:
                 $ref: '#/components/schemas/AppError'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
+  /invitation/:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Invites
+      summary: Create a new invitation
+      description: Create a new invitation given a sender, a receiver, a channel and a timestamp
+      requestBody:
+        description: Invitation data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sender:
+                  $ref: '#/components/schemas/UserDto'
+                receiver:
+                  $ref: '#/components/schemas/UserDto'
+                channel:
+                  $ref: '#/components/schemas/ChannelOut'
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Time the invitation was sent
+                  example: "2024-10-01T12:00:00Z"
+      responses:
+        '201':
+          description: Invitation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationDto'
+        '400':
+          description: Invalid invitation data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+
+  /invitation/{id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Invites
+      summary: Get details of a invitation
+      description: Returns a single invitation
+      parameters:
+        - name: id
+          in: path
+          description: Invitation identifier
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Invitation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationDto'
+        '400':
+          description: Invalid invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        '404':
+          description: Invitation not found
           content:
             application/json:
               schema:
@@ -730,4 +845,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChannelOut'
+
+    MessageIn:
+      type: object
+      description: User data used on register and login
+      required:
+        - senderId
+        - channelId
+        - content
+        - timestamp
+      properties:
+        senderId:
+          type: integer
+          description: sender identifier
+          example: 20
+        channelId:
+          type: integer
+          description: channel identifier
+          example: 10
+        content:
+          type: string
+          description: Message content
+          example: This is a message
+        timestamp:
+          type: string
+          format: date-time
+          description: Time the message was sent
+          example: "2024-10-01T12:00:00Z"
+
 
