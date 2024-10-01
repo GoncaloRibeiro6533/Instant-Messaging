@@ -1,8 +1,4 @@
-package interfaces
-
-import pt.isel.talkRooms.domain.User
-
-interface UsersRepositoryInterface {
+interface UsersRepository {
 
     fun findUserById(id: Int): User
     fun findUserByUsername(username: String) : List<User>

@@ -1,5 +1,3 @@
-package pt.isel.talkRooms.domain
-
 data class Channel(
     val id: Int,
     val name: String,

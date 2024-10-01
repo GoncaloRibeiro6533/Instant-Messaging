@@ -1,7 +1,4 @@
-import interfaces.UsersRepositoryInterface
-import pt.isel.talkRooms.domain.User
-
-class UsersServices(private val userRepository : UsersRepositoryInterface) {
+class UsersServices(private val userRepository : UsersRepository) {
 
     fun getUserById(id: Int) : User {
         return userRepository.findUserById(id)

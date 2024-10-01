@@ -1,5 +1,3 @@
-package pt.isel.talkRooms.domain
-
 data class User(
     val id: Int,
     val username: String,

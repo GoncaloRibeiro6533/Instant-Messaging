@@ -1,11 +1,11 @@
 package mocks
 
-import interfaces.UsersRepositoryInterface
+import UsersRepository
 import pt.isel.talkRooms.domain.Channel
 import pt.isel.talkRooms.domain.Invitation
 import pt.isel.talkRooms.domain.User
 
-class UserRepositoryMock : UsersRepositoryInterface {
+class UserRepositoryMock : UsersRepository {
 
     companion object {
         val users = listOf<User>(
