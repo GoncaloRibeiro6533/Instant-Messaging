@@ -343,7 +343,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppError'
 
-  /channel/{userId}:
+  /channel/user/{userId}:
     get:
       security:
         - bearerAuth: [ ]
