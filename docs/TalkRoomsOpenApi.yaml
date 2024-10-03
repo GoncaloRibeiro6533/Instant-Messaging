@@ -224,7 +224,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Channel
-      summary: Get the messages of a channel
+      summary: Get the messages history of a channel
       description: Returns a list of messages, with a limit and offset to do pagination
       parameters:
         - name: channelId
