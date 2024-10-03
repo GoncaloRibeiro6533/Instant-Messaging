@@ -7,4 +7,12 @@ data class Invitation(
     val channel: Channel,
     val isUsed: Boolean,
     val timestamp: LocalDateTime
-)
+
+
+){
+    init {
+        require(id >= 0) { "id must be greater than 0" }
+        require(!isUsed) { "invitation must be new" }
+
+    }
+}

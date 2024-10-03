@@ -218,6 +218,69 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /user/{id}/invitations:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - User
+      summary: Get invitations of a user
+      description: Returns a list of invitations
+      parameters:
+        - name: id
+          in: path
+          description: User identifier
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: number of messages to return
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: skip
+          in: query
+          description: number of messages to skip
+          required: false
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: Invitations found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationListResponse'
+        '400':
+          description: Invalid invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
   /channel/{channelId}/messages:
     get:
       security:
@@ -549,67 +612,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvitationResponse'
-        '400':
-          description: Invalid invitation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Invitation not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /invitation/user/{id}:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Invitation
-      summary: Get invitations of a user
-      description: Returns a list of invitations
-      parameters:
-        - name: id
-          in: path
-          description: User identifier
-          required: true
-          schema:
-            type: integer
-            example: 1
-        - name: limit
-          in: query
-          description: number of messages to return
-          required: false
-          schema:
-            type: integer
-            example: 20
-        - name: skip
-          in: query
-          description: number of messages to skip
-          required: false
-          schema:
-            type: integer
-            example: 0
-      responses:
-        '200':
-          description: Invitations found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvitationListResponse'
         '400':
           description: Invalid invitation
           content:
