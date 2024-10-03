@@ -1,9 +1,9 @@
 interface InvitationRepository {
 
-    fun createInvitation(sender: User, receiver: User, channel: Channel): Invitation
+    fun createInvitation(sender: Int, receiver: Int, channel: Int): Invitation
 
     fun getInvitationDetails(invitationId: Int): Invitation
 
-    fun acceptInvitation(invitationId: Int)
+    fun acceptInvitation(invitationId: Int) : Invitation
 
 }

@@ -51,6 +51,12 @@ class UserServices(private val userRepository : UserRepository) {
         return user.unreadMessages.groupBy { it.channel }
     }
 
+    fun getInvitations(userId: Int): List<Invitation> {
+        val user = userRepository.findUserById(userId)
+            ?: throw NotFoundException("User not found")
+        return user.invitations
+    }
+
     @OptIn(ExperimentalStdlibApi::class)
     private fun String.hashedWithSha256() =
         MessageDigest.getInstance("SHA-256")
