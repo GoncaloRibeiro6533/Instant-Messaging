@@ -32,7 +32,7 @@ class MockUserRepository : UserRepository {
             .take(limit)
 
     override fun createUser(username: String, password: String): User {
-        users.add(User(currentId++, username.trim(), "token"))
+        users.add(User(currentId++, username.trim(), "token$username"))
         return users.last()
     }
     override fun updateUsername(token: String, newUsername: String): User {

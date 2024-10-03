@@ -6,7 +6,7 @@ import Invitation
 import Message
 import User
 import Visibility
-import mocks.UserRepositoryMock.Companion.users
+import mocks.MockUserRepository.Companion.users
 import java.time.LocalDateTime
 
 class MockChannelRepo : ChannelRepository {
