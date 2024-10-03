@@ -101,7 +101,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserDtoIn'
+              $ref: '#/components/schemas/UserEditUsernameIn'
       responses:
         '201':
           description: Username changed successfully
@@ -506,7 +506,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationDto'
+                $ref: '#/components/schemas/InvitationOut'
         '400':
           description: Invalid invitation data
           content:
@@ -548,7 +548,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationDto'
+                $ref: '#/components/schemas/InvitationOut'
         '400':
           description: Invalid invitation
           content:
@@ -609,7 +609,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationsDto'
+                $ref: '#/components/schemas/InvitationsOut'
         '400':
           description: Invalid invitation
           content:
@@ -635,24 +635,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppError'
 
-  /invitation/{id}/accept/{userId}:
+  /invitation/{id}/accept:
     put:
       security:
         - bearerAuth: [ ]
       tags:
         - Invitation
-      summary: Mark invitation as used
+      summary: Mark invitation as used TODO verify, how we are gonna accept and user to channel
       parameters:
         - name: id
           in: path
           description: Invitation identifier
-          required: true
-          schema:
-            type: integer
-            example: 1
-        - name: userId
-          in: path
-          description: User identifier
           required: true
           schema:
             type: integer
@@ -663,7 +656,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationDto'
+                $ref: '#/components/schemas/InvitationOut'
         '400':
           description: Invalid invitation
           content:
@@ -715,43 +708,6 @@ components:
           description: Error description message
           example: An error occurred
 
-    InvitationDto:
-      type: object
-      description: Message details
-      required:
-        - id
-        - sender
-        - receiver
-        - channel
-        - timestamp
-      properties:
-        id:
-          type: integer
-          description: Message id
-          example: 101
-        sender:
-          $ref: '#/components/schemas/UserOutputModel'
-        receiver:
-          $ref: '#/components/schemas/UserOutputModel'
-        channel:
-          $ref: '#/components/schemas/ChannelOut'
-        timestamp:
-          type: string
-          format: date-time
-          description: Time the invitation was sent
-          example: "2024-10-01T12:00:00Z"
-
-    InvitationsDto:
-      type: object
-      properties:
-        nInvitations:
-          type: integer
-          description: number of results
-          example: 20
-        invitations:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvitationDto'
 
     UserIn:
       type: object
@@ -769,6 +725,22 @@ components:
           description : user password
           example: password
 
+    UserEditUsernameIn:
+      type: object
+      description: User data used on register and login
+      required:
+        - username
+        - newUsername
+      properties:
+        name:
+          type: string
+          description: username
+          example: Bob
+        newUsername:
+          type: string
+          description : user new username
+          example: Bob456
+
     UserDto:
       type: object
       description: User details, to retreive after login or register succeds
@@ -778,6 +750,7 @@ components:
         - username
         - channels
         - invitations
+        - unreadMessages
       properties:
         token:
           type: string
@@ -798,7 +771,11 @@ components:
         invitations:
           type: array
           items:
-            $ref: '#/components/schemas/InvitationsDto'
+            $ref: '#/components/schemas/InvitationsOut'
+        unreadMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnreadMessages'
 
     UserOutputModel:
       type: object
@@ -1029,4 +1006,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvitationOut'
+
+    UnreadMessagePerChannel:
+      type: object
+      description: Invitation details
+      required:
+        - channel
+        - messages
+      properties:
+        channel:
+          $ref: '#/components/schemas/ChannelOut'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageDtoOut'
+
+    UnreadMessages:
+      type: object
+      properties:
+        nMessages:
+          type: integer
+          description: number of results
+          example: 20
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnreadMessagePerChannel'
+
 

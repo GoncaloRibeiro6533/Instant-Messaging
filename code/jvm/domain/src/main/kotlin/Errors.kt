@@ -4,11 +4,13 @@
  */
 
 sealed class Errors(override val message: String) : Exception(message) {
-    class NotAuthorizedException(message: String) : Errors(message)
+    class UnauthorizedException(message: String) : Errors(message)
 
     class NotFoundException(message: String) : Errors(message)
 
     class BadRequestException(message: String) : Errors(message)
+
+    class ForbiddenException(message: String) : Errors(message)
 
     class InternalServerErrorException(message: String) : Errors(message)
 }
