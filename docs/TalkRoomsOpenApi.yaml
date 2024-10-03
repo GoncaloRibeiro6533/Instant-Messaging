@@ -6,7 +6,7 @@ info:
   version: 1.0.0
 
 tags:
-  - name: Users
+  - name: User
   - name: Channel
   - name: Messages
   - name: Invitation
@@ -16,7 +16,7 @@ paths:
   /user/register:
     post:
       tags:
-        - Users
+        - User
       summary: Register a new user
       requestBody:
         description: Register a new user given a username and password
@@ -24,31 +24,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserIn'
+              $ref: '#/components/schemas/UserRequest'
       responses:
         '201':
           description: User registered successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/UserResponse'
         '400':
           description: A user with such username already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/login:
     post:
       tags:
-        - Users
+        - User
       summary: Retrieve a id, a token and a username given a username and a password, a login operation
       requestBody:
         description: Username and password of user
@@ -56,42 +56,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserIn'
+              $ref: '#/components/schemas/UserRequest'
       responses:
         '200':
           description: User details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/UserResponse'
         '400':
           description: Username missing or invalid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: A user with such username does not exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
   /user/edit/username:
     put:
       tags:
-        - Users
+        - User
       security:
         - bearerAuth: [ ]
       summary: Change username
@@ -101,33 +101,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserEditUsernameIn'
+              $ref: '#/components/schemas/UsernameUpdateRequest'
       responses:
         '201':
           description: Username changed successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserOutputModel'
+                $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         '400':
           description: A user with such username already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/{id}:
     get:
       security:
         - bearerAuth: []
       tags:
-        - Users
+        - User
       summary: Get details of a user
       description: Returns a single user
       parameters:
@@ -144,38 +144,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserOutputModel'
+                $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         '400':
           description: Username missing or invalid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/search/{username}:
     get:
       security:
         - bearerAuth: [ ]
       tags:
-        - Users
+        - User
       summary: Search user by username
       description: Returns a list of players by name
       parameters:
@@ -192,31 +192,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UsersOut'
+                $ref: '#/components/schemas/UsersListResponse'
         '400':
           description: Invalid username
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /channel/{channelId}/messages:
     get:
@@ -255,31 +255,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessagesDtoOut'
+                $ref: '#/components/schemas/MessageListResponse'
         '400':
           description: Invalid channel
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Channel not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /channel/{channelId}:
     get:
@@ -317,31 +317,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelDto'
+                $ref: '#/components/schemas/ChannelResponse'
         '400':
           description: Invalid channel
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Channel not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /channel/user/{userId}:
     get:
@@ -365,31 +365,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelsOut'
+                $ref: '#/components/schemas/ChannelListResponse'
         '400':
           description: Invalid user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /channel:
     post:
@@ -422,25 +422,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelDto'
+                $ref: '#/components/schemas/ChannelResponse'
         '400':
           description: Invalid channel data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 
@@ -458,32 +458,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageIn'
+              $ref: '#/components/schemas/MessageRequest'
       responses:
         '201':
           description: Message created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDtoOut'
+                $ref: '#/components/schemas/MessageResponse'
         '400':
           description: Invalid message data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /invitation:
     post:
@@ -499,32 +499,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InvitationIn'
+              $ref: '#/components/schemas/InvitationRequest'
       responses:
         '201':
           description: Invitation created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationOut'
+                $ref: '#/components/schemas/InvitationResponse'
         '400':
           description: Invalid invitation data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /invitation/{id}:
     get:
@@ -548,31 +548,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationOut'
+                $ref: '#/components/schemas/InvitationResponse'
         '400':
           description: Invalid invitation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Invitation not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
   /invitation/user/{id}:
     get:
       security:
@@ -609,31 +609,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationsOut'
+                $ref: '#/components/schemas/InvitationListResponse'
         '400':
           description: Invalid invitation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Invitation not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /invitation/{id}/accept:
     put:
@@ -656,31 +656,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationOut'
+                $ref: '#/components/schemas/InvitationResponse'
         '400':
           description: Invalid invitation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Invitation not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 components:
@@ -691,7 +691,7 @@ components:
       bearerFormat: JWT
 
   schemas:
-    AppError:
+    ErrorResponse:
       type: object
       description: Application error
       required:
@@ -709,7 +709,7 @@ components:
           example: An error occurred
 
 
-    UserIn:
+    UserRequest:
       type: object
       description: User data used on register and login
       required:
@@ -725,7 +725,7 @@ components:
           description : user password
           example: password
 
-    UserEditUsernameIn:
+    UsernameUpdateRequest:
       type: object
       description: User data used on register and login
       required:
@@ -741,7 +741,7 @@ components:
           description : user new username
           example: Bob456
 
-    UserDto:
+    UserResponse:
       type: object
       description: User details, to retreive after login or register succeds
       required:
@@ -767,17 +767,17 @@ components:
         channels:
           type: array
           items:
-            $ref: '#/components/schemas/ChannelsOut'
+            $ref: '#/components/schemas/ChannelListResponse'
         invitations:
           type: array
           items:
-            $ref: '#/components/schemas/InvitationsOut'
+            $ref: '#/components/schemas/InvitationListResponse'
         unreadMessages:
           type: array
           items:
-            $ref: '#/components/schemas/UnreadMessages'
+            $ref: '#/components/schemas/UnreadMessagesResponse'
 
-    UserOutputModel:
+    UserResponsePublicIdentifiers:
       type: object
       description: User details
       required:
@@ -793,17 +793,15 @@ components:
           description: username
           example: Bob123
 
-    UsersOut:
+    UsersListResponse:
       type: object
       properties:
         users:
           type: array
           items:
-            $ref: '#/components/schemas/UserOutputModel'
+            $ref: '#/components/schemas/UserResponsePublicIdentifiers'
 
-
-
-    MessageDtoOut:
+    MessageResponse:
       type: object
       description: Message details
       required:
@@ -817,7 +815,7 @@ components:
           description: Message id
           example: 101
         sender:
-          $ref: '#/components/schemas/UserOutputModel'
+          $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         content:
           type: string
           description: Message content
@@ -828,7 +826,7 @@ components:
           description: Time the message was sent
           example: "2024-10-01T12:00:00Z"
 
-    MessageIn:
+    MessageRequest:
       type: object
       description: Message details
       required:
@@ -842,20 +840,20 @@ components:
           description: Message id
           example: 101
         sender:
-          $ref: '#/components/schemas/UserOutputModel'
+          $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         channel:
-          $ref: '#/components/schemas/ChannelOut'
+          $ref: '#/components/schemas/ChannelDetails'
         content:
           type: string
           description: Message content
           example: "Hello, world!"
 
 
-    MessagesDtoOut:
+    MessageListResponse:
       type: object
       properties:
         channel:
-          $ref: '#/components/schemas/ChannelOut'
+          $ref: '#/components/schemas/ChannelDetails'
         nMessages:
           type: integer
           description: number of results
@@ -863,10 +861,10 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/MessageDtoOut'
+            $ref: '#/components/schemas/MessageResponse'
 
 
-    ChannelDto:
+    ChannelResponse:
       description: Channel representation
       required:
         - id
@@ -885,14 +883,14 @@ components:
           description: channel name
           example: DevPT
         creator:
-          $ref: '#/components/schemas/UserOutputModel'
+          $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         visibility:
           type: string
           description: channel visibility
           enum: [PUBLIC, PRIVATE]
           example: PUBLIC
         messages:
-          $ref: '#/components/schemas/MessagesDtoOut'
+          $ref: '#/components/schemas/MessageListResponse'
         users:
           type: array
           description: List of users and their roles in the channel
@@ -900,14 +898,14 @@ components:
             type: object
             properties:
               user:
-                $ref: '#/components/schemas/UserOutputModel'
+                $ref: '#/components/schemas/UserResponsePublicIdentifiers'
               role:
                 type: string
                 description: Role of the user in the channel
                 enum: [ADMIN, READ_ONLY, READ_WRITE]
                 example: ADMIN
 
-    ChannelOut:
+    ChannelDetails:
       type: object
       description: Channel details
       required:
@@ -925,7 +923,7 @@ components:
           example: DevPT
 
 
-    ChannelsOut:
+    ChannelListResponse:
       type: object
       properties:
         nChannels:
@@ -935,9 +933,9 @@ components:
         channels:
           type: array
           items:
-            $ref: '#/components/schemas/ChannelOut'
+            $ref: '#/components/schemas/ChannelDetails'
 
-    UserDtoIn:
+    UserInput:
       type: object
       description: User details
       required:
@@ -953,25 +951,28 @@ components:
           description: Username
           example: Bob123
 
-    InvitationIn:
+    InvitationRequest:
       type: object
       description: Invitation details
       required:
         - sender
         - channel
+        - receiver
         - role
       properties:
         sender:
-          $ref: '#/components/schemas/UserOutputModel'
+          $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         channel:
-          $ref: '#/components/schemas/ChannelOut'
+          $ref: '#/components/schemas/ChannelDetails'
+        receiver:
+          $ref: '#/components/schemas/UserInput'
         role:
           type: string
           description: Role of the user in the channel
           enum: [ADMIN, READ_ONLY, READ_WRITE]
           example: READ_ONLY
 
-    InvitationOut:
+    InvitationResponse:
       type: object
       description: Invitation details
       required:
@@ -981,9 +982,9 @@ components:
         - timestamp
       properties:
         sender:
-          $ref: '#/components/schemas/UserOutputModel'
+          $ref: '#/components/schemas/UserResponsePublicIdentifiers'
         channel:
-          $ref: '#/components/schemas/ChannelOut'
+          $ref: '#/components/schemas/ChannelDetails'
         role:
           type: string
           description: Role of the user in the channel
@@ -995,7 +996,7 @@ components:
           description: Time the message was sent
           example: "2024-10-01T12:00:00Z"
 
-    InvitationsOut:
+    InvitationListResponse:
       type: object
       properties:
         nInvitations:
@@ -1005,9 +1006,9 @@ components:
         channels:
           type: array
           items:
-            $ref: '#/components/schemas/InvitationOut'
+            $ref: '#/components/schemas/InvitationResponse'
 
-    UnreadMessagePerChannel:
+    UnreadMessageByChannel:
       type: object
       description: Invitation details
       required:
@@ -1015,13 +1016,13 @@ components:
         - messages
       properties:
         channel:
-          $ref: '#/components/schemas/ChannelOut'
+          $ref: '#/components/schemas/ChannelDetails'
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/MessageDtoOut'
+            $ref: '#/components/schemas/MessageResponse'
 
-    UnreadMessages:
+    UnreadMessagesResponse:
       type: object
       properties:
         nMessages:
@@ -1031,6 +1032,6 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/UnreadMessagePerChannel'
+            $ref: '#/components/schemas/UnreadMessageByChannel'
 
 
