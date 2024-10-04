@@ -4,7 +4,7 @@ class MessageService(private val messageRepository : MessageRepository) {
         return messageRepository.findMessageById(id)
     }
 
-    fun sendMessage(channelId: Int, userId: Int, text: String): Message {
+    fun sendMessage(channel: Channel, user: User, text: String): Message {
         return messageRepository.sendMessage(channelId, userId, text)
     }
 }

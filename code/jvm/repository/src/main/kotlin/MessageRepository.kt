@@ -2,6 +2,6 @@ interface MessageRepository {
 
     fun findMessageById(id: Int): Message?
 
-    fun sendMessage(channelId: Int, userId: Int, text: String): Message
+    fun sendMessage(senderId: Int, channelId: Int, text: String): Message
 
 }

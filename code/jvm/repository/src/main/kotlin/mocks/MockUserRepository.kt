@@ -4,6 +4,8 @@ import Channel
 import Invitation
 import User
 import UserRepository
+import Visibility
+import java.time.LocalDateTime
 
 
 class MockUserRepository : UserRepository {
@@ -11,6 +13,7 @@ class MockUserRepository : UserRepository {
     companion object {
         val users = mutableListOf<User>(
             User(0, "user0", "tokenuser0", emptyList<Channel>(), emptyList<Invitation>()),
+            User(1, "user1", "tokenuser1", emptyList<Channel>(), emptyList<Invitation>()),
         )
 
         val passwordsHashed = mutableMapOf<Int, String>(
@@ -20,7 +23,12 @@ class MockUserRepository : UserRepository {
             0 to "password1"
         )
 
-        var currentId = 0
+        var currentId = 2
+
+        val invitations = mutableListOf<Invitation>(
+            Invitation(0, users[0], users[1], Channel(0, "channel0", users[0], Visibility.PUBLIC, emptyList(), emptyMap()), false, LocalDateTime.now())
+        )
+
     }
 
     override fun findUserById(id: Int) = users.firstOrNull { it.id == id }
@@ -32,14 +40,16 @@ class MockUserRepository : UserRepository {
             .take(limit)
 
     override fun createUser(username: String, password: String): User {
-        users.add(User(currentId++, username.trim(), "token$username"))
-        return users.last()
+        val newUser = User(currentId++, username.trim(), "token$username")
+        users.add(newUser)
+        return newUser
     }
+
     override fun updateUsername(token: String, newUsername: String): User {
         val user = users.first { it.token == token }
         users.remove(user)
         val userEdited = user.copy(username = newUsername)
-        users.add(user)
+        users.add(userEdited)
         return userEdited
     }
 
@@ -52,5 +62,10 @@ class MockUserRepository : UserRepository {
 
     override fun markMessageAsRead(userId: Int, messageId: Int): User {
         TODO("Not yet implemented")
+    }
+
+    override fun getInvitations(userId: Int): List<Invitation> {
+        val user = users.first { it.id == userId }
+        return user.invitations
     }
 }

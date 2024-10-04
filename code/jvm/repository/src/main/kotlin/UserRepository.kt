@@ -8,6 +8,7 @@ interface UserRepository {
     fun updateUsername(token: String, newUsername: String) : User
     fun validateLogin(username: String, password: String): User?
     fun markMessageAsRead(userId: Int, messageId: Int): User
+    fun getInvitations(userId: Int): List<Invitation>
 
 
 }
