@@ -1,25 +1,19 @@
-import Errors.*
 import mocks.MockUserRepository
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.BeforeEach
+import kotlin.test.assertIs
 
 class UserServiceTests {
 
-    private val mock = MockUserRepository()
-    private val userServices = UserServices(mock)
-    @Test
-    fun `should return user by id`() {
-        val user = MockUserRepository.users[0]
-        val result = userServices.getUserById(user.id, user.token)
-        assertEquals(user, result)
-    }
+    private lateinit var mock: MockUserRepository
+    private lateinit var userServices : UserService
 
-    @Test
-    fun `should return user by username`() {
-        val user = MockUserRepository.users[0]
-        val result = userServices.findUserByUsername(user.username, user.token)
-        assertEquals(listOf(user), result)
+    @BeforeEach
+    fun setUp() {
+        mock = MockUserRepository()
+        mock.clear()
+        userServices = UserService(mock)
     }
 
     @Test
@@ -27,162 +21,177 @@ class UserServiceTests {
         val username = "user2"
         val password = "password2"
         val result = userServices.createUser(username, password)
-        assertEquals(username, result.username)
+        assertIs<Success<User>>(result)
+        assertEquals(username, result.value.username)
     }
     @Test
     fun `login user`() {
-        val user = MockUserRepository.users[0]
-        val password = MockUserRepository.passwords[user.id]
-        checkNotNull(password)
-        val result = userServices.loginUser(user.username, password)
-        assertEquals(user, result)
+        val username = "Bob"
+        val password = "password"
+        val user = userServices.createUser(username, password)
+        assertIs<Success<User>>(user)
+        val result = userServices.loginUser(username, password)
+        assertIs<Success<User>>(result)
+        assertEquals(user.value, result.value)
     }
+
+
+    @Test
+    fun `should return user by id`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.getUserById(user.value.id, user.value.token)
+        assertIs<Success<User>>(result)
+        assertEquals(user.value, result.value)
+    }
+
+    @Test
+    fun `should return Unauthorized if token is not valid`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.getUserById(user.value.id, "invalidToken")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
+    }
+    @Test
+    fun `should return user by username`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.findUserByUsername("Bob", user.value.token)
+        assertIs<Success<User>>(result)
+        assertEquals(listOf(user.value), result.value)
+    }
+
 
     @Test
     fun `update username`() {
-        val user = MockUserRepository.users[0]
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
         val newUsername = "newUsername"
-        val result = userServices.updateUsername(user.token, newUsername)
-        assertEquals(newUsername, result.username)
+        val result = userServices.updateUsername(user.value.token, newUsername)
+        assertIs<Success<User>>(result)
+        assertEquals(newUsername, result.value.username)
     }
 
     @Test
-    fun testIsValidToken() {
-        val user = MockUserRepository.users[0]
-        val result = userServices.isValidToken(user.token)
-        assertEquals(user, result)
+    fun `getUserById should get Failure with NegativeIdentifier when id is less than 0`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.getUserById(-1, user.value.token)
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.NegativeIdentifier, result.value)
     }
 
     @Test
-    fun `getUserById should throw BadRequestException when id is less than 0`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<BadRequestException> {
-            userServices.getUserById(-1, user.token)
-        }
+    fun `getUserById should return UserNotFound when user is not found`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.getUserById(100, user.value.token)
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
     }
 
     @Test
-    fun `getUserById should throw NotFoundException when user is not found`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<NotFoundException> {
-            userServices.getUserById(3123, user.token)
-        }
+    fun `findUserByUsername should return Unauthorized when user is not autenticated`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.findUserByUsername(user.value.username, "invalidToken")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
     }
 
     @Test
-    fun `findUserByUsername should throw Unauthorized when user is not authenticated`() {
-        MockUserRepository.users[0]
-        assertFailsWith<UnauthorizedException> {
-            userServices.findUserByUsername("user1", "invalidToken")
-        }
+    fun `createUser should return InvalidUsername when username is blank`() {
+        val result = userServices.createUser("", "password")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidUsername, result.value)
     }
 
     @Test
-    fun `createUser should throw BadRequestException when username is blank`() {
-        assertFailsWith<BadRequestException> {
-            userServices.createUser("", "password")
-        }
+    fun `createUser should return InvalidPassword when password is blank`() {
+        val result = userServices.createUser("username", "")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidPassword, result.value)
     }
 
     @Test
-    fun `createUser should throw BadRequestException when password is blank`() {
-        assertFailsWith<BadRequestException> {
-            userServices.createUser("user", "")
-        }
+    fun `createUser should return UsernameToLong when username is greater than 50 characters`() {
+        val result = userServices.createUser("a".repeat(User.MAX_USERNAME_LENGTH + 1), "password")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UsernameToLong, result.value)
     }
 
     @Test
-    fun `createUser should throw BadRequestException when username is greater than 50 characters`() {
-        assertFailsWith<BadRequestException> {
-            userServices.createUser("a".repeat(User.MAX_USERNAME_LENGTH + 1), "password")
-        }
+    fun `createUser should return UsernameAlreadyExists when username already exists`() {
+        val user = userServices.createUser("Bob", "password")
+        val result = userServices.createUser("Bob", "password")
+        assertIs<Failure<UserError>>(result)
     }
 
     @Test
-    fun `createUser should throw BadRequestException when username already exists`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<BadRequestException> {
-            userServices.createUser(user.username, "password")
-        }
+    fun `loginUser should  return  when username is blank`() {
+        val result = userServices.loginUser("", "password")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidUsername, result.value)
     }
 
     @Test
-    fun `loginUser should throw BadRequestException when username is blank`() {
-        assertFailsWith<BadRequestException> {
-            userServices.loginUser("", "password")
-        }
+    fun `loginUser should return InvalidPassword when password is blank`() {
+        val result = userServices.loginUser("username", "")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidPassword, result.value)
     }
 
     @Test
-    fun `loginUser should throw BadRequestException when password is blank`() {
-        assertFailsWith<BadRequestException> {
-            userServices.loginUser("user", "")
-        }
+    fun `loginUser should return NoMatchingUsername when username is invalid`() {
+        val result = userServices.loginUser("invalidUsername", "password")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.NoMatchingUsername, result.value)
     }
 
     @Test
-    fun `loginUser should throw UnauthorizedException when username is invalid`() {
-        assertFailsWith<UnauthorizedException> {
-            userServices.loginUser("invalidUser", "password")
-        }
+    fun `loginUser should return NoMatchingPassword when password is invalid`() {
+        val user = userServices.createUser("Bob", "password")
+        val result = userServices.loginUser("Bob", "invalidPassword")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.NoMatchingPassword, result.value)
     }
 
     @Test
-    fun `loginUser should throw UnauthorizedException when password is invalid`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<UnauthorizedException> {
-            userServices.loginUser(user.username, "invalidPassword")
-        }
+    fun `updateUsername should return InvalidUsername when new username is blank`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.updateUsername(user.value.token, "")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidUsername, result.value)
     }
 
     @Test
-    fun `updateUsername should throw BadRequestException when new username is blank`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<BadRequestException> {
-            userServices.updateUsername(user.token, "")
-        }
+    fun `updateUsername should return UsernameToLong when new username is greater than 50 characters`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices
+            .updateUsername(user.value.token, "a".repeat(User.MAX_USERNAME_LENGTH + 1))
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UsernameToLong, result.value)
     }
 
     @Test
-    fun `updateUsername should throw BadRequestException when new username is greater than 50 characters`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<BadRequestException> {
-            userServices.updateUsername(user.token, "a".repeat(User.MAX_USERNAME_LENGTH + 1))
-        }
+    fun `updateUsername should return UsernameAlreadyExists when new username already exists`() {
+        val user = userServices.createUser("Bob", "password")
+        userServices.createUser("Bob2", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.updateUsername(user.value.token, "Bob2")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UsernameAlreadyExists, result.value)
     }
 
     @Test
-    fun `updateUsername should throw BadRequestException when new username already exists`() {
-        val user = MockUserRepository.users[0]
-        assertFailsWith<BadRequestException> {
-            userServices.updateUsername(user.token, user.username)
-        }
+    fun `updateUsername should return Unauthorized when user is not autenticated`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.updateUsername("invalidToken", "newUsername")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
     }
-/*
-    @Test
-    fun `getUnreadMessages should throw NotFoundException when user is not found`() {
-        assertFailsWith<NotFoundException> {
-            userServices.getUnreadMessages(1)
-        }
-    }
-
-    @Test
-    fun `getUnreadMessages should return empty map when user has no unread messages`() {
-        val user = MockUserRepository.users[0]
-        val result = userServices.getUnreadMessages(user.id)
-        assertEquals(emptyMap<Channel,List<Message>>(), result)
-    }
-*/
-    /*
-    @Test
-    fun `getUnreadMessages should return map with unread messages grouped by channel`() {
-        val user = MockUserRepository.users[0]
-        val channel = Channel(0, "channel", user, Visibility.PUBLIC, emptyList(), mapOf( user to Role.READ_WRITE))
-        val timestamp = ZonedDateTime.of(2024, 10, 3, 15, 0, 0, 0, ZoneId.of("Europe/Lisbon"))
-        val message = Message(0, user, channel, "message", timestamp.toLocalDateTime())
-        val userWithMessages = user.copy(unreadMessages = listOf(message))
-        MockUserRepository.users[0] = userWithMessages
-        val result = userServices.getUnreadMessages(user.id)
-        assertEquals(mapOf(channel to listOf(message)), result)
-    }*/
 }

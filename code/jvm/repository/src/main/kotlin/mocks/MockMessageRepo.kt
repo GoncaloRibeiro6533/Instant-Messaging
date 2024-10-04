@@ -9,9 +9,9 @@ import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
     companion object {
-        val ana = User(1, "Ana", "token1", emptyList(), emptyList())
-        val joana = User(2, "Joana", "token2", emptyList(), emptyList())
-        val joao = User(3, "João", "token3", emptyList(), emptyList())
+        val ana = User(1, "Ana", "token1")
+        val joana = User(2, "Joana", "token2")
+        val joao = User(3, "João", "token3")
 
         val channel1 = Channel(1, "Aulas de DAW", ana.id, Visibility.PUBLIC, emptyList(), emptyMap())
 
