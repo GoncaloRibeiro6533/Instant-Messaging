@@ -48,5 +48,83 @@ class ChannelServicesTests {
         assertEquals(MockChannelRepository.channels, result)
     }
 
+    @Test
+    fun `Test getChannelById with negative ID`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.getChannelById(-1)
+        }
+        assertEquals("Id must be greater than 0", exception.message)
+    }
+
+    @Test
+    fun `Test getChannelByName with blank name`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.getChannelByName("")
+        }
+        assertEquals("Channel name must not be blank", exception.message)
+    }
+
+    @Test
+    fun `Test createChannel with blank name`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.createChannel("", 1, Visibility.PUBLIC)
+        }
+        assertEquals("Channel name must not be blank", exception.message)
+    }
+
+
+    @Test
+    fun `Test getMsgHistory with negative channel ID`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.getMsgHistory(-1)
+        }
+        assertEquals("Channel id must be greater than 0", exception.message)
+    }
+
+    @Test
+    fun `Test getChannelsOfUser with negative user ID`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.getChannelsOfUser(-1)
+        }
+        assertEquals("User id must be greater than 0", exception.message)
+    }
+
+    @Test
+    fun `Test getChannelById with non-existent ID`() {
+        val exception = assertFailsWith<Errors.NotFoundException> {
+            channelServices.getChannelById(999)
+        }
+        assertEquals("Channel not found", exception.message)
+    }
+
+    @Test
+    fun `Test getChannelByName with non-existent name`() {
+        val exception = assertFailsWith<Errors.NotFoundException> {
+            channelServices.getChannelByName("nonExistentChannel")
+        }
+        assertEquals("Channel not found", exception.message)
+    }
+
+    @Test
+    fun `Test createChannel with existing name`() {
+        val existingChannelName = MockChannelRepository.channels[0].name
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.createChannel(existingChannelName, 1, Visibility.PUBLIC)
+        }
+        assertEquals("Channel already exists", exception.message)
+    }
+
+    /*
+    @Test
+    fun `Test createChannel with invalid visibility`() {
+        val exception = assertFailsWith<Errors.BadRequestException> {
+            channelServices.createChannel("channel", 1, Visibility.valueOf("ABC"))
+        }
+        assertEquals("Invalid visibility", exception.message)
+    }
+
+     */
+
+
 
 }

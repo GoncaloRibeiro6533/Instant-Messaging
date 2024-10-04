@@ -2,9 +2,9 @@ import java.time.LocalDateTime
 
 data class Invitation(
     val id: Int,
-    val sender: User,
-    val receiver: User,
-    val channel: Channel,
+    val senderId: Int,
+    val receiverId: Int,
+    val channelId: Int,
     val isUsed: Boolean,
     val timestamp: LocalDateTime
 

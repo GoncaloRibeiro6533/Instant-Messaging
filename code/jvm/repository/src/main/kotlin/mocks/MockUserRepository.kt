@@ -23,10 +23,12 @@ class MockUserRepository : UserRepository {
             0 to "password1"
         )
 
+        val channel = Channel(0, "channel0", users[0].id, Visibility.PUBLIC, emptyList(), emptyMap())
+
         var currentId = 2
 
         val invitations = mutableListOf<Invitation>(
-            Invitation(0, users[0], users[1], Channel(0, "channel0", users[0], Visibility.PUBLIC, emptyList(), emptyMap()), false, LocalDateTime.now())
+            Invitation(0, users[0].id, users[1].id, channel.id, false, LocalDateTime.now())
         )
 
     }

@@ -12,7 +12,7 @@ class ChannelServices(private val channelRepository : ChannelRepository) {
 
     fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Channel {
         if (name.isBlank()) throw Errors.BadRequestException("Channel name must not be blank")
-        if(visibility != Visibility.PUBLIC && visibility != Visibility.PRIVATE)
+        if (!Visibility.entries.toTypedArray().contains(visibility))
             throw Errors.BadRequestException("Invalid visibility")
         if (channelRepository.getChannelByName(name) != null)
             throw Errors.BadRequestException("Channel already exists")

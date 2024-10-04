@@ -44,12 +44,14 @@ class UserServices(private val userRepository : UserRepository) {
             throw BadRequestException("Username already exists")
         return userRepository.updateUsername(token, newUsername)
     }
-
+/* //todo maybe return only List<Message> instead of Map<Channel, List<Message>>?
     fun getUnreadMessages(userId: Int): Map<Channel, List<Message>> {
         val user = userRepository.findUserById(userId)
             ?: throw NotFoundException("User not found")
-        return user.unreadMessages.groupBy { it.channel }
+        return user.unreadMessages.groupBy { it.channelId }
     }
+
+ */
 
     fun getInvitations(userId: Int): List<Invitation> {
         val user = userRepository.findUserById(userId)

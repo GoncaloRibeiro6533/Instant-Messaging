@@ -65,7 +65,7 @@ class UserServiceTests {
     fun `getUserById should throw NotFoundException when user is not found`() {
         val user = MockUserRepository.users[0]
         assertFailsWith<NotFoundException> {
-            userServices.getUserById(1, user.token)
+            userServices.getUserById(3123, user.token)
         }
     }
 
@@ -158,7 +158,7 @@ class UserServiceTests {
             userServices.updateUsername(user.token, user.username)
         }
     }
-
+/*
     @Test
     fun `getUnreadMessages should throw NotFoundException when user is not found`() {
         assertFailsWith<NotFoundException> {
@@ -172,7 +172,7 @@ class UserServiceTests {
         val result = userServices.getUnreadMessages(user.id)
         assertEquals(emptyMap<Channel,List<Message>>(), result)
     }
-
+*/
     /*
     @Test
     fun `getUnreadMessages should return map with unread messages grouped by channel`() {
