@@ -1,15 +1,16 @@
-class InvitationService(private val invitationService: InvitationService){
+
+class InvitationService(private val invitationRepository: InvitationRepository){
 
     fun createInvitation(sender: User, receiver: User, channel: Channel): Invitation {
-        return invitationService.createInvitation(sender, receiver, channel)
+        return invitationRepository.createInvitation(sender, receiver, channel)
     }
 
     fun getInvitationDetails(id: Int) : Invitation {
-        return invitationService.getInvitationDetails(id)
+        return invitationRepository.getInvitationDetails(id)
     }
 
     fun acceptInvitation(id: Int) {
-        invitationService.acceptInvitation(id)
+        invitationRepository.acceptInvitation(id)
     }
 
 }

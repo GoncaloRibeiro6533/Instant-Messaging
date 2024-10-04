@@ -1,11 +1,7 @@
-import mocks.MockUserRepository
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import Errors.*
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.*
+import mocks.MockUserRepository
+import kotlin.test.assertEquals
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
 class UserServiceTests {
@@ -74,8 +70,8 @@ class UserServiceTests {
     }
 
     @Test
-    fun `findUserByUsername should throw Unauthorized when user is not autenticated`() {
-        val user = MockUserRepository.users[0]
+    fun `findUserByUsername should throw Unauthorized when user is not authenticated`() {
+        MockUserRepository.users[0]
         assertFailsWith<UnauthorizedException> {
             userServices.findUserByUsername("user1", "invalidToken")
         }

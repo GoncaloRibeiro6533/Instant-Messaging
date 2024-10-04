@@ -1,11 +1,11 @@
 
 interface ChannelRepository {
 
-   fun getChannelById(id: Int): Channel
+   fun getChannelById(id: Int): Channel?
 
-   fun createChannel(name: String, visibility: Visibility): Channel
+   fun getChannelByName(name: String): Channel?
 
-   fun createInvitation(channelId: Int, userId: Int): Invitation
+   fun createChannel(name: String, creatorId: Int, visibility: Visibility): Channel
 
    fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message>
 

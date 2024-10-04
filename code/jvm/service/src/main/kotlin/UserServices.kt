@@ -12,7 +12,7 @@ class UserServices(private val userRepository : UserRepository) {
     fun loginUser(username: String, password: String): User {
         if (username.isBlank()) throw BadRequestException("Username must not be blank")
         if (password.isBlank()) throw BadRequestException("Password must not be blank")
-        val user = userRepository.findUserByUsername(username, 10, 0)
+        userRepository.findUserByUsername(username, 10, 0)
         return userRepository.validateLogin(username, password.hashedWithSha256())
             ?: throw UnauthorizedException("Invalid username or password")
     }
@@ -36,7 +36,7 @@ class UserServices(private val userRepository : UserRepository) {
     }
 
     fun updateUsername(token: String, newUsername: String) : User {
-        val user = isValidToken(token)
+        isValidToken(token)
         if (newUsername.isBlank()) throw BadRequestException("Username must not be blank")
         if (newUsername.length > User.MAX_USERNAME_LENGTH)
             throw BadRequestException("Username must be less than ${User.MAX_USERNAME_LENGTH} characters")
@@ -59,5 +59,7 @@ class UserServices(private val userRepository : UserRepository) {
 
     fun isValidToken(token: String) =
         userRepository.findUserByToken(token)
-            ?: throw UnauthorizedException("Not autenticated")
+            ?: throw UnauthorizedException("Not authenticated")
+
+
 }

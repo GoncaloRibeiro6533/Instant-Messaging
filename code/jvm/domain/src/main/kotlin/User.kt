@@ -12,10 +12,10 @@ data class User(
     }
 
     init {
-        require(id >= 0) { "id must be greater than 0" }
-        require(username.isNotBlank()) { "username must not be blank" }
+        require(id >= 0) { "Id must be greater than 0" }
+        require(username.isNotBlank()) { "Username must not be blank" }
         require(username.length <= MAX_USERNAME_LENGTH) {
-            "username must be less than $MAX_USERNAME_LENGTH characters" }
-        require(token.isNotBlank()) { "token must not be blank" }
+            "Username must be less than $MAX_USERNAME_LENGTH characters" }
+        require(token.isNotBlank()) { "Token must not be blank" }
     }
 }
