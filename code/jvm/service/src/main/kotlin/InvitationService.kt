@@ -13,5 +13,13 @@ class InvitationService(private val invitationRepository: InvitationRepository){
         invitationRepository.acceptInvitation(id)
     }
 
+    fun declineInvitation(id: Int) {
+        invitationRepository.declineInvitation(id)
+    }
+
+    fun getInvitationsOfUser(userId: Int): List<Invitation> {
+        return invitationRepository.getInvitationsOfUser(userId)
+    }
+
 }
 

@@ -63,6 +63,17 @@ class UserService(private val userRepository : UserRepository) {
         return Either.Right(userEdited)
     }
 
+    fun deleteUser(id: Int, token: String) : Either<UserError, User> {
+        val user = userRepository.findUserByToken(token)
+            ?: return Either.Left(UserError.Unauthorized)
+        if (id < 0) return Either.Left(UserError.NegativeIdentifier)
+        val userDeleted = userRepository.deleleteUser(id)
+        return Either.Right(userDeleted)
+    }
+
+    fun clear() {
+        userRepository.clear()
+    }
 
     @OptIn(ExperimentalStdlibApi::class)
     private fun String.hashedWithSha256() =

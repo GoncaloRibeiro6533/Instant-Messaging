@@ -1,6 +1,5 @@
 interface UserRepository {
 
-
     fun findUserById(id: Int): User?
     fun findUserByToken(token: String): User?
     fun findUserByUsername(username: String, limit: Int, skip: Int) : List<User>

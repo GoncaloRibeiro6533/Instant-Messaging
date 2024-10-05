@@ -37,4 +37,10 @@ class MockMessageRepo : MessageRepository {
         return message
     }
 
+    override fun getMessagesOfChannel(channelId: Int, limit: Int, skip: Int): List<Message> {
+        return messages.filter { it.channelId == channelId }
+            .drop(skip)
+            .take(limit)
+    }
+
 }

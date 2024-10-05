@@ -25,9 +25,17 @@ class ChannelServices(private val channelRepository : ChannelRepository) {
         return channelRepository.getMsgHistory(channelId, limit, skip)
     }
 
+    fun getChannelMembers(channelId: Int) : List<User> {
+        if (channelId < 0) throw Errors.BadRequestException("Channel id must be greater than 0")
+        return channelRepository.getChannelMembers(channelId)
+    }
+
     fun getChannelsOfUser(userId: Int) : List<Channel> {
         if (userId < 0) throw Errors.BadRequestException("User id must be greater than 0")
         return channelRepository.getChannelsOfUser(userId)
     }
+
+
+
 
 }

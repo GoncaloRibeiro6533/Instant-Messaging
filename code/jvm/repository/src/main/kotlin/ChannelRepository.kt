@@ -11,4 +11,8 @@ interface ChannelRepository {
 
    fun getChannelsOfUser(userId: Int): List<Channel>
 
+    fun getChannelMembers(channelId: Int): List<User>
+
+    fun getAllChannels(): List<Channel>
+
 }

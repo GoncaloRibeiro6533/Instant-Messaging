@@ -6,4 +6,8 @@ interface InvitationRepository {
 
     fun acceptInvitation(invitationId: Int) : Invitation
 
+    fun declineInvitation(invitationId: Int) : Invitation
+
+    fun getInvitationsOfUser(userId: Int): List<Invitation>
+
 }
