@@ -43,16 +43,14 @@ class MockInvitationRepo : InvitationRepository {
 
     override fun acceptInvitation(invitationId: Int): Invitation {
         val invitation = invitations.first { it.id == invitationId }
-        val updatedInvitation = invitation.copy(isUsed = true)
-        invitations[invitations.indexOf(invitation)] = updatedInvitation
+        val updatedInvitation = invitation.copy(accepted = true)
+        invitations.remove(invitation)
+        invitations.add(updatedInvitation)
         return updatedInvitation
     }
 
     override fun declineInvitation(invitationId: Int): Invitation {
-        val invitation = invitations.first { it.id == invitationId }
-        val updatedInvitation = invitation.copy(isUsed = true)
-        invitations[invitations.indexOf(invitation)] = updatedInvitation
-        return updatedInvitation
+        invitations.removeIf { it.id == invitationId }
     }
 
     override fun getInvitationsOfUser(userId: Int): List<Invitation> {
