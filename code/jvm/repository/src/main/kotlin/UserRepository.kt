@@ -6,6 +6,6 @@ interface UserRepository {
     fun createUser(username: String, password: String, token: String) : User
     fun updateUsername(token: String, newUsername: String) : User
     fun validateLogin(username: String, password: String): User?
-    fun deleleteUser(id: Int): User
+    fun deleteUser(id: Int): User
     fun clear(): Unit
 }

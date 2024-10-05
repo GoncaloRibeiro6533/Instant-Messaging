@@ -92,7 +92,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `findUserByUsername should return Unauthorized when user is not autenticated`() {
+    fun `findUserByUsername should return Unauthorized when user is not authenticated`() {
         val user = userServices.createUser("Bob", "password")
         assertIs<Success<User>>(user)
         val result = userServices.findUserByUsername(user.value.username, "invalidToken")
@@ -123,7 +123,7 @@ class UserServiceTests {
 
     @Test
     fun `createUser should return UsernameAlreadyExists when username already exists`() {
-        val user = userServices.createUser("Bob", "password")
+        userServices.createUser("Bob", "password")
         val result = userServices.createUser("Bob", "password")
         assertIs<Failure<UserError>>(result)
     }
@@ -151,7 +151,7 @@ class UserServiceTests {
 
     @Test
     fun `loginUser should return NoMatchingPassword when password is invalid`() {
-        val user = userServices.createUser("Bob", "password")
+        userServices.createUser("Bob", "password")
         val result = userServices.loginUser("Bob", "invalidPassword")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.NoMatchingPassword, result.value)
@@ -187,7 +187,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `updateUsername should return Unauthorized when user is not autenticated`() {
+    fun `updateUsername should return Unauthorized when user is not authenticated`() {
         val user = userServices.createUser("Bob", "password")
         assertIs<Success<User>>(user)
         val result = userServices.updateUsername("invalidToken", "newUsername")

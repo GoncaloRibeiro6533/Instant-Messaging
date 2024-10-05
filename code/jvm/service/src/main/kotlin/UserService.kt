@@ -67,7 +67,7 @@ class UserService(private val userRepository : UserRepository) {
         val user = userRepository.findUserByToken(token)
             ?: return Either.Left(UserError.Unauthorized)
         if (id < 0) return Either.Left(UserError.NegativeIdentifier)
-        val userDeleted = userRepository.deleleteUser(id)
+        val userDeleted = userRepository.deleteUser(id)
         return Either.Right(userDeleted)
     }
 
