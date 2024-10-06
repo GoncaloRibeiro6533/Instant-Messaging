@@ -194,4 +194,51 @@ class UserServiceTests {
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.Unauthorized, result.value)
     }
+
+    @Test
+    fun `deleteUser should return Unauthorized when user is not authenticated`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.deleteUser(user.value.id, "invalidToken")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
+    }
+
+    @Test
+    fun `deleteUser should return Unauthorized if token is not valid`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.deleteUser(user.value.id, "invalidToken")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
+    }
+
+    @Test
+    fun `deleteUser should return NegativeIdentifier if id is less than 0`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.deleteUser(-1, user.value.token)
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.NegativeIdentifier, result.value)
+    }
+
+    @Test
+    fun `deleteUser should delete user when valid id and token are provided`() {
+        val user = userServices.createUser("Bob", "password")
+        assertIs<Success<User>>(user)
+        val result = userServices.deleteUser(user.value.id, user.value.token)
+        assertIs<Success<User>>(result)
+        assertEquals(user.value, result.value)
+    }
+
+    @Test
+    fun `clear should remove all users`() {
+        userServices.createUser("Bob", "password")
+        userServices.createUser("Alice", "password")
+        userServices.clear()
+        val result = userServices.findUserByUsername("Bob", "token")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
+    }
+
 }

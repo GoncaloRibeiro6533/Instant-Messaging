@@ -9,9 +9,9 @@ interface ChannelRepository {
 
    fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message>
 
-   fun getChannelsOfUser(userId: Int): List<Channel>
+   fun getChannelsOfUser(userId: Int): List<Channel>?
 
-    fun getChannelMembers(channelId: Int): List<User>
+   fun getChannelMembers(channelId: Int): List<User>?
 
 
 }

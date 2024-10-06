@@ -16,7 +16,7 @@ sealed class UserError {
 class UserService(private val userRepository : UserRepository) {
 
     fun getUserById(id: Int, token: String) : Either<UserError, User> {
-        val userValidated = userRepository.findUserByToken(token)
+        userRepository.findUserByToken(token)
             ?: return Either.Left(UserError.Unauthorized)
         if (id < 0) return Either.Left(UserError.NegativeIdentifier)
         val user = userRepository.findUserById(id)
@@ -24,7 +24,7 @@ class UserService(private val userRepository : UserRepository) {
     }
 
     fun findUserByUsername(username: String, token: String) : Either<UserError, List<User>> {
-        val userValidated = userRepository.findUserByToken(token)
+        userRepository.findUserByToken(token)
             ?: return Either.Left(UserError.Unauthorized)
         val users = userRepository.findUserByUsername(username, 10, 0)
         return Either.Right(users)
@@ -45,7 +45,7 @@ class UserService(private val userRepository : UserRepository) {
     fun loginUser(username: String, password: String) : Either<UserError, User> {
         if (username.isBlank()) return Either.Left(UserError.InvalidUsername)
         if (password.isBlank()) return Either.Left(UserError.InvalidPassword)
-        val user = userRepository.findUserByUsername(username, 1, 0).firstOrNull()
+        userRepository.findUserByUsername(username, 1, 0).firstOrNull()
             ?: return Either.Left(UserError.NoMatchingUsername)
         val userAuthenticated = userRepository.validateLogin(username, password.hashedWithSha256())
         return if (userAuthenticated!= null)
@@ -53,7 +53,7 @@ class UserService(private val userRepository : UserRepository) {
     }
 
     fun updateUsername(token: String, newUsername: String) : Either<UserError, User> {
-        val user = userRepository.findUserByToken(token)
+        userRepository.findUserByToken(token)
             ?: return Either.Left(UserError.Unauthorized)
         if (newUsername.isBlank()) return Either.Left(UserError.InvalidUsername)
         if (newUsername.length > User.MAX_USERNAME_LENGTH) return Either.Left(UserError.UsernameToLong)
@@ -64,7 +64,7 @@ class UserService(private val userRepository : UserRepository) {
     }
 
     fun deleteUser(id: Int, token: String) : Either<UserError, User> {
-        val user = userRepository.findUserByToken(token)
+        userRepository.findUserByToken(token)
             ?: return Either.Left(UserError.Unauthorized)
         if (id < 0) return Either.Left(UserError.NegativeIdentifier)
         val userDeleted = userRepository.deleteUser(id)
