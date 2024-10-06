@@ -1,7 +1,5 @@
 package mocks
 
-import Channel
-import Invitation
 import User
 import UserRepository
 
@@ -9,17 +7,8 @@ import UserRepository
 class MockUserRepository : UserRepository {
 
     companion object {
-        val users = mutableListOf<User>(
-            User(0, "user0", "tokenuser0"),
-        )
-
-        val passwordsHash = mutableMapOf<Int, String>(
-            0 to "0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e"
-        )
-        val passwords = mutableMapOf<Int, String>(
-            0 to "password1"
-        )
-
+        val users = mutableListOf<User>()
+        val passwordsHash = mutableMapOf<Int, String>()
         var currentId = 0
     }
 
@@ -60,7 +49,6 @@ class MockUserRepository : UserRepository {
 
     override fun clear() {
         users.clear()
-        passwords.clear()
         passwordsHash.clear()
         currentId = 0
     }

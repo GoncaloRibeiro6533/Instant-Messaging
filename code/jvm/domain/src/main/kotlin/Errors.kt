@@ -3,6 +3,7 @@
  * @property message the error message
  */
 
+//TODO- Remove this class and use the Either pattern on each service
 sealed class Errors(override val message: String) : Exception(message) {
     class UnauthorizedException(message: String) : Errors(message)
 

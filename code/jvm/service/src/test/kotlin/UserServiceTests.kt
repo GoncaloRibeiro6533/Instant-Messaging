@@ -17,7 +17,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `register user`() {
+    fun `register user should succeed and return user`() {
         val username = "user2"
         val password = "password2"
         val result = userServices.createUser(username, password)
@@ -25,7 +25,7 @@ class UserServiceTests {
         assertEquals(username, result.value.username)
     }
     @Test
-    fun `login user`() {
+    fun `login user should succed and return user`() {
         val username = "Bob"
         val password = "password"
         val user = userServices.createUser(username, password)
@@ -58,13 +58,13 @@ class UserServiceTests {
         val user = userServices.createUser("Bob", "password")
         assertIs<Success<User>>(user)
         val result = userServices.findUserByUsername("Bob", user.value.token)
-        assertIs<Success<User>>(result)
+        assertIs<Success<List<User>>>(result)
         assertEquals(listOf(user.value), result.value)
     }
 
 
     @Test
-    fun `update username`() {
+    fun `should update username and return user`() {
         val user = userServices.createUser("Bob", "password")
         assertIs<Success<User>>(user)
         val newUsername = "newUsername"
