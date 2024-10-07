@@ -52,7 +52,7 @@ class ChannelServiceTests {
         assertIs<Success<Channel>>(result)
         assertEquals(name, result.value.name)
         assertEquals(visibility, result.value.visibility)
-        assertEquals(user.value.id, result.value.creatorId)
+        assertEquals(user.value.id, result.value.creator.id)
     }
 
     @Test

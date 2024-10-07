@@ -13,6 +13,7 @@ sealed class InvitationError {
     data object UserNotFound : InvitationError()
     data object SenderDoesntBelongToChannel : InvitationError()
     data object AlreadyInChannel : InvitationError()
+    data object InvitationAlreadyUsed : InvitationError()
 
     data object CantInviteToPublicChannel : InvitationError()
 
@@ -102,6 +103,7 @@ class InvitationService(private val trxManager: TransactionManager){
             val user = userRepo.findByToken(token) ?: return@run Either.Left(InvitationError.Unauthorized)
             val invitation : ChannelInvitation = (invitationRepo.findChannelInvitationById(invitationId)
                 ?: return@run Either.Left(InvitationError.InvitationNotFound)) as ChannelInvitation
+            if (invitation.isUsed) return@run Either.Left(InvitationError.InvitationAlreadyUsed)
             channelRepo.findById(invitation.channel.id)
                 ?: return@run Either.Left(InvitationError.ChannelNotFound)
             if (invitation.isUsed) return@run Either.Left(InvitationError.InvitationExpired)

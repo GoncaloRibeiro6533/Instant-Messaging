@@ -5,7 +5,7 @@ interface ChannelRepository {
 
    fun getChannelByName(name: String): Channel?
 
-   fun createChannel(name: String, creatorId: Int, visibility: Visibility): Channel
+   fun createChannel(name: String, creator: User, visibility: Visibility): Channel
 
    fun getChannelsOfUser(userId: Int): List<Channel>
 

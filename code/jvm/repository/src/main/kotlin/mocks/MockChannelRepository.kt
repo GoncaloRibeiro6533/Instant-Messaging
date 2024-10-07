@@ -18,10 +18,10 @@ class MockChannelRepository : ChannelRepository {
 
     override fun getChannelByName(name: String) = channels.firstOrNull { it.name == name }
 
-    override fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Channel {
-        val channel = Channel(currentId++, name, creatorId, visibility)
+    override fun createChannel(name: String, creator: User, visibility: Visibility) : Channel {
+        val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
-        addUserToChannel(creatorId, channel.id, Role.READ_WRITE)
+        addUserToChannel(creator.id, channel.id, Role.READ_WRITE)
         return channel
     }
 

@@ -1,13 +1,12 @@
 data class Channel(
     val id: Int,
     val name: String,
-    val creatorId: Int,
+    val creator: User,
     val visibility: Visibility
 ){
     init {
         require(id >= 0) { "id must be greater than 0" }
         require(name.isNotBlank()) { "Channel name must not be blank" }
-        require(creatorId >= 0) { "Creator id must be greater than 0" }
         require(visibility in Visibility.entries.toTypedArray()) { "Invalid visibility" }
     }
 }

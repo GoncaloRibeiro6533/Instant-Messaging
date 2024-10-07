@@ -160,6 +160,27 @@ class InvitationServiceTests {
         assertEquals(InvitationError.Unauthorized, result.value)
     }
 
+
+    @Test
+    fun `acceptChannelInvitation should return AlreadyUsed error if invitation was already used`() {
+        val user =
+            userService.createUser("user", "bob@mail.com", "password")
+        assertIs<Success<User>>(user)
+        val user2 =
+            userService.createUser("user2", "alice@mail.com", "password")
+        assertIs<Success<User>>(user2)
+        val channel = channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
+        assertIs<Success<Channel>>(channel)
+        val invitation =
+            invitationService.createChannelInvitation(user.value.id, user2.value.id,
+                channel.value.id, "READ_WRITE", user.value.token)
+        assertIs<Success<ChannelInvitation>>(invitation)
+        invitationService.acceptChannelInvitation(invitation.value.id, user2.value.token)
+        val result = invitationService.acceptChannelInvitation(invitation.value.id, user2.value.token)
+        assertIs<Failure<InvitationError>>(result)
+        assertEquals(InvitationError.InvitationAlreadyUsed, result.value)
+
+    }
     /*@Test
     fun `acceptChannelInvitation should return ChannelNotFound if channel does not exist anymore`() {
         val user =

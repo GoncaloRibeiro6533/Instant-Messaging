@@ -13,7 +13,7 @@ class MockMessageRepo : MessageRepository {
         val joana = User(2, "Joana", "user1@mail.com","token2")
         val joao = User(3, "João", "user1@mail.com","token3")
 
-        val channel1 = Channel(1, "Aulas de DAW", ana.id, Visibility.PUBLIC)
+        val channel1 = Channel(1, "Aulas de DAW", ana, Visibility.PUBLIC)
 
         val initMsg1 = "Olá, tudo bem?"
         val initMsg2 = "Tudo e convosco?"

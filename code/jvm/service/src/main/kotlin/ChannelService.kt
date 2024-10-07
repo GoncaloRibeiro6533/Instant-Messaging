@@ -26,12 +26,13 @@ class ChannelService(private val trxManager: TransactionManager) {
 
     fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Either<ChannelError, Channel> = trxManager.run {
         if (name.isBlank()) return@run Either.Left(ChannelError.InvalidChannelName)
+        val user = userRepo.findById(creatorId) ?: return@run Either.Left(ChannelError.UserNotFound)
         if (!Visibility.entries.toTypedArray().contains(visibility))
             return@run Either.Left(ChannelError.InvalidVisibility)
         if (channelRepo.getChannelByName(name) != null)
             return@run Either.Left(ChannelError.ChannelAlreadyExists)
         //todo adicionar o user ao canal por default aqui?
-        return@run Either.Right(channelRepo.createChannel(name, creatorId, visibility))
+        return@run Either.Right(channelRepo.createChannel(name, user, visibility))
     }
 
 
