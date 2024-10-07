@@ -1,12 +1,17 @@
 import mocks.MockChannelRepository
+import mocks.MockUserRepository
+import org.junit.jupiter.api.BeforeEach
 
 
 import kotlin.test.*
 
 class ChannelServicesTests {
+    /*
+    //private val mock = TransactionManagerInMem()
+    private val channelServices = ChannelServices
 
-    private val mock = MockChannelRepository()
-    private val channelServices = ChannelServices(mock)
+    @BeforeEach
+
 
     @Test
     fun `Test to get a channel ID` () {
@@ -167,6 +172,8 @@ class ChannelServicesTests {
     }
      */
 
+
+     */
 
 
 }

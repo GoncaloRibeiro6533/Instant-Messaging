@@ -6,13 +6,12 @@ import kotlin.test.assertIs
 
 class UserServiceTests {
 
-    private lateinit var mock: MockUserRepository
     private lateinit var userServices : UserService
 
     @BeforeEach
     fun setUp() {
-        mock = MockUserRepository()
-        userServices = UserService(mock)
+        val trxManager = TransactionManagerInMem()
+        userServices = UserService(trxManager)
     }
 
     @Test

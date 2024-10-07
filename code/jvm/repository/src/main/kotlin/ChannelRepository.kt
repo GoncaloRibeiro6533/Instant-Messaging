@@ -1,7 +1,7 @@
 
 interface ChannelRepository {
 
-   fun getChannelById(id: Int): Channel?
+   fun findById(id: Int): Channel?
 
    fun getChannelByName(name: String): Channel?
 

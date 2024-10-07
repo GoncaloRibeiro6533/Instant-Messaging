@@ -37,7 +37,7 @@ class MockInvitationRepo : InvitationRepository {
         return newInvitation
     }
 
-    override fun getInvitationDetails(invitationId: Int): Invitation? {
+    override fun findById(invitationId: Int): Invitation? {
         return invitations.firstOrNull { it.id == invitationId }
     }
 
@@ -49,7 +49,7 @@ class MockInvitationRepo : InvitationRepository {
         return updatedInvitation
     }
 
-    override fun declineInvitation(invitationId: Int): Invitation {
+    override fun deleteById(invitationId: Int): Invitation {
         val invitation = invitations.first { it.id == invitationId }
         invitations.remove(invitation)
         return invitation

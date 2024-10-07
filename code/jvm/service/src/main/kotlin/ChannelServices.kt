@@ -10,44 +10,44 @@ sealed class ChannelError {
 
 
 
-class ChannelServices(private val channelRepository : ChannelRepository) {
+class ChannelServices(private val trxManager: TransactionManager) {
 
-    fun getChannelById(id: Int) : Either<ChannelError, Channel> {
-        if (id < 0) return Either.Left(ChannelError.NegativeIdentifier)
-        val channel = channelRepository.getChannelById(id)
-        return if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
+    fun getChannelById(id: Int) : Either<ChannelError, Channel> = trxManager.run {
+        if (id < 0) return@run Either.Left(ChannelError.NegativeIdentifier)
+        val channel = channelRepo.findById(id)
+        return@run if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun getChannelByName(name: String) : Either<ChannelError, Channel> {
-        if (name.isBlank()) return Either.Left(ChannelError.InvalidChannelName)
-        val channel = channelRepository.getChannelByName(name)
-        return if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
+    fun getChannelByName(name: String) : Either<ChannelError, Channel> = trxManager.run {
+        if (name.isBlank()) return@run Either.Left(ChannelError.InvalidChannelName)
+        val channel = channelRepo.getChannelByName(name)
+        return@run if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Either<ChannelError, Channel> {
-        if (name.isBlank()) return Either.Left(ChannelError.InvalidChannelName)
+    fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Either<ChannelError, Channel> = trxManager.run {
+        if (name.isBlank()) return@run Either.Left(ChannelError.InvalidChannelName)
         if (!Visibility.entries.toTypedArray().contains(visibility))
-            return Either.Left(ChannelError.InvalidVisibility)
-        if (channelRepository.getChannelByName(name) != null)
-            return Either.Left(ChannelError.ChannelAlreadyExists)
-        return Either.Right(channelRepository.createChannel(name, creatorId, visibility))
+            return@run Either.Left(ChannelError.InvalidVisibility)
+        if (channelRepo.getChannelByName(name) != null)
+            return@run Either.Left(ChannelError.ChannelAlreadyExists)
+        return@run Either.Right(channelRepo.createChannel(name, creatorId, visibility))
     }
 
-    fun getMsgHistory(channelId: Int, limit: Int = 5, skip: Int=5) : Either<ChannelError, List<Message>> {
-        if (channelId < 0) return Either.Left(ChannelError.NegativeIdentifier)
+    fun getMsgHistory(channelId: Int, limit: Int = 5, skip: Int=5) : Either<ChannelError, List<Message>> = trxManager.run {
+        if (channelId < 0) return@run Either.Left(ChannelError.NegativeIdentifier)
         //todo maybe user must be authenticated to see messages?
-        return Either.Right(channelRepository.getMsgHistory(channelId, limit, skip))
+        return@run Either.Right(channelRepo.getMsgHistory(channelId, limit, skip))
     }
 
-    fun getChannelMembers(channelId: Int) : Either<ChannelError, List<User>> {
-        if (channelId < 0) return Either.Left(ChannelError.NegativeIdentifier)
-        val members = channelRepository.getChannelMembers(channelId)
-        return if (members != null) Either.Right(members) else Either.Left(ChannelError.ChannelNotFound)
+    fun getChannelMembers(channelId: Int) : Either<ChannelError, List<User>> = trxManager.run {
+        if (channelId < 0) return@run Either.Left(ChannelError.NegativeIdentifier)
+        val members = channelRepo.getChannelMembers(channelId)
+        return@run if (members != null) Either.Right(members) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun getChannelsOfUser(userId: Int): Either<ChannelError, List<Channel>> {
-        if (userId < 0) return Either.Left(ChannelError.NegativeIdentifier)
-        val channels = channelRepository.getChannelsOfUser(userId)
-        return if (channels != null) Either.Right(channels) else Either.Left(ChannelError.ChannelNotFound)
+    fun getChannelsOfUser(userId: Int): Either<ChannelError, List<Channel>> = trxManager.run {
+        if (userId < 0) return@run Either.Left(ChannelError.NegativeIdentifier)
+        val channels = channelRepo.getChannelsOfUser(userId)
+        return@run if (channels != null) Either.Right(channels) else Either.Left(ChannelError.ChannelNotFound)
     }
 }
