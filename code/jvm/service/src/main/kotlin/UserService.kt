@@ -11,6 +11,7 @@ sealed class UserError {
     data object Unauthorized : UserError()
     data object UsernameToLong : UserError()
     data object NegativeIdentifier : UserError()
+    data object InvalidInvite : UserError()
 }
 
 class UserService(private val trxManager: TransactionManager) {
@@ -31,6 +32,8 @@ class UserService(private val trxManager: TransactionManager) {
     }
 
     fun createUser(username: String, email: String, password: String) : Either<UserError, User> = trxManager.run {
+        //if (inviteId < 0) return@run Either.Left(UserError.NegativeIdentifier) //TODO add inviteId
+        //val invite = invitationRepo.findRegisterInvitationById(inviteId) ?: return@run Either.Left(UserError.InvalidInvite) //TODO test
         if (username.isBlank()) return@run Either.Left(UserError.InvalidUsername)
         if (password.isBlank()) return@run Either.Left(UserError.InvalidPassword)
         if (username.length > User.MAX_USERNAME_LENGTH) return@run Either.Left(UserError.UsernameToLong)
@@ -38,6 +41,7 @@ class UserService(private val trxManager: TransactionManager) {
             return@run Either.Left(UserError.UsernameAlreadyExists)
         val token = UUID.randomUUID().toString()
         val user = userRepo.create(username, email, password.hashedWithSha256(), token)
+        //invitationRepo.deleteRegisterInvitationById(inviteId)
         return@run Either.Right(user)
     }
 

@@ -24,7 +24,6 @@ class ChannelInvitation(
         require(id >= 0) { "id must be greater than 0" }
         require(role in Role.values()) { "Invalid role" }
         require(sender != receiver) { "Sender and receiver must be different" }
-        require(!isUsed) { "Invalid isUsed" }
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
@@ -46,7 +45,6 @@ class RegisterInvitation(
         require(id >= 0) { "id must be greater than 0" }
         require(email.isNotBlank()) { "Email must not be blank" }
         require(sender.email != email) { "Sender and receiver email must be different" }
-        require(!isUsed) { "Invalid isUsed" }
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
