@@ -27,7 +27,7 @@ class MockMessageRepo : MessageRepository {
 
     }
 
-    override fun findMessageById(id: Int): Message? {
+    override fun findById(id: Int): Message? {
         return messages.firstOrNull { it.id == id }
     }
 

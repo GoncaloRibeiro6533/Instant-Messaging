@@ -6,13 +6,13 @@ import UserRepository
 
 class MockUserRepository : UserRepository {
 
-    companion object {
-        val users = mutableListOf<User>()
-        val passwordsHash = mutableMapOf<Int, String>()
-        var currentId = 0
-    }
 
-    override fun findUserById(id: Int) = users.firstOrNull { it.id == id }
+    private val users = mutableListOf<User>()
+    private val passwordsHash = mutableMapOf<Int, String>()
+    private var currentId = 0
+
+
+    override fun findById(id: Int) = users.firstOrNull { it.id == id }
 
     override fun findUserByToken(token: String) = users.firstOrNull { it.token == token }
     override fun findUserByUsername(username: String, limit: Int, skip: Int): List<User> =
@@ -41,7 +41,7 @@ class MockUserRepository : UserRepository {
         } else null
     }
 
-    override fun deleteUser(id: Int): User {
+    override fun delete(id: Int): User {
         val user = users.first { it.id == id }
         users.remove(user)
         return user

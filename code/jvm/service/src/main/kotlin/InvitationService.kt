@@ -6,7 +6,7 @@ class InvitationService(private val invitationRepository: InvitationRepository){
     }
 
     fun getInvitationDetails(id: Int): Invitation? {
-        return invitationRepository.getInvitationDetails(id)
+        return invitationRepository.findById(id)
     }
 
     fun acceptInvitation(id: Int) {
@@ -14,7 +14,7 @@ class InvitationService(private val invitationRepository: InvitationRepository){
     }
 
     fun declineInvitation(id: Int) {
-        invitationRepository.declineInvitation(id)
+        invitationRepository.deleteById(id)
     }
 
     fun getInvitationsOfUser(userId: Int): List<Invitation> {

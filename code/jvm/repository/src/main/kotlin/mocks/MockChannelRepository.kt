@@ -8,7 +8,7 @@ import User
 import Visibility
 
 class MockChannelRepository : ChannelRepository {
-    companion object {
+
         val users = mutableListOf(
             User(1, "Tiago", "token"),
             User(2, "João", "token1"))
@@ -17,9 +17,9 @@ class MockChannelRepository : ChannelRepository {
 
 
         var currentId = 0
-    }
 
-    override fun getChannelById(id: Int) = channels.firstOrNull { it.id == id }
+
+    override fun findById(id: Int) = channels.firstOrNull { it.id == id }
 
     override fun getChannelByName(name: String) = channels.firstOrNull { it.name == name }
 
