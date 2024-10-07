@@ -4,56 +4,67 @@ import java.time.LocalDateTime
 import kotlin.test.Test
 
 class InvitationTests {
+    private val user = User(1, "username", "email", "token")
+    private val invitedUser = User(2, "invitedUsername", "invitedEmail", "invitedToken")
+    private val channel = Channel(1, "channel", user, Visibility.PUBLIC)
     @Test
-    fun `should create an invitation`() {
-        val invitation = Invitation(1, 1, 2, 1, false, LocalDateTime.now())
+    fun `should create an Channelinvitation`() {
+        val invitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, LocalDateTime.now())
         assertEquals(1, invitation.id)
-        assertEquals(1, invitation.senderId)
-        assertEquals(2, invitation.receiverId)
-        assertEquals(1, invitation.channelId)
-        assertFalse(invitation.isUsed)
-        assertNotNull(invitation.timestamp)
+        assertEquals(User(1, "username", "email", "token"), invitation.sender)
+        assertEquals(false, invitation.isUsed)
     }
 
     @Test
-    fun `should throw exception when id is lower than 0`() {
+    fun `should create an Registerinvitation`() {
+        val invitation = RegisterInvitation(1, user, invitedUser.email,
+            null, null, false, LocalDateTime.now())
+        assertEquals(1, invitation.id)
+        assertEquals(user, invitation.sender)
+        assertEquals(false, invitation.isUsed)
+    }
+
+    @Test
+    fun `should throw exception when id is lower than 0 in ChannelInvitation`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(-1, 1, 2, 1, false, LocalDateTime.now())
+            ChannelInvitation(-1, user, invitedUser, channel, Role.READ_WRITE, false, LocalDateTime.now())
         }
     }
 
     @Test
-    fun `should throw exception when invitation is already used`() {
+    fun `should throw exception when id is lower than 0 in RegisterInvitation`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(1, 1, 2, 1, true, LocalDateTime.now())
+            RegisterInvitation(-1, user, invitedUser.email, null, null, false, LocalDateTime.now())
         }
     }
 
     @Test
-    fun `should throw exception when senderId is lower than 0`() {
+    fun `should throw exception when ChannelInvitation is already used`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(1, -1, 2, 1, false, LocalDateTime.now())
+            ChannelInvitation(1, user, invitedUser,channel, Role.READ_WRITE, true, LocalDateTime.now())
         }
     }
 
     @Test
-    fun `should throw exception when receiverId is lower than 0`() {
+    fun `should throw exception when RegisterInvitation is already used`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(1, 1, -1, 1, false, LocalDateTime.now())
+            RegisterInvitation(1, user, invitedUser.email, null, null, true, LocalDateTime.now())
         }
     }
 
     @Test
-    fun `should throw exception when channelId is lower than 0`() {
+    fun `should throw exception when receiver email is empty in RegisterInvitatiton`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(1, 1, 2, -1, false, LocalDateTime.now())
+            RegisterInvitation(1, user, "", null, null, false, LocalDateTime.now())
         }
     }
 
+
     @Test
-    fun `should throw exception when senderId is equal to receiverId`() {
+    fun `should throw exception when sender email is equal to receiver email`() {
         assertThrows<IllegalArgumentException> {
-            Invitation(1, 1, 1, 1, false, LocalDateTime.now())
+            RegisterInvitation(1, user, user.email, null, null, false, LocalDateTime.now())
         }
     }
+
 }
