@@ -1,41 +1,53 @@
+
+sealed class ChannelError {
+    data object ChannelNotFound : ChannelError()
+    data object InvalidChannelName : ChannelError()
+    data object ChannelAlreadyExists : ChannelError()
+    data object InvalidVisibility : ChannelError()
+    data object NegativeIdentifier : ChannelError()
+    data object InvalidChannelId : ChannelError()
+}
+
+
+
 class ChannelServices(private val channelRepository : ChannelRepository) {
 
-    fun getChannelById(id: Int) : Channel {
-        if (id < 0) throw Errors.BadRequestException("Id must be greater than 0")
-        return channelRepository.getChannelById(id) ?: throw Errors.NotFoundException("Channel not found")
+    fun getChannelById(id: Int) : Either<ChannelError, Channel> {
+        if (id < 0) return Either.Left(ChannelError.NegativeIdentifier)
+        val channel = channelRepository.getChannelById(id)
+        return if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun getChannelByName(name: String) : Channel {
-        if (name.isBlank()) throw Errors.BadRequestException("Channel name must not be blank")
-        return channelRepository.getChannelByName(name) ?: throw Errors.NotFoundException("Channel not found")
+    fun getChannelByName(name: String) : Either<ChannelError, Channel> {
+        if (name.isBlank()) return Either.Left(ChannelError.InvalidChannelName)
+        val channel = channelRepository.getChannelByName(name)
+        return if (channel != null) Either.Right(channel) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Channel {
-        if (name.isBlank()) throw Errors.BadRequestException("Channel name must not be blank")
+    fun createChannel(name: String, creatorId: Int, visibility: Visibility) : Either<ChannelError, Channel> {
+        if (name.isBlank()) return Either.Left(ChannelError.InvalidChannelName)
         if (!Visibility.entries.toTypedArray().contains(visibility))
-            throw Errors.BadRequestException("Invalid visibility")
+            return Either.Left(ChannelError.InvalidVisibility)
         if (channelRepository.getChannelByName(name) != null)
-            throw Errors.BadRequestException("Channel already exists")
-        return channelRepository.createChannel(name, creatorId, visibility)
+            return Either.Left(ChannelError.ChannelAlreadyExists)
+        return Either.Right(channelRepository.createChannel(name, creatorId, visibility))
     }
 
-    fun getMsgHistory(channelId: Int, limit: Int = 5, skip: Int=5) : List<Message> {
-        if (channelId < 0) throw Errors.BadRequestException("Channel id must be greater than 0")
+    fun getMsgHistory(channelId: Int, limit: Int = 5, skip: Int=5) : Either<ChannelError, List<Message>> {
+        if (channelId < 0) return Either.Left(ChannelError.NegativeIdentifier)
         //todo maybe user must be authenticated to see messages?
-        return channelRepository.getMsgHistory(channelId, limit, skip)
+        return Either.Right(channelRepository.getMsgHistory(channelId, limit, skip))
     }
 
-    fun getChannelMembers(channelId: Int) : List<User> {
-        if (channelId < 0) throw Errors.BadRequestException("Channel id must be greater than 0")
-        return channelRepository.getChannelMembers(channelId) ?: throw Errors.NotFoundException("Channel not found")
+    fun getChannelMembers(channelId: Int) : Either<ChannelError, List<User>> {
+        if (channelId < 0) return Either.Left(ChannelError.NegativeIdentifier)
+        val members = channelRepository.getChannelMembers(channelId)
+        return if (members != null) Either.Right(members) else Either.Left(ChannelError.ChannelNotFound)
     }
 
-    fun getChannelsOfUser(userId: Int): List<Channel> {
-        if (userId < 0) throw Errors.BadRequestException("User id must be greater than 0")
-        return channelRepository.getChannelsOfUser(userId) ?: throw Errors.NotFoundException("User not found")
+    fun getChannelsOfUser(userId: Int): Either<ChannelError, List<Channel>> {
+        if (userId < 0) return Either.Left(ChannelError.NegativeIdentifier)
+        val channels = channelRepository.getChannelsOfUser(userId)
+        return if (channels != null) Either.Right(channels) else Either.Left(ChannelError.ChannelNotFound)
     }
-
-
-
-
 }
