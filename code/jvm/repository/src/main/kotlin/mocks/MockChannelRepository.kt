@@ -10,8 +10,8 @@ import Visibility
 class MockChannelRepository : ChannelRepository {
     companion object {
         val users = mutableListOf(
-            User(1, "Tiago", "token"),
-            User(2, "João", "token1"))
+            User(1, "Tiago", "user1@mail.com","token"),
+            User(2, "João", "user1@mail.com", "token1"))
         val channels = listOf(Channel(1, "channel1", users[0].id, Visibility.PUBLIC, emptyList(), mapOf(Pair(users[0],Role.READ_WRITE), Pair(users[1],Role.READ_ONLY))),
             )
 

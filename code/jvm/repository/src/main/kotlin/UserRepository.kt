@@ -1,11 +1,11 @@
 interface UserRepository {
 
-    fun findUserById(id: Int): User?
-    fun findUserByToken(token: String): User?
-    fun findUserByUsername(username: String, limit: Int, skip: Int) : List<User>
-    fun createUser(username: String, password: String, token: String) : User
+    fun findById(id: Int): User?
+    fun findByToken(token: String): User?
+    fun findByUsername(username: String, limit: Int, skip: Int) : List<User>
+    fun create(username: String, email: String, password: String, token: String) : User
     fun updateUsername(token: String, newUsername: String) : User
-    fun validateLogin(username: String, password: String): User?
-    fun deleteUser(id: Int): User
+    fun getByUsernameAndPassword(username: String, password: String): User?
+    fun delete(id: Int): User
     fun clear(): Unit
 }

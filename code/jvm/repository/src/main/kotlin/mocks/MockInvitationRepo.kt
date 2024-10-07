@@ -10,10 +10,10 @@ import java.time.LocalDateTime
 class MockInvitationRepo : InvitationRepository {
 
     companion object {
-        val maria = User(1, "Maria", "token1")
-        val ricardo = User(2, "Ricardo", "token2")
+        val maria = User(1, "Maria", "user1@mail.com","token1")
+        val ricardo = User(2, "Ricardo", "user1@mail.com","token2")
 
-        val ines = User(3, "Inês", "token3")
+        val ines = User(3, "Inês", "user1@mail.com","token3")
 
 
         val channel1 = Channel(1, "Aniversário da Maria", maria.id, Visibility.PUBLIC, emptyList(), emptyMap())
