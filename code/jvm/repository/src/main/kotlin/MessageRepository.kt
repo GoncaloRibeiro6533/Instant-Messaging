@@ -6,4 +6,6 @@ interface MessageRepository {
 
     fun getMessagesOfChannel(channelId: Int, limit: Int, skip: Int): List<Message>
 
+    //fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message>
+
 }

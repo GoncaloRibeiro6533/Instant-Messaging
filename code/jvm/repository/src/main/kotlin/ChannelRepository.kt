@@ -7,11 +7,10 @@ interface ChannelRepository {
 
    fun createChannel(name: String, creatorId: Int, visibility: Visibility): Channel
 
-   fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message>
+   fun getChannelsOfUser(userId: Int): List<Channel>
 
-   fun getChannelsOfUser(userId: Int): List<Channel>?
+   fun getChannelMembers(channelId: Int): List<Int>
 
-   fun getChannelMembers(channelId: Int): List<User>?
-
+   fun addUserToChannel(userId: Int, channelId: Int, role: Role): Channel?
 
 }

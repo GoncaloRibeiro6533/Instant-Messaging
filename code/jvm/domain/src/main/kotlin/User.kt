@@ -10,7 +10,10 @@ data class User(
         require(username.isNotBlank()) { "Username cannot be blank" }
         require(username.length <= MAX_USERNAME_LENGTH) {
             "Username cannot be longer than $MAX_USERNAME_LENGTH characters" }
-        require(email.isNotBlank()) { "Email cannot be blank" }
+        val emailRegex = "^[a-zA-Z0-9._%+-]+@[a-z.-]+\\.[a-z]{2,4}$"
+        require(email.matches(emailRegex.toRegex())) {
+            throw IllegalArgumentException("Invalid Email: $email")
+        }
         require(token.isNotBlank()) { "Token cannot be blank" }
     }
     companion object {
