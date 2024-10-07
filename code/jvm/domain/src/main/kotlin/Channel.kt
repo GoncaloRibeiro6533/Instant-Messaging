@@ -2,9 +2,7 @@ data class Channel(
     val id: Int,
     val name: String,
     val creatorId: Int,
-    val visibility: Visibility,
-    val messages: List<Message>,
-    val users: Map<User, Role>
+    val visibility: Visibility
 ){
     init {
         require(id >= 0) { "id must be greater than 0" }
