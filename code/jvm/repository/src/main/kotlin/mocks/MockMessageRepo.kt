@@ -8,7 +8,7 @@ import Visibility
 import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
-    companion object {
+    /*companion object {
         val ana = User(1, "Ana", "user1@mail.com","token1")
         val joana = User(2, "Joana", "user1@mail.com","token2")
         val joao = User(3, "João", "user1@mail.com","token3")
@@ -25,9 +25,12 @@ class MockMessageRepo : MessageRepository {
             Message(3, ana.id, channel1.id, initMsg3, LocalDateTime.now())
         )
 
-    }
+    }*/
+
+    private val messages = mutableListOf<Message>()
 
     override fun findById(id: Int): Message? {
+        if(messages.isEmpty()) return null
         return messages.firstOrNull { it.id == id }
     }
 
@@ -37,13 +40,10 @@ class MockMessageRepo : MessageRepository {
         return message
     }
 
-    override fun getMessagesOfChannel(channelId: Int, limit: Int, skip: Int): List<Message> {
+    override fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message> {
         return messages.filter { it.channelId == channelId }
             .drop(skip)
             .take(limit)
     }
-
-    //todo
-    //override fun getMsgHistory(channelId: Int, limit: Int, skip: Int) = emptyList<Message>()
 
 }
