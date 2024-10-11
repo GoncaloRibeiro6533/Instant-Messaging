@@ -30,4 +30,6 @@ interface UserRepository {
 
     @Suppress("RedundantUnitReturnType")
     fun clear(): Unit
+
+    fun findAll(): List<User>
 }

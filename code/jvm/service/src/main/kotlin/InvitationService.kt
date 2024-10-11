@@ -43,7 +43,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             val user = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (user.id != userId) return@run failure(InvitationError.UserNotFound)
-            val invitations = invitationRepo.getInvitationsOfUser(userId)
+            val invitations = invitationRepo.getInvitationsOfUser(user)
             return@run success(invitations)
         }
 
@@ -59,25 +59,34 @@ class InvitationService(private val trxManager: TransactionManager) {
         senderId: Int,
         email: String,
         channelId: Int?,
-        role: String?,
+        role: Role?,
         token: String,
     ): Either<InvitationError, RegisterInvitation> =
         trxManager.run {
-            userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (senderId < 0) return@run failure(InvitationError.NegativeIdentifier)
-            if (email.isBlank()) return@run failure(InvitationError.InvalidEmail)
-            if (channelId != null && channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
-            val roleInvite = Role.entries.find { it.name == role }
-            if (role != null && roleInvite == null) return@run failure(InvitationError.InvalidRole)
-            val sender = userRepo.findById(senderId) ?: return@run failure(InvitationError.InvalidSender)
-            val channel = if (channelId != null) channelRepo.findById(channelId) else null
-            if (channelId != null && channel == null) return@run failure(InvitationError.ChannelNotFound)
+            if (senderId < 0) {
+                return@run failure(InvitationError.NegativeIdentifier)
+            }
+            val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
+            if (email.isBlank()) {
+                return@run failure(InvitationError.InvalidEmail)
+            }
+            if (channelId != null && channelId < 0) {
+                return@run failure(InvitationError.NegativeIdentifier)
+            }
+            val channel =
+                if (channelId != null) channelRepo.findById(channelId) else null
+            if (channelId != null && channel == null) {
+                return@run failure(InvitationError.ChannelNotFound)
+            }
+            if (channel != null && role == null) {
+                return@run failure(InvitationError.InvalidRole)
+            }
             val createdInvitation =
                 invitationRepo.createRegisterInvitation(
-                    sender,
+                    autenticatedUser,
                     email,
                     channel,
-                    roleInvite,
+                    role,
                 )
             return@run success(createdInvitation)
         }
@@ -96,17 +105,17 @@ class InvitationService(private val trxManager: TransactionManager) {
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (role.isBlank()) return@run failure(InvitationError.InvalidRole)
             if (role !in Role.entries.map { it.name }) return@run failure(InvitationError.InvalidRole)
-            val sender = userRepo.findById(senderId) ?: return@run failure(InvitationError.InvalidSender)
+            val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
             val receiver = userRepo.findById(receiverId) ?: return@run failure(InvitationError.InvalidReceiver)
             val channel = channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
-            if (sender == receiver) return@run failure(InvitationError.InvalidReceiver)
+            if (autenticatedUser == receiver) return@run failure(InvitationError.InvalidReceiver)
             if (channel.visibility == Visibility.PUBLIC) return@run failure(InvitationError.CantInviteToPublicChannel)
             val channelMembers = channelRepo.getChannelMembers(channel).map { userRepo.findById(it) }
-            if (channelMembers.none { it == sender }) return@run failure(InvitationError.SenderDoesntBelongToChannel)
+            if (channelMembers.none { it == autenticatedUser }) return@run failure(InvitationError.SenderDoesntBelongToChannel)
             if (channelMembers.any { it == receiver }) return@run failure(InvitationError.AlreadyInChannel)
             val createdInvitation =
                 invitationRepo.createChannelInvitation(
-                    sender,
+                    autenticatedUser,
                     receiver,
                     channel,
                     Role.valueOf(role),
@@ -114,20 +123,10 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(createdInvitation)
         }
 
-    fun acceptRegisterInvitation(invitationId: Int): Either<InvitationError, Invitation> =
-        trxManager.run {
-            val invitation =
-                invitationRepo.findRegisterInvitationById(invitationId)
-                    ?: return@run failure(InvitationError.InvitationNotFound)
-            if (invitation.isUsed) return@run failure(InvitationError.InvitationExpired)
-            val invitationEdited = invitationRepo.updateRegisterInvitation(invitationId)
-            return@run success(invitationEdited)
-        }
-
     fun acceptChannelInvitation(
         invitationId: Int,
         token: String,
-    ): Either<InvitationError, List<Channel>> =
+    ): Either<InvitationError, Channel> =
         trxManager.run {
             val user = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
             val invitation: ChannelInvitation =
@@ -136,13 +135,9 @@ class InvitationService(private val trxManager: TransactionManager) {
                         ?: return@run failure(InvitationError.InvitationNotFound)
                 ) as ChannelInvitation
             if (invitation.isUsed) return@run failure(InvitationError.InvitationAlreadyUsed)
-            channelRepo.findById(invitation.channel.id)
-                ?: return@run failure(InvitationError.ChannelNotFound)
-            val invitationEdited = invitationRepo.updateChannelInvitation(invitationId)
             val channel =
                 channelRepo.addUserToChannel(invitation.receiver, invitation.channel, invitation.role)
-                    ?: return@run failure(InvitationError.ChannelNotFound)
-            val channels = channelRepo.getChannelsOfUser(user)
-            return@run success(channels)
+            invitationRepo.updateChannelInvitation(invitation)
+            return@run success(channel)
         }
 }

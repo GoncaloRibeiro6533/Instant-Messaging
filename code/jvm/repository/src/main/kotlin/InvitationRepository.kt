@@ -17,13 +17,13 @@ interface InvitationRepository {
 
     fun findChannelInvitationById(invitationId: Int): Invitation?
 
-    fun updateRegisterInvitation(invitationId: Int): Invitation
+    fun updateRegisterInvitation(invitation: Invitation): Invitation
 
-    fun updateChannelInvitation(invitationId: Int): Invitation
+    fun updateChannelInvitation(invitation: Invitation): Invitation
 
     fun deleteRegisterInvitationById(invitationId: Int): Invitation
 
     fun deleteChannelInvitationById(invitationId: Int): Invitation
 
-    fun getInvitationsOfUser(userId: Int): List<Invitation>
+    fun getInvitationsOfUser(user: User): List<Invitation>
 }

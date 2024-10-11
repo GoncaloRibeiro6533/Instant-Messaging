@@ -19,5 +19,5 @@ interface ChannelRepository {
         user: User,
         channel: Channel,
         role: Role,
-    ): Channel?
+    ): Channel
 }

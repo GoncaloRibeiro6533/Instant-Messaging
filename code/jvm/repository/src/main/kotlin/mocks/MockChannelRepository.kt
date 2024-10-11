@@ -6,11 +6,14 @@ import Role
 import User
 import Visibility
 
-typealias ChannelUserInfo = Pair<Int, Role>
-
 class MockChannelRepository : ChannelRepository {
+    private data class UserRole(
+        val userId: Int,
+        val role: Role,
+    )
+
     private val channels = mutableListOf<Channel>()
-    private val usersInChannel = mutableSetOf<Pair<Int, ChannelUserInfo>>() // <ChannelId,Pair<UserId,Role>>
+    private val usersInChannel = mutableSetOf<Pair<Int, UserRole>>() // <ChannelId,Pair<UserId,Role>>
     private var currentId = 0
 
     override fun findById(id: Int) = channels.firstOrNull { it.id == id }
@@ -32,7 +35,7 @@ class MockChannelRepository : ChannelRepository {
         // Filtrar todos os channelIds nos quais o userId está presente
         val userChannelIds =
             usersInChannel
-                .filter { it.second.first == user.id } // it.second.first é o userId
+                .filter { it.second.userId == user.id } // it.second.first é o userId
                 .map { it.first } // it.first é o channelId
 
         // Procurar os canais correspondentes a esses channelIds
@@ -47,7 +50,7 @@ class MockChannelRepository : ChannelRepository {
         val userIdsInChannel =
             usersInChannel
                 .filter { it.first == channel.id } // Filtra os pares que têm o mesmo channelId
-                .map { it.second.first } // Mapeia para userId (it.second.first)
+                .map { it.second.userId } // Mapeia para userId (it.second.first)
 
         // Retornar a lista de usuários ou null se não houver membros
         return userIdsInChannel.ifEmpty { emptyList() }
@@ -58,7 +61,7 @@ class MockChannelRepository : ChannelRepository {
         channel: Channel,
         role: Role,
     ): Channel {
-        usersInChannel.add(channel.id to (user.id to role))
+        usersInChannel.add(channel.id to UserRole(user.id, role))
         return channel
     }
 }

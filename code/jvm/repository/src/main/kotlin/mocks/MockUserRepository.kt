@@ -6,6 +6,7 @@ import UserRepository
 class MockUserRepository : UserRepository {
     private val users = mutableListOf<User>()
     private val passwordsHash = mutableMapOf<Int, String>()
+    private val saltColumn = mutableMapOf<Int, String>()
     private var currentId = 0
 
     override fun findById(id: Int) = users.firstOrNull { it.id == id }
@@ -67,4 +68,6 @@ class MockUserRepository : UserRepository {
         passwordsHash.clear()
         currentId = 0
     }
+
+    override fun findAll() = users.toList()
 }

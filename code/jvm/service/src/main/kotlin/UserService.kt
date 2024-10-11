@@ -21,9 +21,29 @@ sealed class UserError {
     data object NegativeIdentifier : UserError()
 
     data object InvalidInvite : UserError()
+
+    data object NotFirstUser : UserError()
+
+    data object InvalidEmail : UserError()
+
+    data object EmailDoesNotMatchInvite : UserError()
 }
 
 class UserService(private val trxManager: TransactionManager) {
+    fun addFirstUser(
+        username: String,
+        password: String,
+        email: String,
+    ) = trxManager.run {
+        if (userRepo.findAll().isNotEmpty()) return@run failure(UserError.NotFirstUser)
+        if (username.isBlank()) return@run failure(UserError.InvalidUsername)
+        if (password.isBlank()) return@run failure(UserError.InvalidPassword)
+        if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
+        val token = UUID.randomUUID().toString()
+        val user = userRepo.create(username, email, password.hashedWithSha256(), token)
+        return@run success(user)
+    }
+
     fun getUserById(
         id: Int,
         token: String,
@@ -51,19 +71,30 @@ class UserService(private val trxManager: TransactionManager) {
         username: String,
         email: String,
         password: String,
+        inviteId: Int,
     ): Either<UserError, User> =
         trxManager.run {
-            // if (inviteId < 0) return@run Either.Left(UserError.NegativeIdentifier) //TODO add inviteId
-            // val invite = invitationRepo.findRegisterInvitationById(inviteId) ?: return@run Either.Left(UserError.InvalidInvite) //TODO test
+            if (inviteId < 0) return@run failure(UserError.NegativeIdentifier)
+            val invitation =
+                (invitationRepo.findRegisterInvitationById(inviteId) as? RegisterInvitation)
+                    ?: return@run failure(UserError.InvalidInvite)
+            if (invitation.isUsed) return@run failure(UserError.InvalidInvite)
             if (username.isBlank()) return@run failure(UserError.InvalidUsername)
             if (password.isBlank()) return@run failure(UserError.InvalidPassword)
+            if (email.isBlank()) return@run failure(UserError.InvalidEmail)
+            if (email != invitation.email) return@run failure(UserError.EmailDoesNotMatchInvite)
             if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
                 return@run failure(UserError.UsernameAlreadyExists)
             }
             val token = UUID.randomUUID().toString()
             val user = userRepo.create(username, email, password.hashedWithSha256(), token)
-            // invitationRepo.deleteRegisterInvitationById(inviteId)
+            invitationRepo.updateRegisterInvitation(invitation)
+            val invitationChannel = invitation.channel
+            val invitationRole = invitation.role
+            if (invitationChannel != null && invitationRole != null) {
+                channelRepo.addUserToChannel(user, invitationChannel, invitationRole)
+            }
             return@run success(user)
         }
 
@@ -89,8 +120,9 @@ class UserService(private val trxManager: TransactionManager) {
         newUsername: String,
     ): Either<UserError, User> =
         trxManager.run {
-            userRepo.findByToken(token)
-                ?: return@run failure(UserError.Unauthorized)
+            val user =
+                userRepo.findByToken(token)
+                    ?: return@run failure(UserError.Unauthorized)
             if (newUsername.isBlank()) return@run failure(UserError.InvalidUsername)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
@@ -117,9 +149,21 @@ class UserService(private val trxManager: TransactionManager) {
             userRepo.clear()
         }
 
+   /* private val random = SecureRandom()
+    private fun generateSalt(): ByteArray {
+        val salt = ByteArray(16)
+        random.nextBytes(salt)
+        return salt
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun hashedWithSha256(password: String, salt: String) =
+        MessageDigest.getInstance("SHA-256")
+            .digest(password.encodeToByteArray() + salt.encodeToByteArray())
+            .toHexString()*/
     @OptIn(ExperimentalStdlibApi::class)
     private fun String.hashedWithSha256() =
         MessageDigest.getInstance("SHA-256")
-            .digest(toByteArray())
+            .digest(this.encodeToByteArray())
             .toHexString()
 }
