@@ -4,9 +4,7 @@ sealed class Invitation(
     val id: Int,
     val sender: User,
     val isUsed: Boolean,
-    val timestamp: LocalDateTime
-
-
+    val timestamp: LocalDateTime,
 ) {
     abstract fun markAsUsed(): Invitation
 }
@@ -18,17 +16,17 @@ class ChannelInvitation(
     val channel: Channel,
     val role: Role,
     isUsed: Boolean = false,
-    timestamp: LocalDateTime
-) : Invitation(id, sender, isUsed, timestamp){
+    timestamp: LocalDateTime,
+) : Invitation(id, sender, isUsed, timestamp) {
     init {
         require(id >= 0) { "id must be greater than 0" }
-        require(role in Role.values()) { "Invalid role" }
+        require(role in Role.entries.toTypedArray()) { "Invalid role" }
         require(sender != receiver) { "Sender and receiver must be different" }
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
-
     private fun copy() = ChannelInvitation(id, sender, receiver, channel, role, true, timestamp)
+
     override fun markAsUsed() = copy()
 }
 
@@ -39,8 +37,8 @@ class RegisterInvitation(
     val channel: Channel? = null,
     val role: Role? = null,
     isUsed: Boolean = false,
-    timestamp: LocalDateTime
-) : Invitation(id, sender, isUsed, timestamp){
+    timestamp: LocalDateTime,
+) : Invitation(id, sender, isUsed, timestamp) {
     init {
         require(id >= 0) { "id must be greater than 0" }
         require(email.isNotBlank()) { "Email must not be blank" }
@@ -48,7 +46,7 @@ class RegisterInvitation(
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
-    private fun copy() =
-        RegisterInvitation(id, sender, email, channel, role, true, timestamp)
+    private fun copy() = RegisterInvitation(id, sender, email, channel, role, true, timestamp)
+
     override fun markAsUsed() = copy()
 }

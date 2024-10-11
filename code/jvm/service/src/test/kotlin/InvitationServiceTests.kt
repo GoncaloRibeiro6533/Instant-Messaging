@@ -4,8 +4,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class InvitationServiceTests {
-
-
     private lateinit var invitationService: InvitationService
     private lateinit var userService: UserService
     private lateinit var channelService: ChannelService
@@ -18,7 +16,6 @@ class InvitationServiceTests {
         channelService = ChannelService(trxManager)
     }
 
-
     @Test
     fun `createRegisterInvitation should succeed`() {
         val user =
@@ -28,8 +25,13 @@ class InvitationServiceTests {
             channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
         assertIs<Success<Channel>>(channel)
         val result =
-            invitationService.createRegisterInvitation(user.value.id, "alice@mail.com",
-                channel.value.id, "READ_WRITE", user.value.token)
+            invitationService.createRegisterInvitation(
+                user.value.id,
+                "alice@mail.com",
+                channel.value.id,
+                "READ_WRITE",
+                user.value.token,
+            )
         assertIs<Success<RegisterInvitation>>(result)
         assertEquals(channel.value, result.value.channel)
         assertEquals(user.value, result.value.sender)
@@ -43,15 +45,19 @@ class InvitationServiceTests {
             userService.createUser("user", "bob@mail.com", "password")
         assertIs<Success<User>>(user)
         val result =
-            invitationService.createRegisterInvitation(user.value.id, "alice@mail.com",
-                null, null, user.value.token)
+            invitationService.createRegisterInvitation(
+                user.value.id,
+                "alice@mail.com",
+                null,
+                null,
+                user.value.token,
+            )
         assertIs<Success<RegisterInvitation>>(result)
         assertEquals(null, result.value.channel)
         assertEquals(user.value, result.value.sender)
         assertEquals("alice@mail.com", result.value.email)
         assertEquals(null, result.value.role)
     }
-
 
     @Test
     fun `createRegisterInvitation should return Unauthorized if token is invalid`() {
@@ -102,8 +108,13 @@ class InvitationServiceTests {
             userService.createUser("user2", "alice@mail.com", "password")
         assertIs<Success<User>>(user2)
         val invitation =
-            invitationService.createChannelInvitation(user.value.id, user2.value.id,
-                channel.value.id, "READ_WRITE", user.value.token)
+            invitationService.createChannelInvitation(
+                user.value.id,
+                user2.value.id,
+                channel.value.id,
+                "READ_WRITE",
+                user.value.token,
+            )
         assertIs<Success<ChannelInvitation>>(invitation)
         val result = invitationService.getInvitationsOfUser(user2.value.id, user2.value.token)
         assertIs<Success<List<Invitation>>>(result)
@@ -120,13 +131,18 @@ class InvitationServiceTests {
     @Test
     fun `getRegisterInvitationById should return the register invitation with the given id`() {
         val user =
-            userService.createUser("user", "bob@mail.com" ,"password")
+            userService.createUser("user", "bob@mail.com", "password")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
         assertIs<Success<Channel>>(channel)
         val invitation =
-            invitationService.createRegisterInvitation(user.value.id, "alice@mail.com",
-                channel.value.id, "READ_WRITE", user.value.token)
+            invitationService.createRegisterInvitation(
+                user.value.id,
+                "alice@mail.com",
+                channel.value.id,
+                "READ_WRITE",
+                user.value.token,
+            )
         assertIs<Success<RegisterInvitation>>(invitation)
         val result = invitationService.getRegisterInvitationById(invitation.value.id)
         assertIs<Success<Invitation>>(result)
@@ -143,8 +159,13 @@ class InvitationServiceTests {
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
         assertIs<Success<Channel>>(channel)
         val invitation =
-            invitationService.createChannelInvitation(user.value.id, user2.value.id,
-                channel.value.id, "READ_WRITE", user.value.token)
+            invitationService.createChannelInvitation(
+                user.value.id,
+                user2.value.id,
+                channel.value.id,
+                "READ_WRITE",
+                user.value.token,
+            )
         assertIs<Success<ChannelInvitation>>(invitation)
         val result = invitationService.acceptChannelInvitation(invitation.value.id, user2.value.token)
         assertIs<Success<ChannelInvitation>>(result)
@@ -160,7 +181,6 @@ class InvitationServiceTests {
         assertEquals(InvitationError.Unauthorized, result.value)
     }
 
-
     @Test
     fun `acceptChannelInvitation should return AlreadyUsed error if invitation was already used`() {
         val user =
@@ -172,14 +192,18 @@ class InvitationServiceTests {
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
         assertIs<Success<Channel>>(channel)
         val invitation =
-            invitationService.createChannelInvitation(user.value.id, user2.value.id,
-                channel.value.id, "READ_WRITE", user.value.token)
+            invitationService.createChannelInvitation(
+                user.value.id,
+                user2.value.id,
+                channel.value.id,
+                "READ_WRITE",
+                user.value.token,
+            )
         assertIs<Success<ChannelInvitation>>(invitation)
         invitationService.acceptChannelInvitation(invitation.value.id, user2.value.token)
         val result = invitationService.acceptChannelInvitation(invitation.value.id, user2.value.token)
         assertIs<Failure<InvitationError>>(result)
         assertEquals(InvitationError.InvitationAlreadyUsed, result.value)
-
     }
     /*@Test
     fun `acceptChannelInvitation should return ChannelNotFound if channel does not exist anymore`() {
@@ -197,5 +221,4 @@ class InvitationServiceTests {
         assertIs<Success<ChannelInvitation>>(invitation)
         channelService.deleteChannel(channel.value.id)
     }*/
-
 }

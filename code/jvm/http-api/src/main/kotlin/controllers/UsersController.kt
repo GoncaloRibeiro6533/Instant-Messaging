@@ -1,4 +1,3 @@
 package controllers
 
-class UsersController {
-}
+class UsersController

@@ -1,16 +1,23 @@
 
+
 interface ChannelRepository {
+    fun findById(id: Int): Channel?
 
-   fun findById(id: Int): Channel?
+    fun getChannelByName(name: String): Channel?
 
-   fun getChannelByName(name: String): Channel?
+    fun createChannel(
+        name: String,
+        creator: User,
+        visibility: Visibility,
+    ): Channel
 
-   fun createChannel(name: String, creator: User, visibility: Visibility): Channel
+    fun getChannelsOfUser(user: User): List<Channel>
 
-   fun getChannelsOfUser(userId: Int): List<Channel>
+    fun getChannelMembers(channel: Channel): List<Int>
 
-   fun getChannelMembers(channelId: Int): List<Int>
-
-   fun addUserToChannel(userId: Int, channelId: Int, role: Role): Channel?
-
+    fun addUserToChannel(
+        user: User,
+        channel: Channel,
+        role: Role,
+    ): Channel?
 }

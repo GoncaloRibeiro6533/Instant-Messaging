@@ -1,2 +1,1 @@
-class JdbiUsersRepository {
-}
+class JdbiUsersRepository

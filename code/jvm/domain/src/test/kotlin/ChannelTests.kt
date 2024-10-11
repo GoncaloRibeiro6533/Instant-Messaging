@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
-
 import kotlin.test.Test
 
 class ChannelTests {
     private val user = User(1, "username", "email@mail.com", "token")
+
     @Test
     fun `Channel creation succeeds`() {
         val channel = Channel(1, "channel1", user, Visibility.PUBLIC)
@@ -37,13 +37,10 @@ class ChannelTests {
         }
     }
 
-
     @Test
     fun `Channel creation fails with invalid visibility`() {
         assertThrows<IllegalArgumentException> {
             Channel(1, "channel1", user, Visibility.valueOf("INVALID-VISIBILITY"))
         }
     }
-
-
 }

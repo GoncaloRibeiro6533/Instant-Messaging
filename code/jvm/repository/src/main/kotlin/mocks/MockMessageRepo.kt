@@ -4,7 +4,6 @@ import Channel
 import Message
 import MessageRepository
 import User
-import Visibility
 import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
@@ -30,20 +29,27 @@ class MockMessageRepo : MessageRepository {
     private val messages = mutableListOf<Message>()
 
     override fun findById(id: Int): Message? {
-        if(messages.isEmpty()) return null
+        if (messages.isEmpty()) return null
         return messages.firstOrNull { it.id == id }
     }
 
-    override fun sendMessage(senderId: Int, channelId: Int, text: String): Message {
-        val message = Message(messages.size + 1, senderId, channelId, text, LocalDateTime.now())
+    override fun sendMessage(
+        sender: User,
+        channel: Channel,
+        text: String,
+    ): Message {
+        val message = Message(messages.size + 1, sender, channel, text, LocalDateTime.now())
         messages.add(message)
         return message
     }
 
-    override fun getMsgHistory(channelId: Int, limit: Int, skip: Int): List<Message> {
-        return messages.filter { it.channelId == channelId }
+    override fun getMsgHistory(
+        channel: Channel,
+        limit: Int,
+        skip: Int,
+    ): List<Message> {
+        return messages.filter { it.channel.id == channel.id }
             .drop(skip)
             .take(limit)
     }
-
 }

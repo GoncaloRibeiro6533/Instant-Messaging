@@ -7,12 +7,10 @@ import InvitationRepository
 import RegisterInvitation
 import Role
 import User
-import Visibility
 import java.time.LocalDateTime
 
 class MockInvitationRepo : InvitationRepository {
-
-/*        val maria = User(1, "Maria", "user1@mail.com","token1")
+    /*        val maria = User(1, "Maria", "user1@mail.com","token1")
         val ricardo = User(2, "Ricardo", "user1@mail.com","token2")
 
         val ines = User(3, "Inês", "user1@mail.com","token3")
@@ -29,29 +27,51 @@ class MockInvitationRepo : InvitationRepository {
         val channelInvitation = ChannelInvitation(3, maria, ricardo, channel1, Role.READ_WRITE, false,
             LocalDateTime.of(2021, 10, 10, 10, 10))
 */
-        private val channelInvitations = mutableSetOf<ChannelInvitation>()
-        private var currentIdChannelInvitations = channelInvitations.size
+    private val channelInvitations = mutableSetOf<ChannelInvitation>()
+    private var currentIdChannelInvitations = channelInvitations.size
 
-        private val registerInvitations = mutableSetOf<RegisterInvitation>()
-        private var currentIdRegisterInvitation = registerInvitations.size
+    private val registerInvitations = mutableSetOf<RegisterInvitation>()
+    private var currentIdRegisterInvitation = registerInvitations.size
 
-
-    override fun createRegisterInvitation(sender: User, email: String, channel: Channel?, role: Role?): RegisterInvitation {
+    override fun createRegisterInvitation(
+        sender: User,
+        email: String,
+        channel: Channel?,
+        role: Role?,
+    ): RegisterInvitation {
         val invitation =
             RegisterInvitation(
-                ++currentIdRegisterInvitation, sender, email, channel, role, false, LocalDateTime.now())
+                ++currentIdRegisterInvitation,
+                sender,
+                email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+            )
         registerInvitations.add(invitation)
         return invitation
     }
 
-    override fun createChannelInvitation(sender: User, receiver: User, channel: Channel, role: Role): ChannelInvitation {
+    override fun createChannelInvitation(
+        sender: User,
+        receiver: User,
+        channel: Channel,
+        role: Role,
+    ): ChannelInvitation {
         val invitation =
             ChannelInvitation(
-                ++currentIdChannelInvitations, sender, receiver, channel, role, false, LocalDateTime.now())
+                ++currentIdChannelInvitations,
+                sender,
+                receiver,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+            )
         channelInvitations.add(invitation)
         return invitation
     }
-
 
     override fun findRegisterInvitationById(invitationId: Int): Invitation? {
         return registerInvitations.firstOrNull { it.id == invitationId }
@@ -92,6 +112,4 @@ class MockInvitationRepo : InvitationRepository {
     override fun getInvitationsOfUser(userId: Int): List<Invitation> {
         return channelInvitations.filter { it.receiver.id == userId }
     }
-
-
 }

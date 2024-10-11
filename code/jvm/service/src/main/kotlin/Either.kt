@@ -1,8 +1,8 @@
 /**
  * Yuml class diagram:
-   [Either\<L,R\>|+Left(value: L);+Right(value: R)]
-   [Either\<L,R\>]^-.-[Left|+value: L]
-   [Either\<L,R\>]^-.-[Right|+value: R]
+ [Either\<L,R\>|+Left(value: L);+Right(value: R)]
+ [Either\<L,R\>]^-.-[Left|+value: L]
+ [Either\<L,R\>]^-.-[Right|+value: R]
  */
 sealed class Either<out L, out R> {
     data class Left<out L>(val value: L) : Either<L, Nothing>()

@@ -1,4 +1,4 @@
 enum class Role {
     READ_ONLY,
-    READ_WRITE
+    READ_WRITE,
 }

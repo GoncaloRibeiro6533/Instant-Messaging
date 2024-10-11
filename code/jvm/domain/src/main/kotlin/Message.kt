@@ -2,12 +2,11 @@ import java.time.LocalDateTime
 
 data class Message(
     val id: Int,
-    val senderId: Int,
-    val channelId: Int,
+    val sender: User,
+    val channel: Channel,
     val content: String,
-    val timestamp: LocalDateTime
-
-){
+    val timestamp: LocalDateTime,
+) {
     companion object {
         const val MAX_MESSAGE_LENGTH = 1000
     }
@@ -16,6 +15,7 @@ data class Message(
         require(id >= 0) { "Id must be greater than 0" }
         require(content.isNotBlank()) { "A message can't be blank" }
         require(content.length <= MAX_MESSAGE_LENGTH) {
-            "Content must be less than $MAX_MESSAGE_LENGTH characters" }
+            "Content must be less than $MAX_MESSAGE_LENGTH characters"
+        }
     }
 }

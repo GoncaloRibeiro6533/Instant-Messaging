@@ -4,11 +4,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class MessageServiceTest {
-
     private lateinit var messageService: MessageService
     private lateinit var userService: UserService
     private lateinit var channelService: ChannelService
-
 
     @BeforeEach
     fun setUp() {
@@ -16,7 +14,6 @@ class MessageServiceTest {
         channelService = ChannelService(trxManager)
         messageService = MessageService(trxManager)
         userService = UserService(trxManager)
-
     }
 
     @Test
@@ -31,10 +28,9 @@ class MessageServiceTest {
             messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
 
         assertIs<Success<Message>>(result)
-        assertEquals(user.value.id, result.value.senderId)
-        assertEquals(channel.value.id, result.value.channelId)
+        assertEquals(user.value.id, result.value.sender.id)
+        assertEquals(channel.value.id, result.value.channel.id)
         assertEquals("Hello, how are you?", result.value.content)
-
     }
 
     @Test
@@ -63,7 +59,6 @@ class MessageServiceTest {
 
         val result = messageService.sendMessage(channel.value.id, user.value.id, "", user.value.token)
         assertIs<Failure<MessageError.InvalidText>>(result)
-
     }
 
     @Test
@@ -77,7 +72,6 @@ class MessageServiceTest {
         val result = messageService.sendMessage(channel.value.id, -1, "Hello, how are you?", user.value.token)
 
         assertIs<Failure<MessageError.InvalidUserId>>(result)
-
     }
 
     @Test
@@ -87,7 +81,6 @@ class MessageServiceTest {
 
         val result = messageService.sendMessage(1, user.value.id, "Hello, how are you?", user.value.token)
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
-
     }
 
     @Test
@@ -104,7 +97,6 @@ class MessageServiceTest {
         val result =
             messageService.sendMessage(channel.value.id, user2.value.id, "Hello, how are you?", user2.value.token)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
-
     }
 
     @Test
@@ -202,8 +194,7 @@ class MessageServiceTest {
             messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
         assertIs<Success<Message>>(message2)
 
-        val result = messageService.getMsgHistory(channel.value.id, 2, 0, user.value.token)
-
+        messageService.getMsgHistory(channel.value.id, 2, 0, user.value.token)
     }
 
     @Test
@@ -224,7 +215,6 @@ class MessageServiceTest {
 
         val result = messageService.getMsgHistory(channel.value.id, 2, 0, "Invalid token")
         assertIs<Failure<MessageError.Unauthorized>>(result)
-
     }
 
     @Test
@@ -234,7 +224,6 @@ class MessageServiceTest {
 
         val result = messageService.getMsgHistory(-1, 2, 0, user.value.token)
         assertIs<Failure<MessageError.InvalidChannelId>>(result)
-
     }
 
     @Test
@@ -255,7 +244,6 @@ class MessageServiceTest {
 
         val result = messageService.getMsgHistory(channel.value.id, -1, 0, user.value.token)
         assertIs<Failure<MessageError.InvalidLimit>>(result)
-
     }
 
     @Test
@@ -276,7 +264,6 @@ class MessageServiceTest {
 
         val result = messageService.getMsgHistory(channel.value.id, 2, -2, user.value.token)
         assertIs<Failure<MessageError.InvalidSkip>>(result)
-
     }
 
     @Test
@@ -286,7 +273,6 @@ class MessageServiceTest {
 
         val result = messageService.getMsgHistory(1, 2, 0, user.value.token)
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
-
     }
 
     @Test
@@ -311,5 +297,4 @@ class MessageServiceTest {
         val result = messageService.getMsgHistory(channel.value.id, 2, 0, user2.value.token)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
     }
-    
 }

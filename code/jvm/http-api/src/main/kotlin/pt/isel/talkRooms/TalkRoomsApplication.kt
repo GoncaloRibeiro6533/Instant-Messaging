@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class TalkRoomsApplication
 
 fun main(args: Array<String>) {
-	runApplication<TalkRoomsApplication>(*args)
+    runApplication<TalkRoomsApplication>(*args)
 }

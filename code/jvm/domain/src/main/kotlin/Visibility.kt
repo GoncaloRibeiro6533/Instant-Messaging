@@ -1,4 +1,4 @@
 enum class Visibility {
     PUBLIC,
-    PRIVATE
+    PRIVATE,
 }

@@ -1,2 +1,1 @@
-class JdbiChannelRepository {
-}
+class JdbiChannelRepository

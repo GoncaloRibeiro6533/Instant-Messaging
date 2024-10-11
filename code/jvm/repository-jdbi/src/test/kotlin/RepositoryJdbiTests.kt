@@ -1,9 +1,9 @@
 import org.junit.jupiter.api.Test
 
-class TalkRoomsApplicationTests {
-
+class RepositoryJdbiTests {
     @Test
     fun test() {
+        // TODO
+        assert(true)
     }
-
 }
