@@ -30,10 +30,10 @@ class UserService(private val trxManager: TransactionManager) {
     ): Either<UserError, User> =
         trxManager.run {
             userRepo.findByToken(token)
-                ?: return@run Either.Left(UserError.Unauthorized)
-            if (id < 0) return@run Either.Left(UserError.NegativeIdentifier)
+                ?: return@run failure(UserError.Unauthorized)
+            if (id < 0) return@run failure(UserError.NegativeIdentifier)
             val user = userRepo.findById(id)
-            return@run if (user != null) Either.Right(user) else Either.Left(UserError.UserNotFound)
+            return@run if (user != null) success(user) else failure(UserError.UserNotFound)
         }
 
     fun findUserByUsername(
@@ -42,9 +42,9 @@ class UserService(private val trxManager: TransactionManager) {
     ): Either<UserError, List<User>> =
         trxManager.run {
             userRepo.findByToken(token)
-                ?: return@run Either.Left(UserError.Unauthorized)
+                ?: return@run failure(UserError.Unauthorized)
             val users = userRepo.findByUsername(username, 10, 0)
-            return@run Either.Right(users)
+            return@run success(users)
         }
 
     fun createUser(
@@ -55,16 +55,16 @@ class UserService(private val trxManager: TransactionManager) {
         trxManager.run {
             // if (inviteId < 0) return@run Either.Left(UserError.NegativeIdentifier) //TODO add inviteId
             // val invite = invitationRepo.findRegisterInvitationById(inviteId) ?: return@run Either.Left(UserError.InvalidInvite) //TODO test
-            if (username.isBlank()) return@run Either.Left(UserError.InvalidUsername)
-            if (password.isBlank()) return@run Either.Left(UserError.InvalidPassword)
-            if (username.length > User.MAX_USERNAME_LENGTH) return@run Either.Left(UserError.UsernameToLong)
+            if (username.isBlank()) return@run failure(UserError.InvalidUsername)
+            if (password.isBlank()) return@run failure(UserError.InvalidPassword)
+            if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
-                return@run Either.Left(UserError.UsernameAlreadyExists)
+                return@run failure(UserError.UsernameAlreadyExists)
             }
             val token = UUID.randomUUID().toString()
             val user = userRepo.create(username, email, password.hashedWithSha256(), token)
             // invitationRepo.deleteRegisterInvitationById(inviteId)
-            return@run Either.Right(user)
+            return@run success(user)
         }
 
     fun loginUser(
@@ -72,15 +72,15 @@ class UserService(private val trxManager: TransactionManager) {
         password: String,
     ): Either<UserError, User> =
         trxManager.run {
-            if (username.isBlank()) return@run Either.Left(UserError.InvalidUsername)
-            if (password.isBlank()) return@run Either.Left(UserError.InvalidPassword)
+            if (username.isBlank()) return@run failure(UserError.InvalidUsername)
+            if (password.isBlank()) return@run failure(UserError.InvalidPassword)
             userRepo.findByUsername(username, 1, 0).firstOrNull()
-                ?: return@run Either.Left(UserError.NoMatchingUsername)
+                ?: return@run failure(UserError.NoMatchingUsername)
             val userAuthenticated = userRepo.getByUsernameAndPassword(username, password.hashedWithSha256())
             return@run if (userAuthenticated != null) {
-                Either.Right(userAuthenticated)
+                success(userAuthenticated)
             } else {
-                Either.Left(UserError.NoMatchingPassword)
+                failure(UserError.NoMatchingPassword)
             }
         }
 
@@ -90,14 +90,14 @@ class UserService(private val trxManager: TransactionManager) {
     ): Either<UserError, User> =
         trxManager.run {
             userRepo.findByToken(token)
-                ?: return@run Either.Left(UserError.Unauthorized)
-            if (newUsername.isBlank()) return@run Either.Left(UserError.InvalidUsername)
-            if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run Either.Left(UserError.UsernameToLong)
+                ?: return@run failure(UserError.Unauthorized)
+            if (newUsername.isBlank()) return@run failure(UserError.InvalidUsername)
+            if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
-                return@run Either.Left(UserError.UsernameAlreadyExists)
+                return@run failure(UserError.UsernameAlreadyExists)
             }
             val userEdited = userRepo.updateUsername(token, newUsername)
-            return@run Either.Right(userEdited)
+            return@run success(userEdited)
         }
 
     fun deleteUser(
@@ -106,10 +106,10 @@ class UserService(private val trxManager: TransactionManager) {
     ): Either<UserError, User> =
         trxManager.run {
             userRepo.findByToken(token)
-                ?: return@run Either.Left(UserError.Unauthorized)
-            if (id < 0) return@run Either.Left(UserError.NegativeIdentifier)
+                ?: return@run failure(UserError.Unauthorized)
+            if (id < 0) return@run failure(UserError.NegativeIdentifier)
             val userDeleted = userRepo.delete(id)
-            return@run Either.Right(userDeleted)
+            return@run success(userDeleted)
         }
 
     fun clear() =

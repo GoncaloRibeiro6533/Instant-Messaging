@@ -30,14 +30,14 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Either<MessageError, Message?> =
         trxManager.run {
-            val user = userRepo.findByToken(token) ?: return@run Either.Left(MessageError.Unauthorized)
-            if (id < 0) return@run Either.Left(MessageError.NegativeIdentifier)
+            val user = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            if (id < 0) return@run failure(MessageError.NegativeIdentifier)
 
-            val msg = messageRepo.findById(id) ?: return@run Either.Left(MessageError.MessageNotFound)
+            val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
 
-            if (!channelRepo.getChannelMembers(msg.channel).contains(user.id)) return@run Either.Left(MessageError.UserNotInChannel)
+            if (!channelRepo.getChannelMembers(msg.channel).contains(user.id)) return@run failure(MessageError.UserNotInChannel)
 
-            return@run Either.Right(msg)
+            return@run success(msg)
         }
 
     fun sendMessage(
@@ -47,15 +47,15 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Any =
         trxManager.run {
-            val autenticatedUser = userRepo.findByToken(token) ?: return@run Either.Left(MessageError.Unauthorized)
-            if (channelId < 0) return@run Either.Left(MessageError.InvalidChannelId)
-            if (text.isBlank()) return@run Either.Left(MessageError.InvalidText)
-            if (userId < 0) return@run Either.Left(MessageError.InvalidUserId)
-            if (autenticatedUser.id != userId) return@run Either.Left(MessageError.Unauthorized)
-            val channel = channelRepo.findById(channelId) ?: return@run Either.Left(MessageError.ChannelNotFound)
+            val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
+            if (text.isBlank()) return@run failure(MessageError.InvalidText)
+            if (userId < 0) return@run failure(MessageError.InvalidUserId)
+            if (autenticatedUser.id != userId) return@run failure(MessageError.Unauthorized)
+            val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
-            if (!members.contains(userId)) return@run Either.Left(MessageError.UserNotInChannel)
-            return@run Either.Right(messageRepo.sendMessage(autenticatedUser, channel, text))
+            if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
+            return@run success(messageRepo.sendMessage(autenticatedUser, channel, text))
         }
 
     fun getMsgHistory(
@@ -65,16 +65,16 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Either<MessageError, List<Message>> =
         trxManager.run {
-            val user = userRepo.findByToken(token) ?: return@run Either.Left(MessageError.Unauthorized)
+            val user = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
 
-            if (channelId < 0) return@run Either.Left(MessageError.InvalidChannelId)
-            if (limit < 0) return@run Either.Left(MessageError.InvalidLimit)
-            if (skip < 0) return@run Either.Left(MessageError.InvalidSkip)
+            if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
+            if (limit < 0) return@run failure(MessageError.InvalidLimit)
+            if (skip < 0) return@run failure(MessageError.InvalidSkip)
 
-            val channel = channelRepo.findById(channelId) ?: return@run Either.Left(MessageError.ChannelNotFound)
+            val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
 
-            if (!channelRepo.getChannelMembers(channel).contains(user.id)) return@run Either.Left(MessageError.UserNotInChannel)
+            if (!channelRepo.getChannelMembers(channel).contains(user.id)) return@run failure(MessageError.UserNotInChannel)
 
-            return@run Either.Right(messageRepo.getMsgHistory(channel, limit, skip))
+            return@run success(messageRepo.getMsgHistory(channel, limit, skip))
         }
 }
