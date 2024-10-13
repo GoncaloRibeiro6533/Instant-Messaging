@@ -1,4 +1,7 @@
-
+import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.annotation.ComponentScan
 
 sealed class MessageError {
     data object MessageNotFound : MessageError()
@@ -24,6 +27,8 @@ sealed class MessageError {
     data object UserNotInChannel : MessageError()
 }
 
+
+@Service
 class MessageService(private val trxManager: TransactionManager) {
     fun findMessageById(
         id: Int,
