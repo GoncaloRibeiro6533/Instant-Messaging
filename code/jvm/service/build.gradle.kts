@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":repository"))
     testImplementation(kotlin("test"))
+
+    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 }
 
 tasks.test {

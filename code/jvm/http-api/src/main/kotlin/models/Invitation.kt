@@ -8,7 +8,7 @@ data class InvitationInputModel(
     val receiverId: Int,
     val email: String?,
     val channelId: Int?,
-    val role: Role
+    val role: Role,
 )
 
 data class InvitationOutputModel(
@@ -20,5 +20,3 @@ data class InvitationOutputModel(
     val isUsed: Boolean,
     val timestamp: LocalDateTime,
 )
-
-

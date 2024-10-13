@@ -1,4 +1,4 @@
-
+import jakarta.inject.Named
 
 sealed class InvitationError {
     data object InvitationNotFound : InvitationError()
@@ -34,6 +34,7 @@ sealed class InvitationError {
     data object ChannelNotFound : InvitationError()
 }
 
+@Named
 class InvitationService(private val trxManager: TransactionManager) {
     fun getInvitationsOfUser(
         userId: Int,
@@ -66,7 +67,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             if (senderId < 0) {
                 return@run failure(InvitationError.NegativeIdentifier)
             }
-            val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
+            val authenticatedUser = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
             if (email.isBlank()) {
                 return@run failure(InvitationError.InvalidEmail)
             }
@@ -83,7 +84,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             }
             val createdInvitation =
                 invitationRepo.createRegisterInvitation(
-                    autenticatedUser,
+                    authenticatedUser,
                     email,
                     channel,
                     role,

@@ -1,4 +1,4 @@
-
+import jakarta.inject.Named
 
 sealed class ChannelError {
     data object ChannelNotFound : ChannelError()
@@ -16,6 +16,7 @@ sealed class ChannelError {
     data object UserAlreadyInChannel : ChannelError()
 }
 
+@Named
 class ChannelService(private val trxManager: TransactionManager) {
     fun getChannelById(id: Int): Either<ChannelError, Channel> =
         trxManager.run {

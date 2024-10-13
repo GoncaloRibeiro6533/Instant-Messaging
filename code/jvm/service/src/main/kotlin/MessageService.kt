@@ -1,7 +1,4 @@
-import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.context.annotation.ComponentScan
+import jakarta.inject.Named
 
 sealed class MessageError {
     data object MessageNotFound : MessageError()
@@ -27,8 +24,7 @@ sealed class MessageError {
     data object UserNotInChannel : MessageError()
 }
 
-
-@Service
+@Named
 class MessageService(private val trxManager: TransactionManager) {
     fun findMessageById(
         id: Int,
@@ -52,15 +48,15 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Any =
         trxManager.run {
-            val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            val authenticatedUser = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (text.isBlank()) return@run failure(MessageError.InvalidText)
             if (userId < 0) return@run failure(MessageError.InvalidUserId)
-            if (autenticatedUser.id != userId) return@run failure(MessageError.Unauthorized)
+            if (authenticatedUser.id != userId) return@run failure(MessageError.Unauthorized)
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.sendMessage(autenticatedUser, channel, text))
+            return@run success(messageRepo.sendMessage(authenticatedUser, channel, text))
         }
 
     fun getMsgHistory(

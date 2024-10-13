@@ -1,3 +1,4 @@
+import jakarta.inject.Named
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -29,6 +30,7 @@ sealed class UserError {
     data object EmailDoesNotMatchInvite : UserError()
 }
 
+@Named
 class UserService(private val trxManager: TransactionManager) {
     fun addFirstUser(
         username: String,

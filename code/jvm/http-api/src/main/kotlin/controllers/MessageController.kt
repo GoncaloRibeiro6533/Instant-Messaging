@@ -1,24 +1,26 @@
 package controllers
 
-import Message
-import MessageService
-import Either
 import Failure
-import MessageError
+import MessageService
 import Success
 import models.MessageInputModel
-import models.MessageOutputModel
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api/messages")
 class MessageController(private val messageService: MessageService) {
-
     @GetMapping("/{id}")
     fun getMessageById(
         @PathVariable id: Int,
-        @RequestHeader("Authorization") token: String
+        @RequestHeader("Authorization") token: String,
     ): ResponseEntity<Any> {
         val result = messageService.findMessageById(id, token)
 
@@ -31,14 +33,15 @@ class MessageController(private val messageService: MessageService) {
     @PostMapping
     fun sendMessage(
         @RequestBody messageInputModel: MessageInputModel,
-        @RequestHeader("Authorization") token: String
+        @RequestHeader("Authorization") token: String,
     ): ResponseEntity<Any> {
-        val result = messageService.sendMessage(
-            messageInputModel.channelId,
-            messageInputModel.userId,
-            messageInputModel.content,
-            token
-        )
+        val result =
+            messageService.sendMessage(
+                messageInputModel.channelId,
+                messageInputModel.userId,
+                messageInputModel.content,
+                token,
+            )
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
@@ -54,7 +57,7 @@ class MessageController(private val messageService: MessageService) {
         @PathVariable channelId: Int,
         @RequestParam limit: Int,
         @RequestParam skip: Int,
-        @RequestHeader("Authorization") token: String
+        @RequestHeader("Authorization") token: String,
     ): ResponseEntity<Any> {
         val result = messageService.getMsgHistory(channelId, limit, skip, token)
 
@@ -63,5 +66,4 @@ class MessageController(private val messageService: MessageService) {
             is Failure -> ResponseEntity.badRequest().body(result.value)
         }
     }
-
 }
