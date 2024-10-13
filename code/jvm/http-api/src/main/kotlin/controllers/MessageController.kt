@@ -20,11 +20,22 @@ class MessageController(private val messageService: MessageService) {
         @PathVariable id: Int,
         @RequestHeader("Authorization") token: String
     ): ResponseEntity<Any> {
-        val result = messageService.findMessageById(id, token)
+        val result = messageService.findMessageById(
+            id,
+            token
+        )
 
         return when (result) {
             is Success -> ResponseEntity.ok(result.value)
-            is Failure -> ResponseEntity.badRequest().body(result.value)
+            is Failure -> when (result.value) {
+                is MessageError.MessageNotFound -> ResponseEntity.notFound().build()
+                is MessageError.UserNotInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                else -> ResponseEntity.badRequest().body(result.value)
+            }
+
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
         }
     }
 
@@ -42,7 +53,16 @@ class MessageController(private val messageService: MessageService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> ResponseEntity.badRequest().body(result.value)
+            is Failure<*> -> when (result.value) {
+                //is MessageError.InvalidChannelId -> ResponseEntity.badRequest().body(result.value)
+                //is MessageError.InvalidText -> ResponseEntity.badRequest().body(result.value)
+                //is MessageError.InvalidUserId -> ResponseEntity.badRequest().body(result.value)
+                is MessageError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                is MessageError.ChannelNotFound -> ResponseEntity.notFound().build()
+                is MessageError.UserNotInChannel -> ResponseEntity.notFound().build()
+                else -> ResponseEntity.internalServerError().body(result.value)
+            }
+
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
@@ -56,11 +76,23 @@ class MessageController(private val messageService: MessageService) {
         @RequestParam skip: Int,
         @RequestHeader("Authorization") token: String
     ): ResponseEntity<Any> {
-        val result = messageService.getMsgHistory(channelId, limit, skip, token)
+        val result = messageService.getMsgHistory(
+            channelId,
+            limit,
+            skip,
+            token
+        )
 
         return when (result) {
             is Success -> ResponseEntity.ok(result.value)
-            is Failure -> ResponseEntity.badRequest().body(result.value)
+            is Failure -> when (result.value) {
+                //is MessageError.InvalidChannelId -> ResponseEntity.badRequest().body(result.value)
+                //is MessageError.InvalidLimit -> ResponseEntity.badRequest().body(result.value)
+                //is MessageError.InvalidSkip -> ResponseEntity.badRequest().body(result.value)
+                is MessageError.ChannelNotFound -> ResponseEntity.notFound().build()
+                is MessageError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                else -> ResponseEntity.internalServerError().body(result.value)
+            }
         }
     }
 
