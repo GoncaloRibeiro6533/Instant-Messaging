@@ -27,7 +27,7 @@ class MockChannelRepository : ChannelRepository {
     ): Channel {
         val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
-        addUserToChannel(creator, channel, Role.READ_WRITE)
+        //addUserToChannel(creator, channel, Role.READ_WRITE)
         return channel
     }
 
@@ -62,6 +62,23 @@ class MockChannelRepository : ChannelRepository {
         role: Role,
     ): Channel {
         usersInChannel.add(channel.id to UserRole(user.id, role))
+        return channel
+    }
+
+    override fun updateChannelName(
+        channel: Channel,
+        name: String,
+    ): Channel {
+        val updatedChannel = channel.copy(name = name)
+        channels.replaceAll { if (it.id == channel.id) updatedChannel else it }
+        return updatedChannel
+    }
+
+    override fun leaveChannel(
+        user: User,
+        channel: Channel,
+    ): Channel {
+        usersInChannel.remove(channel.id to UserRole(user.id, Role.READ_WRITE))
         return channel
     }
 }
