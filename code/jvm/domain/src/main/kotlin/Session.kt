@@ -1,7 +1,7 @@
 import java.time.LocalDateTime
 
 data class Session(
-    val user: User,
+    val userId: Int,
     val token: String,
     val expiration: LocalDateTime,
 ) {
