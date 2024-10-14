@@ -22,6 +22,8 @@ sealed class MessageError {
     data object ChannelNotFound : MessageError()
 
     data object UserNotInChannel : MessageError()
+
+    data object SessionExpired : MessageError()
 }
 
 @Named
@@ -31,13 +33,14 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Either<MessageError, Message?> =
         trxManager.run {
-            val user = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(MessageError.SessionExpired)
+            }
             if (id < 0) return@run failure(MessageError.NegativeIdentifier)
-
             val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
-
-            if (!channelRepo.getChannelMembers(msg.channel).contains(user.id)) return@run failure(MessageError.UserNotInChannel)
-
+            if (!channelRepo.getChannelMembers(msg.channel).contains(session.userId)) return@run failure(MessageError.UserNotInChannel)
             return@run success(msg)
         }
 
@@ -48,15 +51,20 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Any =
         trxManager.run {
-            val authenticatedUser = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(MessageError.SessionExpired)
+            }
+            val user = userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (text.isBlank()) return@run failure(MessageError.InvalidText)
             if (userId < 0) return@run failure(MessageError.InvalidUserId)
-            if (authenticatedUser.id != userId) return@run failure(MessageError.Unauthorized)
+            if (session.userId != userId) return@run failure(MessageError.Unauthorized)
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.sendMessage(authenticatedUser, channel, text))
+            return@run success(messageRepo.sendMessage(user, channel, text))
         }
 
     fun getMsgHistory(
@@ -66,16 +74,16 @@ class MessageService(private val trxManager: TransactionManager) {
         token: String,
     ): Either<MessageError, List<Message>> =
         trxManager.run {
-            val user = userRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
-
+            val session = sessionRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(MessageError.SessionExpired)
+            }
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (limit < 0) return@run failure(MessageError.InvalidLimit)
             if (skip < 0) return@run failure(MessageError.InvalidSkip)
-
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
-
-            if (!channelRepo.getChannelMembers(channel).contains(user.id)) return@run failure(MessageError.UserNotInChannel)
-
+            if (!channelRepo.getChannelMembers(channel).contains(session.userId)) return@run failure(MessageError.UserNotInChannel)
             return@run success(messageRepo.getMsgHistory(channel, limit, skip))
         }
 }

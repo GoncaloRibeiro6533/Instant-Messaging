@@ -83,13 +83,15 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
+        val logged = userService.loginUser("user", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val invitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                user.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(invitation)
         val user2 = userService.createUser("user2", "bob@mail.com", "password2", invitation.value.id)

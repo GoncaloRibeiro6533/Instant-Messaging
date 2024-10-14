@@ -1,12 +1,11 @@
-interface SessionRepository{
-
+interface SessionRepository {
     fun findByToken(token: String): Session?
 
-    fun findByUserId(userId: Int): Session?
+    fun findByUserId(userId: Int): List<Session>
 
     fun createSession(
         userId: Int,
-        channel: Channel,
+        token: String,
     ): Session
 
     fun getSessionHistory(
@@ -15,7 +14,5 @@ interface SessionRepository{
         skip: Int,
     ): List<Session>
 
-    fun deleteSession(
-        id: Int,
-    ): Boolean
+    fun deleteSession(token: String): Boolean
 }

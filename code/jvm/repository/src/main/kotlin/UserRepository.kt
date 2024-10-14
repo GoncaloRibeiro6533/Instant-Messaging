@@ -1,8 +1,6 @@
 interface UserRepository {
     fun findById(id: Int): User?
 
-    fun findByToken(token: String): User?
-
     fun findByUsername(
         username: String,
         limit: Int,
@@ -13,11 +11,10 @@ interface UserRepository {
         username: String,
         email: String,
         password: String,
-        token: String,
     ): User
 
     fun updateUsername(
-        token: String,
+        userId: Int,
         newUsername: String,
     ): User
 

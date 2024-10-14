@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 import kotlin.test.Test
 
 class InvitationTests {
-    private val user = User(1, "username", "email@mail.com", "token")
-    private val invitedUser = User(2, "invitedUsername", "invitedEmail@mail.com", "invitedToken")
+    private val user = User(1, "username", "email@mail.com")
+    private val invitedUser = User(2, "invitedUsername", "invitedEmail@mail.com")
     private val channel = Channel(1, "channel", user, Visibility.PUBLIC)
 
     @Test

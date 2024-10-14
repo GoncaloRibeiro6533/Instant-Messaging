@@ -22,12 +22,13 @@ class MessageServiceTest {
     fun `createMessage should succeed`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val result =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
 
         assertIs<Success<Message>>(result)
         assertEquals(user.value.id, result.value.sender.id)
@@ -46,8 +47,9 @@ class MessageServiceTest {
     fun `createMessage should return InvalidChannelId if channelId is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
-        val result = messageService.sendMessage(-1, user.value.id, "Hello, how are you?", user.value.token)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = messageService.sendMessage(-1, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Failure<MessageError.InvalidChannelId>>(result)
     }
 
@@ -55,11 +57,12 @@ class MessageServiceTest {
     fun `createMessage should return InvalidText if text is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
-        val result = messageService.sendMessage(channel.value.id, user.value.id, "", user.value.token)
+        val result = messageService.sendMessage(channel.value.id, user.value.id, "", logged.value.token)
         assertIs<Failure<MessageError.InvalidText>>(result)
     }
 
@@ -68,11 +71,12 @@ class MessageServiceTest {
         val user =
             userService.addFirstUser("user", "password", "bob@mail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
-        val result = messageService.sendMessage(channel.value.id, -1, "Hello, how are you?", user.value.token)
+        val result = messageService.sendMessage(channel.value.id, -1, "Hello, how are you?", logged.value.token)
 
         assertIs<Failure<MessageError.InvalidUserId>>(result)
     }
@@ -81,8 +85,9 @@ class MessageServiceTest {
     fun `createMessage should return ChannelNotFound if channel does not exist`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
-        val result = messageService.sendMessage(1, user.value.id, "Hello, how are you?", user.value.token)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = messageService.sendMessage(1, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
     }
 
@@ -90,13 +95,15 @@ class MessageServiceTest {
     fun `createMessage should return UserNotInChannel if user is not in channel`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
                 null,
                 null,
-                user.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
 
@@ -104,12 +111,13 @@ class MessageServiceTest {
             userService
                 .createUser("user2", "alice@mail.com", "password", registerInvitation.value.id)
         assertIs<Success<User>>(user2)
-
+        val logged2 = userService.loginUser("user2", "password")
+        assertIs<Success<AuthenticatedUser>>(logged2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val result =
-            messageService.sendMessage(channel.value.id, user2.value.id, "Hello, how are you?", user2.value.token)
+            messageService.sendMessage(channel.value.id, user2.value.id, "Hello, how are you?", logged2.value.token)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
     }
 
@@ -117,15 +125,16 @@ class MessageServiceTest {
     fun `findMessageById should succeed`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message)
 
-        val result = messageService.findMessageById(message.value.id, user.value.token)
+        val result = messageService.findMessageById(message.value.id, logged.value.token)
         assertIs<Success<Message?>>(result)
     }
 
@@ -133,12 +142,13 @@ class MessageServiceTest {
     fun `findMessageById should return Unauthorized if token is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message)
 
         val result = messageService.findMessageById(message.value.id, "Invalid token")
@@ -149,15 +159,16 @@ class MessageServiceTest {
     fun `findMessageById should return NegativeIdentifier if id is negative`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message)
 
-        val result = messageService.findMessageById(-1, user.value.token)
+        val result = messageService.findMessageById(-1, logged.value.token)
         assertIs<Failure<MessageError.NegativeIdentifier>>(result)
     }
 
@@ -165,11 +176,12 @@ class MessageServiceTest {
     fun `findMessageById should return MessageNotFound if message does not exist`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
-        val result = messageService.findMessageById(1, user.value.token)
+        val result = messageService.findMessageById(1, logged.value.token)
         assertIs<Failure<MessageError.MessageNotFound>>(result)
     }
 
@@ -177,28 +189,32 @@ class MessageServiceTest {
     fun `findMessageById should return UserNotInChannel if user is not in channel`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
                 null,
                 null,
-                user.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
 
         val user2 =
             userService
                 .createUser("user2", "alice@mail.com", "password", registerInvitation.value.id)
+        val logged2 = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged2)
         assertIs<Success<User>>(user2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message)
 
-        val result = messageService.findMessageById(message.value.id, user2.value.token)
+        val result = messageService.findMessageById(message.value.id, logged2.value.token)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
     }
 
@@ -206,35 +222,37 @@ class MessageServiceTest {
     fun `getMsgHistory should succeed`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message1 =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message1)
 
         val message2 =
-            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", logged.value.token)
         assertIs<Success<Message>>(message2)
 
-        messageService.getMsgHistory(channel.value.id, 2, 0, user.value.token)
+        messageService.getMsgHistory(channel.value.id, 2, 0, logged.value.token)
     }
 
     @Test
     fun `getMsgHistory should return Unauthorized if token is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message1 =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message1)
 
         val message2 =
-            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", logged.value.token)
         assertIs<Success<Message>>(message2)
 
         val result = messageService.getMsgHistory(channel.value.id, 2, 0, "Invalid token")
@@ -245,8 +263,9 @@ class MessageServiceTest {
     fun `getMsgHistory should return InvalidChannelId if channelId is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
-        val result = messageService.getMsgHistory(-1, 2, 0, user.value.token)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = messageService.getMsgHistory(-1, 2, 0, logged.value.token)
         assertIs<Failure<MessageError.InvalidChannelId>>(result)
     }
 
@@ -254,19 +273,20 @@ class MessageServiceTest {
     fun `getMsgHistory should return InvalidLimit if limit is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message1 =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message1)
 
         val message2 =
-            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", logged.value.token)
         assertIs<Success<Message>>(message2)
 
-        val result = messageService.getMsgHistory(channel.value.id, -1, 0, user.value.token)
+        val result = messageService.getMsgHistory(channel.value.id, -1, 0, logged.value.token)
         assertIs<Failure<MessageError.InvalidLimit>>(result)
     }
 
@@ -274,19 +294,20 @@ class MessageServiceTest {
     fun `getMsgHistory should return InvalidSkip if limit is invalid`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message1 =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message1)
 
         val message2 =
-            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", logged.value.token)
         assertIs<Success<Message>>(message2)
 
-        val result = messageService.getMsgHistory(channel.value.id, 2, -2, user.value.token)
+        val result = messageService.getMsgHistory(channel.value.id, 2, -2, logged.value.token)
         assertIs<Failure<MessageError.InvalidSkip>>(result)
     }
 
@@ -294,8 +315,9 @@ class MessageServiceTest {
     fun `getMsgHistory should return ChannelNotFound if channel does not exist`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
-
-        val result = messageService.getMsgHistory(1, 2, 0, user.value.token)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = messageService.getMsgHistory(1, 2, 0, logged.value.token)
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
     }
 
@@ -303,31 +325,35 @@ class MessageServiceTest {
     fun `getMsgHistory should return UserNotInChannel if user is not in channel`() {
         val user = userService.addFirstUser("user1", "password1", "email1@gmail.com")
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
                 null,
                 null,
-                user.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user2 =
             userService
                 .createUser("user2", "alice@mail.com", "password", registerInvitation.value.id)
         assertIs<Success<User>>(user2)
+        val logged2 = userService.loginUser("user1", "password")
+        assertIs<Success<AuthenticatedUser>>(logged2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
         val message1 =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?", logged.value.token)
         assertIs<Success<Message>>(message1)
 
         val message2 =
-            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", user.value.token)
+            messageService.sendMessage(channel.value.id, user.value.id, "I'm fine, thank you!", logged.value.token)
         assertIs<Success<Message>>(message2)
 
-        val result = messageService.getMsgHistory(channel.value.id, 2, 0, user2.value.token)
+        val result = messageService.getMsgHistory(channel.value.id, 2, 0, logged2.value.token)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
     }
 }

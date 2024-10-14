@@ -9,4 +9,6 @@ data class Session(
         require(token.isNotBlank()) { "Token must not be blank" }
         require(expiration.isAfter(LocalDateTime.now())) { "Expiration must be in the future" }
     }
+
+    fun expired(): Boolean = expiration.isBefore(LocalDateTime.now())
 }

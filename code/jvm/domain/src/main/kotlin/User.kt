@@ -2,7 +2,6 @@ data class User(
     val id: Int,
     val username: String,
     val email: String,
-    val token: String,
 ) {
     init {
         require(id >= 0) { "Id cannot be negative" }
@@ -14,7 +13,6 @@ data class User(
         require(email.matches(emailRegex.toRegex())) {
             "Invalid Email: $email"
         }
-        require(token.isNotBlank()) { "Token cannot be blank" }
     }
 
     companion object {

@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 import kotlin.test.Test
 
 class MessageTests {
-    private val channel = Channel(1, "Aulas de DAW", User(1, "Ana", "ana@mail.com", "token1"), Visibility.PUBLIC)
-    private val user = User(1, "Ana", "ana@mail.com", "token1")
+    private val channel = Channel(1, "Aulas de DAW", User(1, "Ana", "ana@mail.com"), Visibility.PUBLIC)
+    private val user = User(1, "Ana", "ana@mail.com")
 
     @Test
     fun `should return message`() {

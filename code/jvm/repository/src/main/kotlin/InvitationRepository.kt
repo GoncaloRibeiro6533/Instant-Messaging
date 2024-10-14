@@ -26,5 +26,4 @@ interface InvitationRepository {
     fun deleteChannelInvitationById(invitationId: Int): Invitation
 
     fun getInvitationsOfUser(user: User): List<Invitation>
-
 }

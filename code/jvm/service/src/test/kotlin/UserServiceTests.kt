@@ -43,13 +43,15 @@ class UserServiceTests {
     fun `register user should succeed and return user with invitation with no channel`() {
         val user = userService.addFirstUser("admin", "password", "admin@mail.com")
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                user.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val username = "Bob"
@@ -82,7 +84,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val result = userService.getUserById(admin.value.id, admin.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.getUserById(admin.value.id, logged.value.token)
         assertIs<Success<User>>(result)
         assertEquals(admin.value, result.value)
     }
@@ -110,7 +114,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val result = userService.findUserByUsername("admin", user.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.findUserByUsername("admin", logged.value.token)
         assertIs<Success<List<User>>>(result)
         assertEquals(listOf(user.value), result.value)
     }
@@ -124,8 +130,10 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val newUsername = "newUsername"
-        val result = userService.updateUsername(user.value.token, newUsername)
+        val result = userService.updateUsername(logged.value.token, newUsername)
         assertIs<Success<User>>(result)
         assertEquals(newUsername, result.value.username)
     }
@@ -139,7 +147,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val result = userService.getUserById(-1, user.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.getUserById(-1, logged.value.token)
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.NegativeIdentifier, result.value)
     }
@@ -153,7 +163,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val result = userService.getUserById(100, user.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.getUserById(100, logged.value.token)
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UserNotFound, result.value)
     }
@@ -181,13 +193,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val result =
@@ -210,13 +224,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val result =
@@ -239,13 +255,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val result =
@@ -269,13 +287,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val result =
@@ -332,7 +352,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val result = userService.updateUsername(user.value.token, "")
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.updateUsername(logged.value.token, "")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.InvalidUsername, result.value)
     }
@@ -346,9 +368,11 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val result =
             userService
-                .updateUsername(user.value.token, "a".repeat(User.MAX_USERNAME_LENGTH + 1))
+                .updateUsername(logged.value.token, "a".repeat(User.MAX_USERNAME_LENGTH + 1))
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UsernameToLong, result.value)
     }
@@ -362,18 +386,22 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val newUser = userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
         assertIs<Success<User>>(newUser)
-        val result = userService.updateUsername(newUser.value.token, "admin")
+        val logged2 = userService.loginUser("Bob", "password")
+        assertIs<Success<AuthenticatedUser>>(logged2)
+        val result = userService.updateUsername(logged2.value.token, "admin")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UsernameAlreadyExists, result.value)
     }
@@ -394,13 +422,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user =
@@ -434,7 +464,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val result = userService.deleteUser(-1, admin.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.deleteUser(-1, logged.value.token)
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.NegativeIdentifier, result.value)
     }
@@ -448,7 +480,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val result = userService.deleteUser(admin.value.id, admin.value.token)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.deleteUser(admin.value.id, logged.value.token)
         assertIs<Success<User>>(result)
         assertEquals(admin.value, result.value)
     }
@@ -462,13 +496,15 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("Bob123", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
                 null,
                 null,
-                admin.value.token,
+                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user =

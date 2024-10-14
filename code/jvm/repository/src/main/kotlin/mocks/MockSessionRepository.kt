@@ -1,28 +1,25 @@
 package mocks
 
-import Channel
 import Session
 import SessionRepository
-import User
 import java.time.LocalDateTime
 
-class MockSessionRepository : SessionRepository{
-
+class MockSessionRepository : SessionRepository {
     private val sessions = mutableListOf<Session>()
 
     override fun findByToken(token: String): Session? {
         return sessions.firstOrNull { it.token == token }
     }
 
-    override fun findByUserId(userId: Int): Session? {
-        return sessions.firstOrNull { it.userId == userId }
+    override fun findByUserId(userId: Int): List<Session> {
+        return sessions.filter { it.userId == userId }
     }
 
     override fun createSession(
         userId: Int,
-        channel: Channel,
+        token: String,
     ): Session {
-        val session = Session(userId, "token", LocalDateTime.now().plusDays(7))
+        val session = Session(userId, token, LocalDateTime.now().plusDays(7))
         sessions.add(session)
         return session
     }
@@ -37,10 +34,8 @@ class MockSessionRepository : SessionRepository{
             .take(limit)
     }
 
-    override fun deleteSession(
-        id: Int,
-    ): Boolean {
-        val session = sessions.firstOrNull { it.userId == id }
+    override fun deleteSession(token: String): Boolean {
+        val session = sessions.firstOrNull { it.token == token }
         return if (session != null) {
             sessions.remove(session)
             true
@@ -48,6 +43,4 @@ class MockSessionRepository : SessionRepository{
             false
         }
     }
-
 }
-

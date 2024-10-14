@@ -3,7 +3,7 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 
 class ChannelTests {
-    private val user = User(1, "username", "email@mail.com", "token")
+    private val user = User(1, "username", "email@mail.com")
 
     @Test
     fun `Channel creation succeeds`() {

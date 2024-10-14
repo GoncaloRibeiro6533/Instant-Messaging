@@ -1,6 +1,4 @@
 import jakarta.inject.Named
-import java.security.MessageDigest
-import java.util.UUID
 
 sealed class UserError {
     data object UserNotFound : UserError()
@@ -28,10 +26,19 @@ sealed class UserError {
     data object InvalidEmail : UserError()
 
     data object EmailDoesNotMatchInvite : UserError()
+
+    data object NegativeSkip : UserError()
+
+    data object NegativeLimit : UserError()
+
+    data object SessionExpired : UserError()
 }
 
 @Named
 class UserService(private val trxManager: TransactionManager) {
+    private val sha256Token = Sha256Token()
+    private val token = Token()
+
     fun addFirstUser(
         username: String,
         password: String,
@@ -41,18 +48,31 @@ class UserService(private val trxManager: TransactionManager) {
         if (username.isBlank()) return@run failure(UserError.InvalidUsername)
         if (password.isBlank()) return@run failure(UserError.InvalidPassword)
         if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
-        val token = UUID.randomUUID().toString()
-        val user = userRepo.create(username, email, password.hashedWithSha256(), token)
+        val user = userRepo.create(username, email, sha256Token.hashedWithSha256(password))
         return@run success(user)
     }
+
+    fun logoutUser(token: String) =
+        trxManager.run {
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(UserError.SessionExpired)
+            }
+            sessionRepo.deleteSession(token)
+            return@run success(Unit)
+        }
 
     fun getUserById(
         id: Int,
         token: String,
     ): Either<UserError, User> =
         trxManager.run {
-            userRepo.findByToken(token)
-                ?: return@run failure(UserError.Unauthorized)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(UserError.SessionExpired)
+            }
             if (id < 0) return@run failure(UserError.NegativeIdentifier)
             val user = userRepo.findById(id)
             return@run if (user != null) success(user) else failure(UserError.UserNotFound)
@@ -61,11 +81,18 @@ class UserService(private val trxManager: TransactionManager) {
     fun findUserByUsername(
         username: String,
         token: String,
+        limit: Int = 10,
+        skip: Int = 0,
     ): Either<UserError, List<User>> =
         trxManager.run {
-            userRepo.findByToken(token)
-                ?: return@run failure(UserError.Unauthorized)
-            val users = userRepo.findByUsername(username, 10, 0)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(UserError.SessionExpired)
+            }
+            if (limit < 0) return@run failure(UserError.NegativeLimit)
+            if (skip < 0) return@run failure(UserError.NegativeSkip)
+            val users = userRepo.findByUsername(username, limit, skip)
             return@run success(users)
         }
 
@@ -89,8 +116,7 @@ class UserService(private val trxManager: TransactionManager) {
             if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
                 return@run failure(UserError.UsernameAlreadyExists)
             }
-            val token = UUID.randomUUID().toString()
-            val user = userRepo.create(username, email, password.hashedWithSha256(), token)
+            val user = userRepo.create(username, email, sha256Token.hashedWithSha256(password))
             invitationRepo.updateRegisterInvitation(invitation)
             val invitationChannel = invitation.channel
             val invitationRole = invitation.role
@@ -103,18 +129,17 @@ class UserService(private val trxManager: TransactionManager) {
     fun loginUser(
         username: String,
         password: String,
-    ): Either<UserError, User> =
+    ): Either<UserError, AuthenticatedUser> =
         trxManager.run {
             if (username.isBlank()) return@run failure(UserError.InvalidUsername)
             if (password.isBlank()) return@run failure(UserError.InvalidPassword)
             userRepo.findByUsername(username, 1, 0).firstOrNull()
                 ?: return@run failure(UserError.NoMatchingUsername)
-            val userAuthenticated = userRepo.getByUsernameAndPassword(username, password.hashedWithSha256())
-            return@run if (userAuthenticated != null) {
-                success(userAuthenticated)
-            } else {
-                failure(UserError.NoMatchingPassword)
-            }
+            val userAuthenticated =
+                userRepo.getByUsernameAndPassword(username, sha256Token.hashedWithSha256(password))
+                    ?: return@run failure(UserError.NoMatchingPassword)
+            val session = sessionRepo.createSession(userAuthenticated.id, token.generateToken())
+            return@run success(AuthenticatedUser(userAuthenticated, session.token))
         }
 
     fun updateUsername(
@@ -122,15 +147,17 @@ class UserService(private val trxManager: TransactionManager) {
         newUsername: String,
     ): Either<UserError, User> =
         trxManager.run {
-            val user =
-                userRepo.findByToken(token)
-                    ?: return@run failure(UserError.Unauthorized)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(UserError.SessionExpired)
+            }
             if (newUsername.isBlank()) return@run failure(UserError.InvalidUsername)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
                 return@run failure(UserError.UsernameAlreadyExists)
             }
-            val userEdited = userRepo.updateUsername(token, newUsername)
+            val userEdited = userRepo.updateUsername(session.userId, newUsername)
             return@run success(userEdited)
         }
 
@@ -139,9 +166,14 @@ class UserService(private val trxManager: TransactionManager) {
         token: String,
     ): Either<UserError, User> =
         trxManager.run {
-            userRepo.findByToken(token)
-                ?: return@run failure(UserError.Unauthorized)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            if (session.expired()) {
+                sessionRepo.deleteSession(token)
+                return@run failure(UserError.SessionExpired)
+            }
             if (id < 0) return@run failure(UserError.NegativeIdentifier)
+            if (session.userId != id) return@run failure(UserError.Unauthorized)
+            sessionRepo.findByUserId(id).forEach { sessionRepo.deleteSession(it.token) }
             val userDeleted = userRepo.delete(id)
             return@run success(userDeleted)
         }
@@ -150,22 +182,4 @@ class UserService(private val trxManager: TransactionManager) {
         trxManager.run {
             userRepo.clear()
         }
-
-   /* private val random = SecureRandom()
-    private fun generateSalt(): ByteArray {
-        val salt = ByteArray(16)
-        random.nextBytes(salt)
-        return salt
-    }
-
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun hashedWithSha256(password: String, salt: String) =
-        MessageDigest.getInstance("SHA-256")
-            .digest(password.encodeToByteArray() + salt.encodeToByteArray())
-            .toHexString()*/
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun String.hashedWithSha256() =
-        MessageDigest.getInstance("SHA-256")
-            .digest(this.encodeToByteArray())
-            .toHexString()
 }
