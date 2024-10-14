@@ -71,8 +71,8 @@ class UserServiceTests {
             )
         assertIs<Success<User>>(admin)
         val result = userService.loginUser(admin.value.username, "password")
-        assertIs<Success<User>>(result)
-        assertEquals(admin.value, result.value)
+        assertIs<Success<AuthenticatedUser>>(result)
+        assertEquals(admin.value, result.value.user)
     }
 
     @Test

@@ -16,6 +16,7 @@ data class User(
     }
 
     companion object {
+        const val MAX_SESSIONS = 5
         const val MAX_USERNAME_LENGTH = 50
     }
 }

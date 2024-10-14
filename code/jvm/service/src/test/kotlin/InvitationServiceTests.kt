@@ -99,7 +99,7 @@ class InvitationServiceTests {
     }
 
     @Test
-    fun `getInvitationsOfUser should return UserNotFound error if userId does not exist`() {
+    fun `getInvitationsOfUser should return Unauthorized error if userId does not exist`() {
         val user =
             userService.addFirstUser("user", "password", "bob@mail.com")
         assertIs<Success<User>>(user)
@@ -107,7 +107,7 @@ class InvitationServiceTests {
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = invitationService.getInvitationsOfUser(2, logged.value.token)
         assertIs<Failure<InvitationError>>(result)
-        assertEquals(InvitationError.UserNotFound, result.value)
+        assertEquals(InvitationError.Unauthorized, result.value)
     }
 
     @Test

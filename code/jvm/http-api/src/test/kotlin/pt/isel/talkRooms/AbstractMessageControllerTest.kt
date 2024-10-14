@@ -1,4 +1,3 @@
 package pt.isel.talkRooms
 
-abstract class AbstractMessageControllerTest {
-}
+abstract class AbstractMessageControllerTest

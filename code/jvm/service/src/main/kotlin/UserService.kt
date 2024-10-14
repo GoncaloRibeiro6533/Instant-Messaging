@@ -138,6 +138,10 @@ class UserService(private val trxManager: TransactionManager) {
             val userAuthenticated =
                 userRepo.getByUsernameAndPassword(username, sha256Token.hashedWithSha256(password))
                     ?: return@run failure(UserError.NoMatchingPassword)
+            val nSessions = sessionRepo.findByUserId(userAuthenticated.id).size
+            if (nSessions >= User.MAX_SESSIONS) {
+                sessionRepo.deleteSession(sessionRepo.findByUserId(userAuthenticated.id).first().token)
+            }
             val session = sessionRepo.createSession(userAuthenticated.id, token.generateToken())
             return@run success(AuthenticatedUser(userAuthenticated, session.token))
         }
