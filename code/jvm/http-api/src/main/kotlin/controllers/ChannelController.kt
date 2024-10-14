@@ -8,7 +8,14 @@ import models.ChannelInputModel
 import models.ChannelOutputModel
 import models.UserOutputModel
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api/channels")
@@ -113,15 +120,15 @@ class ChannelController(
     ): ResponseEntity<Any> {
         return when (val result = channelService.getChannelMembers(channelId)) {
             is Success -> {
-                val outputModel = result.value.map {
-                    UserOutputModel(
-                        id = it.id,
-                        username = it.username,
-                        email = it.email,
-                    )
-                }
+                val outputModel =
+                    result.value.map {
+                        UserOutputModel(
+                            id = it.id,
+                            username = it.username,
+                            email = it.email,
+                        )
+                    }
                 ResponseEntity.ok(outputModel)
-
             }
             is Failure ->
                 when (result.value) {
@@ -141,14 +148,15 @@ class ChannelController(
     ): ResponseEntity<Any> {
         return when (val result = channelService.getChannelsOfUser(userId)) {
             is Success -> {
-                val outputModel = result.value.map {
-                    ChannelOutputModel(
-                        id = it.id,
-                        name = it.name,
-                        creator = it.creator.username,
-                        visibility = it.visibility,
-                    )
-                }
+                val outputModel =
+                    result.value.map {
+                        ChannelOutputModel(
+                            id = it.id,
+                            name = it.name,
+                            creator = it.creator.username,
+                            visibility = it.visibility,
+                        )
+                    }
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->

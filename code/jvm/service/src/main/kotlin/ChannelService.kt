@@ -91,14 +91,14 @@ class ChannelService(private val trxManager: TransactionManager) {
         }
 
     fun updateChannelName(
-        channelId :Int,
+        channelId: Int,
         name: String,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
-            if(name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
-            if(channelRepo.getChannelByName(name) != null) return@run failure(ChannelError.ChannelNameAlreadyExists)
+            if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
+            if (channelRepo.getChannelByName(name) != null) return@run failure(ChannelError.ChannelNameAlreadyExists)
             return@run success(channelRepo.updateChannelName(channel, name))
         }
 

@@ -24,7 +24,7 @@ interface ChannelRepository {
     fun updateChannelName(
         channel: Channel,
         name: String,
-        ): Channel
+    ): Channel
 
     fun leaveChannel(
         user: User,

@@ -11,8 +11,6 @@ class MockUserRepository : UserRepository {
 
     override fun findById(id: Int) = users.firstOrNull { it.id == id }
 
-    override fun findByToken(token: String) = users.firstOrNull { it.token == token }
-
     override fun findByUsername(
         username: String,
         limit: Int,
@@ -26,19 +24,18 @@ class MockUserRepository : UserRepository {
         username: String,
         email: String,
         password: String,
-        token: String,
     ): User {
-        users.add(User(currentId++, username.trim(), email, token))
+        users.add(User(currentId++, username.trim(), email))
         val user = users.last()
         passwordsHash[user.id] = password
         return user
     }
 
     override fun updateUsername(
-        token: String,
+        userId: Int,
         newUsername: String,
     ): User {
-        val user = users.first { it.token == token }
+        val user = users.first { it.id == userId }
         users.remove(user)
         val userEdited = user.copy(username = newUsername)
         users.add(user)
