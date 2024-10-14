@@ -141,4 +141,15 @@ class InvitationService(private val trxManager: TransactionManager) {
             invitationRepo.updateChannelInvitation(invitation)
             return@run success(channel)
         }
+
+    fun declineInvitation(
+        invitationId: Int,
+        token: String
+    ){
+        trxManager.run {
+            val user = userRepo.findByToken(token) ?: return@run
+            val invitation = invitationRepo.findChannelInvitationById(invitationId) ?: return@run
+            invitationRepo.deleteChannelInvitationById(invitationId)
+        }
+    }
 }
