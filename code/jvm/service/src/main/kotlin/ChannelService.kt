@@ -14,6 +14,8 @@ sealed class ChannelError {
     data object UserNotFound : ChannelError()
 
     data object UserAlreadyInChannel : ChannelError()
+
+    data object Unauthorized : ChannelError()
 }
 
 @Named
@@ -36,9 +38,11 @@ class ChannelService(private val trxManager: TransactionManager) {
         name: String,
         creatorId: Int,
         visibility: Visibility,
+        // token: String,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
+            // userRepo.findByToken(token) ?: return@run failure(ChannelError.Unauthorized)
             val user = userRepo.findById(creatorId) ?: return@run failure(ChannelError.UserNotFound)
             if (!Visibility.entries.toTypedArray().contains(visibility)) {
                 return@run failure(ChannelError.InvalidVisibility)

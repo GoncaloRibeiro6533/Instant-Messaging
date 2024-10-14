@@ -1,10 +1,9 @@
 package controllers
 
 import Failure
-import Invitation
 import InvitationError
 import InvitationService
-import java.security.Principal
+import Success
 import models.InvitationInputModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import Success
+import java.security.Principal
 
 @RestController
 @RequestMapping("api/invitation")
@@ -40,19 +39,20 @@ class InvitationController(private val invitationService: InvitationService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> when (result.value) {
-                //is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
-                //is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.InvalidChannel -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.InvalidRole -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.AlreadyInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.UserNotFound -> ResponseEntity.notFound().build()
+            is Failure<*> ->
+                when (result.value) {
+                    // is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
+                    // is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.InvalidChannel -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.InvalidRole -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.AlreadyInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.UserNotFound -> ResponseEntity.notFound().build()
 
-                else -> ResponseEntity.badRequest().body(result.value)
-            }
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
@@ -80,17 +80,18 @@ class InvitationController(private val invitationService: InvitationService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> when (result.value) {
-                //is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
-                //is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
-                //is InvitationError.InvalidEmail -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.UserNotFound -> ResponseEntity.notFound().build()
+            is Failure<*> ->
+                when (result.value) {
+                    // is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
+                    // is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
+                    // is InvitationError.InvalidEmail -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.UserNotFound -> ResponseEntity.notFound().build()
 
-                else -> ResponseEntity.badRequest().body(result.value)
-            }
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
@@ -110,17 +111,18 @@ class InvitationController(private val invitationService: InvitationService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> when (result.value) {
-                //is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.AlreadyInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
-                is InvitationError.InvitationExpired -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.InvitationAlreadyUsed -> ResponseEntity.unprocessableEntity().body(result.value)
-                else -> {
-                    ResponseEntity.badRequest().body(result.value)
+            is Failure<*> ->
+                when (result.value) {
+                    // is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.AlreadyInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
+                    is InvitationError.InvitationExpired -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.InvitationAlreadyUsed -> ResponseEntity.unprocessableEntity().body(result.value)
+                    else -> {
+                        ResponseEntity.badRequest().body(result.value)
+                    }
                 }
-            }
         }
     }
 
@@ -139,12 +141,13 @@ class InvitationController(private val invitationService: InvitationService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> when (result.value) {
-                //is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
-                else -> ResponseEntity.badRequest().body(result.value)
-            }
+            is Failure<*> ->
+                when (result.value) {
+                    // is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
@@ -162,11 +165,12 @@ class InvitationController(private val invitationService: InvitationService) {
 
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> -> when (result.value) {
-                //is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
-                else -> ResponseEntity.badRequest().body(result.value)
-            }
+            is Failure<*> ->
+                when (result.value) {
+                    // is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
