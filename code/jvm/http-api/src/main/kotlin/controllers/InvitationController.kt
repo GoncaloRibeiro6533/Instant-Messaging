@@ -32,7 +32,7 @@ class InvitationController(private val invitationService: InvitationService) {
                     senderId,
                     invitationInputModel.receiverId,
                     invitationInputModel.channelId,
-                    invitationInputModel.role.toString(),
+                    invitationInputModel.role,
                     token,
                 )
             }
@@ -155,7 +155,7 @@ class InvitationController(private val invitationService: InvitationService) {
     }
 
     @GetMapping("/register")
-    fun getChannelInvitations(
+    fun getRegisterInvitation(
         @RequestParam invitationId: Int,
     ): ResponseEntity<Any> {
         val result =

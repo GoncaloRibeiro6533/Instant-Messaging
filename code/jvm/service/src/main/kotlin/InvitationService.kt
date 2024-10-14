@@ -96,7 +96,7 @@ class InvitationService(private val trxManager: TransactionManager) {
         senderId: Int,
         receiverId: Int,
         channelId: Int,
-        role: String,
+        role: Role,
         token: String,
     ): Either<InvitationError, ChannelInvitation> =
         trxManager.run {
@@ -104,8 +104,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             if (senderId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (receiverId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
-            if (role.isBlank()) return@run failure(InvitationError.InvalidRole)
-            if (role !in Role.entries.map { it.name }) return@run failure(InvitationError.InvalidRole)
+            if (role !in Role.values()) return@run failure(InvitationError.InvalidRole)
             val autenticatedUser = userRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
             val receiver = userRepo.findById(receiverId) ?: return@run failure(InvitationError.InvalidReceiver)
             val channel = channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
@@ -119,8 +118,9 @@ class InvitationService(private val trxManager: TransactionManager) {
                     autenticatedUser,
                     receiver,
                     channel,
-                    Role.valueOf(role),
+                    role
                 )
+
             return@run success(createdInvitation)
         }
 
@@ -141,4 +141,15 @@ class InvitationService(private val trxManager: TransactionManager) {
             invitationRepo.updateChannelInvitation(invitation)
             return@run success(channel)
         }
+
+    fun declineInvitation(
+        invitationId: Int,
+        token: String
+    ){
+        trxManager.run {
+            val user = userRepo.findByToken(token) ?: return@run
+            val invitation = invitationRepo.findChannelInvitationById(invitationId) ?: return@run
+            invitationRepo.deleteChannelInvitationById(invitationId)
+        }
+    }
 }
