@@ -20,4 +20,14 @@ interface ChannelRepository {
         channel: Channel,
         role: Role,
     ): Channel
+
+    fun updateChannelName(
+        channel: Channel,
+        name: String,
+        ): Channel
+
+    fun leaveChannel(
+        user: User,
+        channel: Channel,
+    ): Channel
 }

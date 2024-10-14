@@ -2,9 +2,11 @@ package controllers
 
 import ChannelService
 import Failure
+import Role
 import Success
 import models.ChannelInputModel
 import models.ChannelOutputModel
+import models.UserOutputModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -97,6 +99,152 @@ class ChannelController(
                     is ChannelError.UserNotFound -> ResponseEntity.badRequest().body(result.value)
                     is ChannelError.InvalidVisibility -> ResponseEntity.badRequest().body(result.value)
                     is ChannelError.ChannelAlreadyExists -> ResponseEntity.badRequest().body(result.value)
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+    @GetMapping("/{channelId}/members")
+    fun getChannelMembers(
+        @PathVariable channelId: Int,
+    ): ResponseEntity<Any> {
+        return when (val result = channelService.getChannelMembers(channelId)) {
+            is Success -> {
+                val outputModel = result.value.map {
+                    UserOutputModel(
+                        id = it.id,
+                        username = it.username,
+                        email = it.email,
+                    )
+                }
+                ResponseEntity.ok(outputModel)
+
+            }
+            is Failure ->
+                when (result.value) {
+                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    fun getChannelsOfUser(
+        @PathVariable userId: Int,
+    ): ResponseEntity<Any> {
+        return when (val result = channelService.getChannelsOfUser(userId)) {
+            is Success -> {
+                val outputModel = result.value.map {
+                    ChannelOutputModel(
+                        id = it.id,
+                        name = it.name,
+                        creator = it.creator.username,
+                        visibility = it.visibility,
+                    )
+                }
+                ResponseEntity.ok(outputModel)
+            }
+            is Failure ->
+                when (result.value) {
+                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+    @PutMapping("/{channelId}/members/{userId}")
+    fun addUserToChannel(
+        @PathVariable channelId: Int,
+        @PathVariable userId: Int,
+        @RequestParam role: Role,
+    ): ResponseEntity<Any> {
+        return when (val result = channelService.addUserToChannel(userId, channelId, role)) {
+            is Success -> {
+                val outputModel =
+                    ChannelOutputModel(
+                        id = result.value.id,
+                        name = result.value.name,
+                        creator = result.value.creator.username,
+                        visibility = result.value.visibility,
+                    )
+                ResponseEntity.ok(outputModel)
+            }
+            is Failure ->
+                when (result.value) {
+                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.UserAlreadyInChannel -> ResponseEntity.badRequest().body(result.value)
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+    @PutMapping("/{channelId}")
+    fun updateChannelName(
+        @PathVariable channelId: Int,
+        @RequestParam name: String,
+    ): ResponseEntity<Any> {
+        return when (val result = channelService.updateChannelName(channelId, name)) {
+            is Success -> {
+                val outputModel =
+                    ChannelOutputModel(
+                        id = result.value.id,
+                        name = result.value.name,
+                        creator = result.value.creator.username,
+                        visibility = result.value.visibility,
+                    )
+                ResponseEntity.ok(outputModel)
+            }
+            is Failure ->
+                when (result.value) {
+                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.InvalidChannelName -> ResponseEntity.badRequest().body(result.value)
+                    is ChannelError.ChannelNameAlreadyExists -> ResponseEntity.badRequest().body(result.value)
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+    @PutMapping("/{channelId}/leave/{userId}")
+    fun leaveChannel(
+        @PathVariable channelId: Int,
+        @PathVariable userId: Int,
+    ): ResponseEntity<Any> {
+        return when (val result = channelService.leaveChannel(userId, channelId)) {
+            is Success -> {
+                val outputModel =
+                    ChannelOutputModel(
+                        id = result.value.id,
+                        name = result.value.name,
+                        creator = result.value.creator.username,
+                        visibility = result.value.visibility,
+                    )
+                ResponseEntity.ok(outputModel)
+            }
+            is Failure ->
+                when (result.value) {
+                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
