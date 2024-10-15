@@ -7,6 +7,7 @@ class InvitationTests {
     private val user = User(1, "username", "email@mail.com")
     private val invitedUser = User(2, "invitedUsername", "invitedEmail@mail.com")
     private val channel = Channel(1, "channel", user, Visibility.PUBLIC)
+    private val role = Role.READ_WRITE
 
     @Test
     fun `should create an Channelinvitation`() {
@@ -23,8 +24,8 @@ class InvitationTests {
                 1,
                 user,
                 invitedUser.email,
-                null,
-                null,
+                channel,
+                role,
                 false,
                 LocalDateTime.now(),
             )
@@ -43,21 +44,21 @@ class InvitationTests {
     @Test
     fun `should throw exception when id is lower than 0 in RegisterInvitation`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(-1, user, invitedUser.email, null, null, false, LocalDateTime.now())
+            RegisterInvitation(-1, user, invitedUser.email, channel, role, false, LocalDateTime.now())
         }
     }
 
     @Test
     fun `should throw exception when receiver email is empty in RegisterInvitatiton`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(1, user, "", null, null, false, LocalDateTime.now())
+            RegisterInvitation(1, user, "", channel, role, false, LocalDateTime.now())
         }
     }
 
     @Test
     fun `should throw exception when sender email is equal to receiver email`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(1, user, user.email, null, null, false, LocalDateTime.now())
+            RegisterInvitation(1, user, user.email, channel, role, false, LocalDateTime.now())
         }
     }
 }
