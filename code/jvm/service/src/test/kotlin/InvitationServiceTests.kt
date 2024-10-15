@@ -41,27 +41,6 @@ class InvitationServiceTests {
         assertEquals(Role.READ_WRITE, result.value.role)
     }
 
-    @Test
-    fun `createRegisterInvitation should succeed with null channel`() {
-        val user =
-            userService.addFirstUser("user", "password", "bob@mail.com")
-        assertIs<Success<User>>(user)
-        val logged = userService.loginUser("user", "password")
-        assertIs<Success<AuthenticatedUser>>(logged)
-        val result =
-            invitationService.createRegisterInvitation(
-                user.value.id,
-                "alice@mail.com",
-                null,
-                null,
-                logged.value.token,
-            )
-        assertIs<Success<RegisterInvitation>>(result)
-        assertEquals(null, result.value.channel)
-        assertEquals(user.value, result.value.sender)
-        assertEquals("alice@mail.com", result.value.email)
-        assertEquals(null, result.value.role)
-    }
 
     @Test
     fun `createRegisterInvitation should return Unauthorized if token is invalid`() {
@@ -70,7 +49,7 @@ class InvitationServiceTests {
                 .createRegisterInvitation(
                     1,
                     "bob@mail.com",
-                    null,
+                    1,
                     Role.READ_WRITE,
                     "invalidToken",
                 )
@@ -150,8 +129,8 @@ class InvitationServiceTests {
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -201,8 +180,8 @@ class InvitationServiceTests {
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)

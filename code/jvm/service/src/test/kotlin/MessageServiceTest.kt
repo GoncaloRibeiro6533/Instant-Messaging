@@ -101,8 +101,8 @@ class MessageServiceTest {
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -195,8 +195,8 @@ class MessageServiceTest {
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -331,8 +331,8 @@ class MessageServiceTest {
             invitationService.createRegisterInvitation(
                 user.value.id,
                 "alice@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)

@@ -19,8 +19,8 @@ class MockInvitationRepo : InvitationRepository {
     override fun createRegisterInvitation(
         sender: User,
         email: String,
-        channel: Channel?,
-        role: Role?,
+        channel: Channel,
+        role: Role,
     ): RegisterInvitation {
         val invitation =
             RegisterInvitation(
@@ -65,17 +65,17 @@ class MockInvitationRepo : InvitationRepository {
     }
 
     override fun updateRegisterInvitation(invitation: Invitation): Invitation {
-        val invitation = registerInvitations.first { it.id == invitation.id }
-        val invitationEdited = invitation.markAsUsed()
-        registerInvitations.remove(invitation)
+        val invite = registerInvitations.first { it.id == invitation.id }
+        val invitationEdited = invite.markAsUsed()
+        registerInvitations.remove(invite)
         registerInvitations.add(invitationEdited)
         return invitationEdited
     }
 
     override fun updateChannelInvitation(invitation: Invitation): Invitation {
-        val invitation = channelInvitations.first { it.id == invitation.id }
-        val invitationEdited = invitation.markAsUsed()
-        channelInvitations.remove(invitation)
+        val invite = channelInvitations.first { it.id == invitation.id }
+        val invitationEdited = invite.markAsUsed()
+        channelInvitations.remove(invite)
         channelInvitations.add(invitationEdited)
         return invitationEdited
     }

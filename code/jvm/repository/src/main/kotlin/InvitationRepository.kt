@@ -2,8 +2,8 @@ interface InvitationRepository {
     fun createRegisterInvitation(
         sender: User,
         email: String,
-        channel: Channel?,
-        role: Role?,
+        channel: Channel,
+        role: Role,
     ): RegisterInvitation
 
     fun createChannelInvitation(

@@ -1,6 +1,7 @@
-import org.junit.jupiter.api.Assertions.assertEquals
+
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class UserServiceTests {
@@ -39,27 +40,6 @@ class UserServiceTests {
         assertEquals(UserError.NotFirstUser, secondUser.value)
     }
 
-    @Test
-    fun `register user should succeed and return user with invitation with no channel`() {
-        val user = userService.addFirstUser("admin", "password", "admin@mail.com")
-        assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
-        assertIs<Success<AuthenticatedUser>>(logged)
-        val registerInvitation =
-            invitationService.createRegisterInvitation(
-                user.value.id,
-                "bob@mail.com",
-                null,
-                null,
-                logged.value.token,
-            )
-        assertIs<Success<RegisterInvitation>>(registerInvitation)
-        val username = "Bob"
-        val result =
-            userService.createUser(username, registerInvitation.value.email, "password", registerInvitation.value.id)
-        assertIs<Success<User>>(result)
-        assertEquals(username, result.value.username)
-    }
 
     @Test
     fun `login user should succed and return user`() {
@@ -195,12 +175,14 @@ class UserServiceTests {
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "password")
         assertIs<Success<AuthenticatedUser>>(logged)
+        val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
+        assertIs<Success<Channel>>(channel)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                channel.value.id,
+                Role.READ_ONLY,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -226,12 +208,14 @@ class UserServiceTests {
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "password")
         assertIs<Success<AuthenticatedUser>>(logged)
+        val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
+        assertIs<Success<Channel>>(channel)
         val registerInvitation =
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                channel.value.id,
+                Role.READ_ONLY,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -261,8 +245,8 @@ class UserServiceTests {
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_ONLY,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -293,8 +277,8 @@ class UserServiceTests {
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -392,8 +376,8 @@ class UserServiceTests {
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -428,8 +412,8 @@ class UserServiceTests {
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_ONLY,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
@@ -486,8 +470,8 @@ class UserServiceTests {
             invitationService.createRegisterInvitation(
                 admin.value.id,
                 "bob@mail.com",
-                null,
-                null,
+                1,
+                Role.READ_WRITE,
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
