@@ -1,6 +1,8 @@
-package models
+package models.invitation
 
 import Role
+import models.channel.ChannelOutputModel
+import models.user.UserIdentifiers
 import java.time.LocalDateTime
 
 data class InvitationInputModel(
@@ -13,10 +15,14 @@ data class InvitationInputModel(
 
 data class InvitationOutputModel(
     val id: Int,
-    val senderId: Int,
+    val sender: UserIdentifiers,
     val receiverId: Int,
-    val email: String?,
-    val channelId: Int?,
-    val isUsed: Boolean,
+    val channel: ChannelOutputModel,
+    val role: Role,
     val timestamp: LocalDateTime,
+)
+
+data class InvitationsList(
+    val nInvitations: Int,
+    val invitations: List<InvitationOutputModel>,
 )

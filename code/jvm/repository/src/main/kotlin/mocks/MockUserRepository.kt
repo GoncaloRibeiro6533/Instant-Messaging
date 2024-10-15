@@ -67,4 +67,6 @@ class MockUserRepository : UserRepository {
     }
 
     override fun findAll() = users.toList()
+
+    override fun findByEmail(email: String) = users.firstOrNull { it.email == email }
 }

@@ -29,4 +29,6 @@ interface UserRepository {
     fun clear(): Unit
 
     fun findAll(): List<User>
+
+    fun findByEmail(email: String): User?
 }

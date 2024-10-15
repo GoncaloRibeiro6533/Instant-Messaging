@@ -29,7 +29,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `register first user should return NotFirstUser when user already exists`() {
+    fun `register first user should return NotFirstUser when first user already exists`() {
         val firstUser =
             userService.addFirstUser("admin", "password", "admin@mail.com")
         assertIs<Success<User>>(firstUser)
@@ -185,7 +185,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `createUser should return InvalidUsername when username is blank`() {
+    fun `createUser should return UsernameCannotBeBlank when username is blank`() {
         val admin =
             userService.addFirstUser(
                 "admin",
@@ -212,11 +212,11 @@ class UserServiceTests {
                 registerInvitation.value.id,
             )
         assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.InvalidUsername, result.value)
+        assertEquals(UserError.UsernameCannotBeBlank, result.value)
     }
 
     @Test
-    fun `createUser should return InvalidPassword when password is blank`() {
+    fun `createUser should return PasswordCannotBeBlank when password is blank`() {
         val admin =
             userService.addFirstUser(
                 "admin",
@@ -243,7 +243,7 @@ class UserServiceTests {
                 registerInvitation.value.id,
             )
         assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.InvalidPassword, result.value)
+        assertEquals(UserError.PasswordCannotBeBlank, result.value)
     }
 
     @Test
@@ -312,14 +312,14 @@ class UserServiceTests {
     fun `loginUser should  return  when username is blank`() {
         val result = userService.loginUser("", "password")
         assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.InvalidUsername, result.value)
+        assertEquals(UserError.UsernameCannotBeBlank, result.value)
     }
 
     @Test
-    fun `loginUser should return InvalidPassword when password is blank`() {
+    fun `loginUser should return PasswordCannotBeBlank when password is blank`() {
         val result = userService.loginUser("username", "")
         assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.InvalidPassword, result.value)
+        assertEquals(UserError.PasswordCannotBeBlank, result.value)
     }
 
     @Test
@@ -344,7 +344,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `updateUsername should return InvalidUsername when new username is blank`() {
+    fun `updateUsername should return UsernameCannotBeBlank when new username is blank`() {
         val user =
             userService.addFirstUser(
                 "admin",
@@ -356,7 +356,7 @@ class UserServiceTests {
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.updateUsername(logged.value.token, "")
         assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.InvalidUsername, result.value)
+        assertEquals(UserError.UsernameCannotBeBlank, result.value)
     }
 
     @Test
@@ -436,7 +436,7 @@ class UserServiceTests {
         val user =
             userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
         assertIs<Success<User>>(user)
-        val result = userService.deleteUser(user.value.id, "invalidToken")
+        val result = userService.deleteUser("invalidToken")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.Unauthorized, result.value)
     }
@@ -450,25 +450,9 @@ class UserServiceTests {
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val result = userService.deleteUser(admin.value.id, "invalidToken")
+        val result = userService.deleteUser("invalidToken")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.Unauthorized, result.value)
-    }
-
-    @Test
-    fun `deleteUser should return NegativeIdentifier if id is less than 0`() {
-        val admin =
-            userService.addFirstUser(
-                "admin",
-                "password",
-                "admin@mail.com",
-            )
-        assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
-        assertIs<Success<AuthenticatedUser>>(logged)
-        val result = userService.deleteUser(-1, logged.value.token)
-        assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.NegativeIdentifier, result.value)
     }
 
     @Test
@@ -482,7 +466,7 @@ class UserServiceTests {
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "password")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = userService.deleteUser(admin.value.id, logged.value.token)
+        val result = userService.deleteUser(logged.value.token)
         assertIs<Success<User>>(result)
         assertEquals(admin.value, result.value)
     }
@@ -513,5 +497,43 @@ class UserServiceTests {
         val result = userService.findUserByUsername("Bob", "token")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.Unauthorized, result.value)
+    }
+
+    @Test
+    fun `logoutUser should return Unauthorized when token is invalid`() {
+        val result = userService.logoutUser("invalidToken")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.Unauthorized, result.value)
+    }
+
+    @Test
+    fun `logoutUser should succed`() {
+        val admin =
+            userService.addFirstUser(
+                "admin",
+                "password",
+                "admin@mail.com")
+        assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val result = userService.logoutUser(logged.value.token)
+        assertIs<Success<Unit>>(result)
+    }
+
+    fun `multiple sessions`(){
+        val admin =
+            userService.addFirstUser(
+                "admin",
+                "password",
+                "admin@mail.com")
+        assertIs<Success<User>>(admin)
+        val logged = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged)
+        val logged2 = userService.loginUser("admin", "password")
+        assertIs<Success<AuthenticatedUser>>(logged2)
+        val result = userService.logoutUser(logged.value.token)
+        assertIs<Success<Unit>>(result)
+        val result2 = userService.logoutUser(logged2.value.token)
+        assertIs<Success<Unit>>(result2)
     }
 }

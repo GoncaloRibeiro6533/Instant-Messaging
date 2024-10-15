@@ -3,10 +3,6 @@ import jakarta.inject.Named
 sealed class UserError {
     data object UserNotFound : UserError()
 
-    data object InvalidUsername : UserError()
-
-    data object InvalidPassword : UserError()
-
     data object UsernameAlreadyExists : UserError()
 
     data object NoMatchingUsername : UserError()
@@ -19,8 +15,6 @@ sealed class UserError {
 
     data object NegativeIdentifier : UserError()
 
-    data object InvalidInvite : UserError()
-
     data object NotFirstUser : UserError()
 
     data object InvalidEmail : UserError()
@@ -32,12 +26,23 @@ sealed class UserError {
     data object NegativeLimit : UserError()
 
     data object SessionExpired : UserError()
+
+    data object InvitationNotFound : UserError()
+
+    data object InvitationAlreadyUsed : UserError()
+
+    data object EmailCannotBeBlank : UserError()
+
+    data object UsernameCannotBeBlank : UserError()
+
+    data object PasswordCannotBeBlank : UserError()
+
+    data object EmailAlreadyInUse : UserError()
 }
 
 @Named
 class UserService(private val trxManager: TransactionManager) {
-    private val sha256Token = Sha256Token()
-    private val token = Token()
+    private val usersDomain = UsersDomain()
 
     fun addFirstUser(
         username: String,
@@ -45,10 +50,10 @@ class UserService(private val trxManager: TransactionManager) {
         email: String,
     ) = trxManager.run {
         if (userRepo.findAll().isNotEmpty()) return@run failure(UserError.NotFirstUser)
-        if (username.isBlank()) return@run failure(UserError.InvalidUsername)
-        if (password.isBlank()) return@run failure(UserError.InvalidPassword)
+        if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+        if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
         if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
-        val user = userRepo.create(username, email, sha256Token.hashedWithSha256(password))
+        val user = userRepo.create(username, email, usersDomain.hashedWithSha256(password))
         return@run success(user)
     }
 
@@ -90,6 +95,7 @@ class UserService(private val trxManager: TransactionManager) {
                 sessionRepo.deleteSession(token)
                 return@run failure(UserError.SessionExpired)
             }
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (limit < 0) return@run failure(UserError.NegativeLimit)
             if (skip < 0) return@run failure(UserError.NegativeSkip)
             val users = userRepo.findByUsername(username, limit, skip)
@@ -106,17 +112,19 @@ class UserService(private val trxManager: TransactionManager) {
             if (inviteId < 0) return@run failure(UserError.NegativeIdentifier)
             val invitation =
                 (invitationRepo.findRegisterInvitationById(inviteId) as? RegisterInvitation)
-                    ?: return@run failure(UserError.InvalidInvite)
-            if (invitation.isUsed) return@run failure(UserError.InvalidInvite)
-            if (username.isBlank()) return@run failure(UserError.InvalidUsername)
-            if (password.isBlank()) return@run failure(UserError.InvalidPassword)
-            if (email.isBlank()) return@run failure(UserError.InvalidEmail)
+                    ?: return@run failure(UserError.InvitationNotFound)
+            if (invitation.isUsed) return@run failure(UserError.InvitationAlreadyUsed)
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
+            if (email.isBlank()) return@run failure(UserError.EmailCannotBeBlank)
+            if (!usersDomain.isValidEmail(email)) return@run failure(UserError.InvalidEmail)
+            if (userRepo.findByEmail(email) != null) return@run failure(UserError.EmailAlreadyInUse)
             if (email != invitation.email) return@run failure(UserError.EmailDoesNotMatchInvite)
             if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
                 return@run failure(UserError.UsernameAlreadyExists)
             }
-            val user = userRepo.create(username, email, sha256Token.hashedWithSha256(password))
+            val user = userRepo.create(username, email, usersDomain.hashedWithSha256(password))
             invitationRepo.updateRegisterInvitation(invitation)
             val invitationChannel = invitation.channel
             val invitationRole = invitation.role
@@ -131,18 +139,18 @@ class UserService(private val trxManager: TransactionManager) {
         password: String,
     ): Either<UserError, AuthenticatedUser> =
         trxManager.run {
-            if (username.isBlank()) return@run failure(UserError.InvalidUsername)
-            if (password.isBlank()) return@run failure(UserError.InvalidPassword)
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
             userRepo.findByUsername(username, 1, 0).firstOrNull()
                 ?: return@run failure(UserError.NoMatchingUsername)
             val userAuthenticated =
-                userRepo.getByUsernameAndPassword(username, sha256Token.hashedWithSha256(password))
+                userRepo.getByUsernameAndPassword(username, usersDomain.hashedWithSha256(password))
                     ?: return@run failure(UserError.NoMatchingPassword)
-            val nSessions = sessionRepo.findByUserId(userAuthenticated.id).size
-            if (nSessions >= User.MAX_SESSIONS) {
-                sessionRepo.deleteSession(sessionRepo.findByUserId(userAuthenticated.id).first().token)
+            val sessions = sessionRepo.findByUserId(userAuthenticated.id)
+            if (sessions.size >= User.MAX_SESSIONS) {
+                sessionRepo.deleteSession(sessions.first().token)
             }
-            val session = sessionRepo.createSession(userAuthenticated.id, token.generateToken())
+            val session = sessionRepo.createSession(userAuthenticated.id, usersDomain.generateToken())
             return@run success(AuthenticatedUser(userAuthenticated, session.token))
         }
 
@@ -156,7 +164,7 @@ class UserService(private val trxManager: TransactionManager) {
                 sessionRepo.deleteSession(token)
                 return@run failure(UserError.SessionExpired)
             }
-            if (newUsername.isBlank()) return@run failure(UserError.InvalidUsername)
+            if (newUsername.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
                 return@run failure(UserError.UsernameAlreadyExists)
@@ -165,20 +173,15 @@ class UserService(private val trxManager: TransactionManager) {
             return@run success(userEdited)
         }
 
-    fun deleteUser(
-        id: Int,
-        token: String,
-    ): Either<UserError, User> =
+    fun deleteUser(token: String): Either<UserError, User> =
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
             if (session.expired()) {
                 sessionRepo.deleteSession(token)
                 return@run failure(UserError.SessionExpired)
             }
-            if (id < 0) return@run failure(UserError.NegativeIdentifier)
-            if (session.userId != id) return@run failure(UserError.Unauthorized)
-            sessionRepo.findByUserId(id).forEach { sessionRepo.deleteSession(it.token) }
-            val userDeleted = userRepo.delete(id)
+            sessionRepo.findByUserId(session.userId).forEach { sessionRepo.deleteSession(it.token) }
+            val userDeleted = userRepo.delete(session.userId)
             return@run success(userDeleted)
         }
 

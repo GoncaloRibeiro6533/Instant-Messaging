@@ -1,6 +1,7 @@
 package models.user
 
-data class UserCredentialsInput(
+data class UserRegisterInput(
     val username: String,
+    val email: String,
     val password: String,
 )

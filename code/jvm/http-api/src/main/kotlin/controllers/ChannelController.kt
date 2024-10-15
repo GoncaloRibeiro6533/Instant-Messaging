@@ -4,9 +4,9 @@ import ChannelService
 import Failure
 import Role
 import Success
-import models.ChannelInputModel
-import models.ChannelOutputModel
 import models.UserOutputModel
+import models.channel.ChannelInputModel
+import models.channel.ChannelOutputModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

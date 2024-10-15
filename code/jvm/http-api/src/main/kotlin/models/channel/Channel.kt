@@ -1,4 +1,4 @@
-package models
+package models.channel
 
 import Visibility
 
@@ -9,4 +9,9 @@ data class ChannelOutputModel(
     val name: String,
     val creator: String,
     val visibility: Visibility,
+)
+
+data class ChannelList(
+    val nChannels: Int,
+    val channels: List<ChannelOutputModel>,
 )
