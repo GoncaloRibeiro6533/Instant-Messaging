@@ -61,6 +61,4 @@ sealed class Problem(
 
     data object InvitationAlreadUsed : Problem(URI("$PROBLEM_URI_PATH/invitation-already-used"))
 
-    data object UserIsAlreadyParticipantInTimeSlot :
-        Problem(URI("$PROBLEM_URI_PATH/user-is-already-participant-in-time-slot"))
 }

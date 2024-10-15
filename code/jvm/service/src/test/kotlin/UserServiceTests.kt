@@ -491,8 +491,7 @@ class UserServiceTests {
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
-        val user =
-            userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
+        userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
         userService.clear()
         val result = userService.findUserByUsername("Bob", "token")
         assertIs<Failure<UserError>>(result)
@@ -520,6 +519,7 @@ class UserServiceTests {
         assertIs<Success<Unit>>(result)
     }
 
+    @Test
     fun `multiple sessions`(){
         val admin =
             userService.addFirstUser(
