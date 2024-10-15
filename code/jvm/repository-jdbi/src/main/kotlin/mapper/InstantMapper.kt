@@ -1,5 +1,5 @@
 package mapper
 
 class InstantMapper {
-    //todo
+    // todo
 }

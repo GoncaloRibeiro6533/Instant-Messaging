@@ -40,7 +40,6 @@ class UserServiceTests {
         assertEquals(UserError.NotFirstUser, secondUser.value)
     }
 
-
     @Test
     fun `login user should succed and return user`() {
         val admin =

@@ -41,7 +41,6 @@ class InvitationServiceTests {
         assertEquals(Role.READ_WRITE, result.value.role)
     }
 
-
     @Test
     fun `createRegisterInvitation should return Unauthorized if token is invalid`() {
         val result =

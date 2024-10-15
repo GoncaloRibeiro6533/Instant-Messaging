@@ -8,4 +8,3 @@ sealed class Invitation(
 ) {
     abstract fun markAsUsed(): Invitation
 }
-
