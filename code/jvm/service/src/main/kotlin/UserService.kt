@@ -90,9 +90,11 @@ class UserService(private val trxManager: TransactionManager) {
                 sessionRepo.deleteSession(token)
                 return@run failure(UserError.SessionExpired)
             }
+            if(username.isBlank()) return@run failure(UserError.InvalidUsername)
             if (limit < 0) return@run failure(UserError.NegativeLimit)
             if (skip < 0) return@run failure(UserError.NegativeSkip)
             val users = userRepo.findByUsername(username, limit, skip)
+            if(users.isEmpty()) return@run failure(UserError.UserNotFound) //TODO retorna exceção?
             return@run success(users)
         }
 
