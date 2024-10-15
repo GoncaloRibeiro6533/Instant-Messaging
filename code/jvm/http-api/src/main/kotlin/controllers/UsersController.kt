@@ -17,16 +17,18 @@ import org.springframework.web.bind.annotation.RestController
 class UsersController(
     private val userService: UserService,
 ) {
-
     @PostMapping("api/users/register")
     fun registerFirstUser(
         @RequestBody body: UserInputModel,
-    ) :ResponseEntity<Any> {
-        return when (val result = userService.addFirstUser(
-            body.username,
-            body.email,
-            body.password,
-        )) {
+    ): ResponseEntity<Any> {
+        return when (
+            val result =
+                userService.addFirstUser(
+                    body.username,
+                    body.email,
+                    body.password,
+                )
+        ) {
             is Success -> {
                 val outputModel =
                     UserOutputModel(
@@ -48,17 +50,16 @@ class UsersController(
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
-                    ResponseEntity.badRequest().body("Unknown error")
-                }
+                ResponseEntity.badRequest().body("Unknown error")
             }
         }
-
+    }
 
     @GetMapping("api/users/{id}")
     fun getUserById(
-        @PathVariable id : Int,
-        @RequestParam token : String,
-    ) : ResponseEntity<Any> {
+        @PathVariable id: Int,
+        @RequestParam token: String,
+    ): ResponseEntity<Any> {
         return when (val result = userService.getUserById(id, token)) {
             is Success -> {
                 val outputModel =
@@ -78,28 +79,28 @@ class UsersController(
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
-                    ResponseEntity.badRequest().body("Unknown error")
-                }
+                ResponseEntity.badRequest().body("Unknown error")
             }
         }
-
+    }
 
     @GetMapping("api/users/{name}")
     fun findUserByUsername(
-        @PathVariable name : String,
-        @RequestParam token : String,
-        @RequestParam limit : Int,
-        @RequestParam skip : Int,
-    ) : ResponseEntity<Any> {
+        @PathVariable name: String,
+        @RequestParam token: String,
+        @RequestParam limit: Int,
+        @RequestParam skip: Int,
+    ): ResponseEntity<Any> {
         return when (val result = userService.findUserByUsername(name, token, limit, skip)) {
             is Success -> {
-                val outputModel = result.value.map {
-                    UserOutputModel(
-                        it.id,
-                        it.username,
-                        it.email,
-                    )
-                }
+                val outputModel =
+                    result.value.map {
+                        UserOutputModel(
+                            it.id,
+                            it.username,
+                            it.email,
+                        )
+                    }
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
@@ -109,16 +110,12 @@ class UsersController(
                     is UserError.SessionExpired -> ResponseEntity.badRequest().body(result.value)
                     is UserError.NegativeLimit -> ResponseEntity.badRequest().body(result.value)
                     is UserError.NegativeSkip -> ResponseEntity.badRequest().body(result.value)
-                    is UserError.UserNotFound -> ResponseEntity.notFound().build() //TODO service retorna esta exceção?
+                    is UserError.UserNotFound -> ResponseEntity.notFound().build() // TODO service retorna esta exceção?
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
-                    ResponseEntity.badRequest().body("Unknown error")
-                }
+                ResponseEntity.badRequest().body("Unknown error")
             }
         }
-
+    }
 }
-
-
-
