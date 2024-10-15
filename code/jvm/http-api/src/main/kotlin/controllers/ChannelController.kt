@@ -4,9 +4,9 @@ import ChannelService
 import Failure
 import Role
 import Success
-import models.UserOutputModel
 import models.channel.ChannelInputModel
 import models.channel.ChannelOutputModel
+import models.user.UserIdentifiers
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -122,10 +122,9 @@ class ChannelController(
             is Success -> {
                 val outputModel =
                     result.value.map {
-                        UserOutputModel(
+                        UserIdentifiers(
                             id = it.id,
                             username = it.username,
-                            email = it.email,
                         )
                     }
                 ResponseEntity.ok(outputModel)

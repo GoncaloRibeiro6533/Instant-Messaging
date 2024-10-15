@@ -511,7 +511,8 @@ class UserServiceTests {
             userService.addFirstUser(
                 "admin",
                 "password",
-                "admin@mail.com")
+                "admin@mail.com",
+            )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "password")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -520,12 +521,13 @@ class UserServiceTests {
     }
 
     @Test
-    fun `multiple sessions`(){
+    fun `multiple sessions`() {
         val admin =
             userService.addFirstUser(
                 "admin",
                 "password",
-                "admin@mail.com")
+                "admin@mail.com",
+            )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "password")
         assertIs<Success<AuthenticatedUser>>(logged)
