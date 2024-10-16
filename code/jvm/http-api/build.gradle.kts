@@ -20,14 +20,26 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":service"))
+    implementation(project(":repository-jdbi"))
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation(project(":domain"))
-    implementation(project(":service"))
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+    implementation("org.jdbi:jdbi3-core:3.37.1")
+    implementation("org.postgresql:postgresql:42.7.2")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.bootRun {
+    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost/postgres?user=postgres&password=1506")
 }
 
 kotlin {
@@ -38,4 +50,5 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost/postgres?user=postgres&password=1506")
 }
