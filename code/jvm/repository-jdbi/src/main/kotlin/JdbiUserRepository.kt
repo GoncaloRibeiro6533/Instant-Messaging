@@ -29,36 +29,60 @@ class JdbiUserRepository(
         email: String,
         password: String,
     ): User {
-        TODO("Not yet implemented")
+        return handle.createUpdate("INSERT INTO dbo.User (username, email, password) VALUES (:username, :email, :password)")
+            .bind("username", username)
+            .bind("email", email)
+            .bind("password", password)
+            .executeAndReturnGeneratedKeys()
+            .mapTo(User::class.java)
+            .one()
     }
 
     override fun updateUsername(
-        userId: Int,
+        user: User,
         newUsername: String,
     ): User {
-        TODO("Not yet implemented")
+        return handle.createUpdate("UPDATE dbo.User SET username = :newUsername WHERE id = :id")
+            .bind("newUsername", newUsername)
+            .bind("id", user.id)
+            .execute()
+            .let { user.copy(username = newUsername) }
     }
 
     override fun getByUsernameAndPassword(
         username: String,
         password: String,
     ): User? {
-        TODO("Not yet implemented")
+        return handle.createQuery("SELECT * FROM dbo.User WHERE username = :username AND password = :password")
+            .bind("username", username)
+            .bind("password", password)
+            .mapTo(User::class.java)
+            .findFirst()
+            .orElse(null)
     }
 
-    override fun delete(id: Int): User {
-        TODO("Not yet implemented")
+    override fun delete(id: Int) {
+        handle.createUpdate("DELETE FROM dbo.User WHERE id = :id")
+            .bind("id", id)
+            .execute()
     }
 
     override fun clear() {
-        TODO("Not yet implemented")
+        handle.createUpdate("DELETE FROM dbo.User")
+            .execute()
     }
 
     override fun findAll(): List<User> {
-        TODO("Not yet implemented")
+        return handle.createQuery("SELECT * FROM dbo.User")
+            .mapTo(User::class.java)
+            .list()
     }
 
     override fun findByEmail(email: String): User? {
-        TODO("Not yet implemented")
+        return handle.createQuery("SELECT * FROM dbo.User WHERE email = :email")
+            .bind("email", email)
+            .mapTo(User::class.java)
+            .findFirst()
+            .orElse(null)
     }
 }

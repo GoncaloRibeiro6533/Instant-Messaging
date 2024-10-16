@@ -6,7 +6,6 @@ import UserRepository
 class MockUserRepository : UserRepository {
     private val users = mutableListOf<User>()
     private val passwordsHash = mutableMapOf<Int, String>()
-    private val saltColumn = mutableMapOf<Int, String>()
     private var currentId = 0
 
     override fun findById(id: Int) = users.firstOrNull { it.id == id }
@@ -32,10 +31,9 @@ class MockUserRepository : UserRepository {
     }
 
     override fun updateUsername(
-        userId: Int,
+        user: User,
         newUsername: String,
     ): User {
-        val user = users.first { it.id == userId }
         users.remove(user)
         val userEdited = user.copy(username = newUsername)
         users.add(user)
@@ -54,10 +52,9 @@ class MockUserRepository : UserRepository {
         }
     }
 
-    override fun delete(id: Int): User {
+    override fun delete(id: Int) {
         val user = users.first { it.id == id }
         users.remove(user)
-        return user
     }
 
     override fun clear() {

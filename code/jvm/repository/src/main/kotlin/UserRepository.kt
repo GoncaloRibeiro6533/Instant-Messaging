@@ -14,7 +14,7 @@ interface UserRepository {
     ): User
 
     fun updateUsername(
-        userId: Int,
+        user: User,
         newUsername: String,
     ): User
 
@@ -23,7 +23,7 @@ interface UserRepository {
         password: String,
     ): User?
 
-    fun delete(id: Int): User
+    fun delete(id: Int)
 
     @Suppress("RedundantUnitReturnType")
     fun clear(): Unit

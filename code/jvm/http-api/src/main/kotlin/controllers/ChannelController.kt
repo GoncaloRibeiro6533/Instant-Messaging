@@ -49,7 +49,7 @@ class ChannelController(
         }
     }
 
-    @GetMapping("/{name}")
+   /* @GetMapping("/{name}")
     fun getChannelByName(
         @PathVariable name: String,
     ): ResponseEntity<Any> {
@@ -74,7 +74,7 @@ class ChannelController(
                 ResponseEntity.internalServerError().body("Internal server error")
             }
         }
-    }
+    }*/
 
     @PostMapping
     fun createChannel(
@@ -105,7 +105,7 @@ class ChannelController(
                     is ChannelError.InvalidChannelName -> ResponseEntity.badRequest().body(result.value)
                     is ChannelError.UserNotFound -> ResponseEntity.badRequest().body(result.value)
                     is ChannelError.InvalidVisibility -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.ChannelAlreadyExists -> ResponseEntity.badRequest().body(result.value)
+                    is ChannelError.ChannelNameAlreadyExists -> ResponseEntity.badRequest().body(result.value)
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {

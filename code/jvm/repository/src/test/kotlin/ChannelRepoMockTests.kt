@@ -44,7 +44,7 @@ class ChannelRepoMockTests {
     fun `Test get channel by name`() {
         val user = repoUsers.create("user1", "email1@email.com", "password1")
         val channel = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
-        val channelFound = repoChannels.getChannelByName("channel1")
+        val channelFound = repoChannels.getChannelByName("channel1", 1, 0).first()
         assertEquals(channel, channelFound)
     }
 
