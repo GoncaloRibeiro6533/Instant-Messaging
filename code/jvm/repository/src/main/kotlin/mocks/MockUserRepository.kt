@@ -52,10 +52,9 @@ class MockUserRepository : UserRepository {
         }
     }
 
-    override fun delete(id: Int): User {
+    override fun delete(id: Int) {
         val user = users.first { it.id == id }
         users.remove(user)
-        return user
     }
 
     override fun clear() {
