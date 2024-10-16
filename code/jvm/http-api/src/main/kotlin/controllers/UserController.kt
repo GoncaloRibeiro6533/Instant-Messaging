@@ -191,8 +191,7 @@ class UserController(
     fun deleteUser(
         @RequestHeader("Authorization") token: String,
     ): ResponseEntity<*> {
-        val result: Either<UserError, User> = userService.deleteUser(token)
-        return when (result) {
+        return when (val result: Either<UserError, User> = userService.deleteUser(token)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
                 when (result.value) {

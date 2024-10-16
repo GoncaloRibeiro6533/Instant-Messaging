@@ -43,7 +43,9 @@ sealed class UserError {
 }
 
 @Named
-class UserService(private val trxManager: TransactionManager, private val usersDomain: UsersDomain) {
+class UserService(private val trxManager: TransactionManager) {
+    private val usersDomain = UsersDomain()
+
     fun addFirstUser(
         username: String,
         password: String,
@@ -174,7 +176,7 @@ class UserService(private val trxManager: TransactionManager, private val usersD
             return@run success(userEdited)
         }
 
-    fun deleteUser(token: String): Either<UserError, User> =
+    fun deleteUser(token: String): Either<UserError, Unit> =
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
             val user = userRepo.findById(session.userId) ?: return@run failure(UserError.UserNotFound)

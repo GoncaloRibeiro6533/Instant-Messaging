@@ -23,7 +23,7 @@ interface UserRepository {
         password: String,
     ): User?
 
-    fun delete(id: Int): User
+    fun delete(id: Int)
 
     @Suppress("RedundantUnitReturnType")
     fun clear(): Unit

@@ -5,6 +5,8 @@ sealed class ChannelError {
 
     data object InvalidChannelName : ChannelError()
 
+    data object ChannelAlreadyExists : ChannelError()
+
     data object InvalidVisibility : ChannelError()
 
     data object NegativeIdentifier : ChannelError()
