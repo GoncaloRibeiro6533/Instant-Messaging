@@ -18,7 +18,7 @@ interface UserRepository {
         newUsername: String,
     ): User
 
-    fun getByUsernameAndPassword(
+    fun findByUsernameAndPassword(
         username: String,
         password: String,
     ): User?

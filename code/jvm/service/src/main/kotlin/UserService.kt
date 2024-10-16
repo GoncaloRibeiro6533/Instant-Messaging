@@ -43,9 +43,7 @@ sealed class UserError {
 }
 
 @Named
-class UserService(private val trxManager: TransactionManager) {
-    private val usersDomain = UsersDomain()
-
+class UserService(private val trxManager: TransactionManager, private val usersDomain: UsersDomain) {
     fun addFirstUser(
         username: String,
         password: String,
@@ -146,7 +144,7 @@ class UserService(private val trxManager: TransactionManager) {
             userRepo.findByUsername(username, 1, 0).firstOrNull()
                 ?: return@run failure(UserError.NoMatchingUsername)
             val userAuthenticated =
-                userRepo.getByUsernameAndPassword(username, usersDomain.hashedWithSha256(password))
+                userRepo.findByUsernameAndPassword(username, usersDomain.hashedWithSha256(password))
                     ?: return@run failure(UserError.NoMatchingPassword)
             val sessions = sessionRepo.findByUserId(userAuthenticated.id)
             if (sessions.size >= User.MAX_SESSIONS) {

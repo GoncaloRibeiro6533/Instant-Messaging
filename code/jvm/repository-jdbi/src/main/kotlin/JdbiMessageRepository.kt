@@ -16,7 +16,7 @@ class JdbiMessageRepository(
                 null,
             )
 
-    override fun sendMessage(
+    override fun createMessage(
         sender: User,
         channel: Channel,
         text: String,
@@ -33,7 +33,7 @@ class JdbiMessageRepository(
             .mapTo(Message::class.java)
             .one()
 
-    override fun getMsgHistory(
+    override fun findByChannel(
         channel: Channel,
         limit: Int,
         skip: Int,
@@ -50,5 +50,43 @@ class JdbiMessageRepository(
             .bind("skip", skip)
             .mapTo(Message::class.java)
             .list()
+    }
+
+    override fun deleteMessageById(id: Int): Message =
+        handle.createUpdate(
+            """
+            DELETE FROM message
+            WHERE id = :id
+            """,
+        ).bind("id", id)
+            .executeAndReturnGeneratedKeys()
+            .mapTo(Message::class.java)
+            .one()
+
+    override fun deleteMessagesByChannel(channelId: Int): List<Message> =
+        handle.createUpdate(
+            """
+            DELETE FROM message
+            WHERE channel_id = :channelId
+            """,
+        ).bind("channelId", channelId)
+            .executeAndReturnGeneratedKeys()
+            .mapTo(Message::class.java)
+            .list()
+
+    override fun findAll(): List<Message> =
+        handle.createQuery(
+            """
+            SELECT * FROM message
+            """,
+        ).mapTo(Message::class.java)
+            .list()
+
+    override fun clear() {
+        handle.createUpdate(
+            """
+            DELETE FROM message
+            """,
+        ).execute()
     }
 }

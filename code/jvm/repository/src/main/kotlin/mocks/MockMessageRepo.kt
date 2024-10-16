@@ -33,7 +33,7 @@ class MockMessageRepo : MessageRepository {
         return messages.firstOrNull { it.id == id }
     }
 
-    override fun sendMessage(
+    override fun createMessage(
         sender: User,
         channel: Channel,
         text: String,
@@ -43,7 +43,7 @@ class MockMessageRepo : MessageRepository {
         return message
     }
 
-    override fun getMsgHistory(
+    override fun findByChannel(
         channel: Channel,
         limit: Int,
         skip: Int,
@@ -51,5 +51,25 @@ class MockMessageRepo : MessageRepository {
         return messages.filter { it.channel.id == channel.id }
             .drop(skip)
             .take(limit)
+    }
+
+    override fun deleteMessageById(id: Int): Message {
+        val message = messages.first { it.id == id }
+        messages.remove(message)
+        return message
+    }
+
+    override fun deleteMessagesByChannel(channelId: Int): List<Message> {
+        val messagesToDelete = messages.filter { it.channel.id == channelId }
+        messages.removeAll(messagesToDelete)
+        return messagesToDelete
+    }
+
+    override fun clear() {
+        messages.clear()
+    }
+
+    override fun findAll(): List<Message> {
+        return messages
     }
 }

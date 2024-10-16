@@ -458,8 +458,7 @@ class UserServiceTests {
         val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.deleteUser(logged.value.token)
-        assertIs<Success<User>>(result)
-        assertEquals(admin.value, result.value)
+        assertIs<Success<Unit>>(result)
     }
 
     @Test

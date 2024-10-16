@@ -4,7 +4,7 @@ class JdbiUserRepository(
     private val handle: Handle,
 ) : UserRepository {
     override fun findById(id: Int): User? {
-        return handle.createQuery("SELECT * FROM dbo.User WHERE id = :id")
+        return handle.createQuery("SELECT id, name, email FROM dbo.User WHERE id = :id")
             .bind("id", id)
             .mapTo(User::class.java)
             .findFirst()
@@ -42,14 +42,18 @@ class JdbiUserRepository(
         user: User,
         newUsername: String,
     ): User {
-        return handle.createUpdate("UPDATE dbo.User SET username = :newUsername WHERE id = :id")
-            .bind("newUsername", newUsername)
+        handle.createUpdate(
+            """
+            UPDATE dbo.User set username = :newUsername
+            WHERE id = :id
+            """.trimIndent(),
+        ).bind("newUsername", newUsername)
             .bind("id", user.id)
             .execute()
-            .let { user.copy(username = newUsername) }
+        return user.copy(username = newUsername)
     }
 
-    override fun getByUsernameAndPassword(
+    override fun findByUsernameAndPassword(
         username: String,
         password: String,
     ): User? {

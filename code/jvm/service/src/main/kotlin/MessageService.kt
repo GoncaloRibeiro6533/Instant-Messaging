@@ -64,7 +64,7 @@ class MessageService(private val trxManager: TransactionManager) {
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.sendMessage(user, channel, text))
+            return@run success(messageRepo.createMessage(user, channel, text))
         }
 
     fun getMsgHistory(
@@ -84,6 +84,6 @@ class MessageService(private val trxManager: TransactionManager) {
             if (skip < 0) return@run failure(MessageError.InvalidSkip)
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             if (!channelRepo.getChannelMembers(channel).contains(session.userId)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.getMsgHistory(channel, limit, skip))
+            return@run success(messageRepo.findByChannel(channel, limit, skip))
         }
 }

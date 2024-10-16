@@ -4,66 +4,83 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ChannelRepoMockTests {
-    private val repoUsers = MockUserRepository()
-
+    private var user: User
+    private val repoUsers =
+        MockUserRepository().also {
+            user =
+                it.create(
+                    "Bob",
+                    "bob@mail.com",
+                    "password",
+                )
+        }
     private val repoChannels = MockChannelRepository()
 
     @Test
     fun `Test create channel`() {
-        val user = repoUsers.create("user1", "email@email.com", "password")
-        val channel = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
-        assertEquals("channel1", channel.name)
+        val channel = repoChannels.createChannel("channel", user, Visibility.PUBLIC)
+        assertEquals("channel", channel.name)
         assertEquals(user.id, channel.creator.id)
         assertEquals(Visibility.PUBLIC, channel.visibility)
     }
 
-    /*@Test //TODO
+    @Test
     fun `Test get channels of user`() {
-        val user1 = repoUsers.create("user1", "email@email.com", "password1")
-        val user2 = repoUsers.create("user2", "email1@email.com", "password2")
-        repoChannels.createChannel("channel1", user1, Visibility.PUBLIC)
-        val channel2 = repoChannels.createChannel("channel2", user2, Visibility.PUBLIC)
-        repoChannels.addUserToChannel(user1, channel2, Role.READ_WRITE)
-        val channelsOfUser2 = repoChannels.getChannelsOfUser(user1)
-        assertEquals(2, channelsOfUser2.size)
-        assertEquals(listOf("channel1", "channel2"), channelsOfUser2.map { it.name })
-    }*/
+        val channel1 = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
+        val channel2 = repoChannels.createChannel("channel2", user, Visibility.PUBLIC)
+        repoChannels.addUserToChannel(user, channel1, Role.READ_WRITE)
+        repoChannels.addUserToChannel(user, channel2, Role.READ_WRITE)
+        val channels = repoChannels.getChannelsOfUser(user)
+        assertEquals(2, channels.size)
+        assertEquals(listOf(channel1, channel2), channels)
+    }
 
     @Test
     fun `Test get channel members`() {
-        val user1 = repoUsers.create("user1", "email1@email.com", "password1")
-        val user2 = repoUsers.create("user2", "emai2l@email.com", "password2")
-        val channel1 = repoChannels.createChannel("channel1", user1, Visibility.PUBLIC)
+        val channel1 = repoChannels.createChannel("channel3", user, Visibility.PUBLIC)
+        val user1 = repoUsers.create("user1", "user1@mail.com", "password1")
+        repoChannels.addUserToChannel(user, channel1, Role.READ_WRITE)
         repoChannels.addUserToChannel(user1, channel1, Role.READ_WRITE)
-        repoChannels.addUserToChannel(user2, channel1, Role.READ_WRITE)
         val members = repoChannels.getChannelMembers(channel1)
-        assertEquals(listOf(user1.id, user2.id), members)
+        assertEquals(listOf(user.id, user1.id), members)
     }
 
     @Test
     fun `Test get channel by name`() {
-        val user = repoUsers.create("user1", "email1@email.com", "password1")
-        val channel = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
-        val channelFound = repoChannels.getChannelByName("channel1", 1, 0).first()
+        val channel = repoChannels.createChannel("channel4", user, Visibility.PUBLIC)
+        val channelFound = repoChannels.getChannelByName("channel4", 1, 0).first()
         assertEquals(channel, channelFound)
     }
 
     @Test
     fun `Test find channel by id`() {
-        val user = repoUsers.create("user1", "email1@email.com", "password1")
-        val channel = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
+        val channel = repoChannels.createChannel("channel5", user, Visibility.PUBLIC)
         val channelFound = repoChannels.findById(channel.id)
         assertEquals(channel, channelFound)
     }
 
-    /*@Test //TODO
+    @Test
     fun `Test add user to channel`() {
-        val user = repoUsers.create("user1", "email1@email.com", "password1")
-        val channel = repoChannels.createChannel("channel1", user, Visibility.PUBLIC)
-        val user2 = repoUsers.create("user2", "user2@mail.com", "password2")
-        repoChannels.addUserToChannel(user2, channel, Role.READ_WRITE)
+        val channel = repoChannels.createChannel("channel6", user, Visibility.PUBLIC)
+        repoChannels.addUserToChannel(user, channel, Role.READ_WRITE)
         val members = repoChannels.getChannelMembers(channel)
-        assertEquals(2, members.size)
-        assertEquals(listOf(user.id, user2.id), members)
-    }*/
+        assertEquals(1, members.size)
+        assertEquals(listOf(user.id), members)
+    }
+
+    @Test
+    fun `Test update channel name`() {
+        val channel = repoChannels.createChannel("channel7", user, Visibility.PUBLIC)
+        val updatedChannel = repoChannels.updateChannelName(channel, "channel7_updated")
+        assertEquals("channel7_updated", updatedChannel.name)
+    }
+
+    @Test
+    fun `Test leave channel`() {
+        val channel = repoChannels.createChannel("channel8", user, Visibility.PUBLIC)
+        repoChannels.addUserToChannel(user, channel, Role.READ_WRITE)
+        repoChannels.leaveChannel(user, channel)
+        val members = repoChannels.getChannelMembers(channel)
+        assertEquals(0, members.size)
+    }
 }
