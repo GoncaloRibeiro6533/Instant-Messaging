@@ -88,5 +88,4 @@ class JdbiChannelRepository(
             .execute()
             .let { channel }
     }
-
 }
