@@ -43,9 +43,7 @@ sealed class UserError {
 }
 
 @Named
-class UserService(private val trxManager: TransactionManager) {
-    private val usersDomain = UsersDomain()
-
+class UserService(private val trxManager: TransactionManager, private val usersDomain: UsersDomain) {
     fun addFirstUser(
         username: String,
         password: String,

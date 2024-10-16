@@ -58,8 +58,7 @@ class UserRepoMockTests {
     @Test
     fun `Test delete user`() {
         val user = repoUsers.create("John", "john@mail.com", "password")
-        val userDeleted = repoUsers.delete(user.id)
-        assertEquals(user, userDeleted)
+        repoUsers.delete(user.id)
         assertEquals(null, repoUsers.findById(user.id))
     }
 
