@@ -530,4 +530,17 @@ class UserServiceTests {
         val result2 = userService.logoutUser(logged2.value.token)
         assertIs<Success<Unit>>(result2)
     }
+
+    @Test
+    fun `create user with non existent invitation should return InvitationNotFound`() {
+        val admin =
+            userService.createUser(
+                "admin",
+                "Strong_Password123",
+                "admin@mail.com",
+                999999999,
+            )
+        assertIs<Failure<UserError>>(admin)
+        assertEquals(UserError.InvitationNotFound, admin.value)
+    }
 }
