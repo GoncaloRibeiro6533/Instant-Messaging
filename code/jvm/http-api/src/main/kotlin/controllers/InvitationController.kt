@@ -68,7 +68,7 @@ class InvitationController(private val invitationService: InvitationService) {
         val senderId = principal.name.toInt()
 
         val result =
-            invitationInputModel.email?.let {
+            invitationInputModel.email.let {
                 invitationService.createRegisterInvitation(
                     senderId,
                     invitationInputModel.email,
