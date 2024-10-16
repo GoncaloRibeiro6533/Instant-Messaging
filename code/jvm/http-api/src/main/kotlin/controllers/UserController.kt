@@ -38,6 +38,7 @@ class UserController(
                 userRegisterInput.email.trim(),
                 userRegisterInput.password,
             )
+        println("result is $result")
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
