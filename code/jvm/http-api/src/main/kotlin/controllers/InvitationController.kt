@@ -27,7 +27,7 @@ class InvitationController(private val invitationService: InvitationService) {
         val senderId = principal.name.toInt()
 
         val result =
-            invitationInputModel.channelId?.let {
+            invitationInputModel.channelId.let {
                 invitationService.createChannelInvitation(
                     senderId,
                     invitationInputModel.receiverId,

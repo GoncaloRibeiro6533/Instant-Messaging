@@ -40,7 +40,7 @@ class MockUserRepository : UserRepository {
         return userEdited
     }
 
-    override fun getByUsernameAndPassword(
+    override fun findByUsernameAndPassword(
         username: String,
         password: String,
     ): User? {

@@ -19,4 +19,19 @@ class ChannelInvitation(
     private fun copy() = ChannelInvitation(id, sender, receiver, channel, role, true, timestamp)
 
     override fun markAsUsed() = copy()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ChannelInvitation) return false
+
+        if (id != other.id) return false
+        if (sender != other.sender) return false
+        if (receiver != other.receiver) return false
+        if (channel != other.channel) return false
+        if (role != other.role) return false
+        if (isUsed != other.isUsed) return false
+        if (timestamp != other.timestamp) return false
+
+        return true
+    }
 }
