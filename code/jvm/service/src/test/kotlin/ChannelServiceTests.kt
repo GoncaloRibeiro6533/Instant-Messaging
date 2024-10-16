@@ -34,10 +34,10 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val result = channelService.getChannelByName(channel.value.name)
-        assertIs<Success<Channel>>(result)
-        assertEquals(channel.value.name, result.value.name)
-        assertEquals(channel.value, result.value)
+        val result = channelService.getChannelByName(user.value.id, channel.value.name)
+        assertIs<Success<List<Channel>>>(result)
+        assertEquals(channel.value.name, result.value.first().name)
+        assertEquals(channel.value, result.value.first())
     }
 
     @Test
@@ -112,7 +112,10 @@ class ChannelServiceTests {
 
     @Test
     fun `Test getChannelByName with blank name`() {
-        val exception = channelService.getChannelByName("")
+        val user =
+            userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        assertIs<Success<User>>(user)
+        val exception = channelService.getChannelByName(user.value.id, "", 1, 0)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.InvalidChannelName, exception.value)
     }
@@ -140,9 +143,12 @@ class ChannelServiceTests {
 
     @Test
     fun `Test getChannelByName with non-existent name`() {
-        val exception = channelService.getChannelByName("nonExistentChannel")
-        assertIs<Failure<ChannelError>>(exception)
-        assertEquals(ChannelError.ChannelNotFound, exception.value)
+        val user =
+            userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        assertIs<Success<User>>(user)
+        val channels = channelService.getChannelByName(user.value.id, "non-existent", 1, 0)
+        assertIs<Success<List<Channel>>>(channels)
+        assertEquals(0, channels.value.size)
     }
 
     @Test
@@ -154,7 +160,7 @@ class ChannelServiceTests {
         assertIs<Success<Channel>>(channel)
         val exception = channelService.createChannel(channel.value.name, user.value.id, Visibility.PUBLIC)
         assertIs<Failure<ChannelError>>(exception)
-        assertEquals(ChannelError.ChannelAlreadyExists, exception.value)
+        assertEquals(ChannelError.ChannelNameAlreadyExists, exception.value)
     }
 
     @Test

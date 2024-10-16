@@ -18,7 +18,14 @@ class MockChannelRepository : ChannelRepository {
 
     override fun findById(id: Int) = channels.firstOrNull { it.id == id }
 
-    override fun getChannelByName(name: String) = channels.firstOrNull { it.name == name }
+    override fun getChannelByName(
+        name: String,
+        limit: Int,
+        skip: Int,
+    ): List<Channel> =
+        channels.filter { it.name.trim().uppercase().contains(name.uppercase()) }
+            .drop(skip)
+            .take(limit)
 
     override fun createChannel(
         name: String,
@@ -27,7 +34,6 @@ class MockChannelRepository : ChannelRepository {
     ): Channel {
         val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
-        // addUserToChannel(creator, channel, Role.READ_WRITE)
         return channel
     }
 

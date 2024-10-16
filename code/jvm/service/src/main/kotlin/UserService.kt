@@ -177,11 +177,15 @@ class UserService(private val trxManager: TransactionManager, private val usersD
     fun deleteUser(token: String): Either<UserError, User> =
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
+            val user = userRepo.findById(session.userId) ?: return@run failure(UserError.UserNotFound)
             if (session.expired()) {
                 sessionRepo.deleteSession(token)
                 return@run failure(UserError.SessionExpired)
             }
             sessionRepo.findByUserId(session.userId).forEach { sessionRepo.deleteSession(it.token) }
+            val invitations = invitationRepo.getInvitationsOfUser(user)
+            invitations.forEach { invitationRepo.deleteChannelInvitationById(it.id) }
+            channelRepo.getChannelsOfUser(user).forEach { channelRepo.leaveChannel(user, it) }
             val userDeleted = userRepo.delete(session.userId)
             return@run success(userDeleted)
         }

@@ -3,7 +3,11 @@
 interface ChannelRepository {
     fun findById(id: Int): Channel?
 
-    fun getChannelByName(name: String): Channel?
+    fun getChannelByName(
+        name: String,
+        limit: Int,
+        skip: Int,
+    ): List<Channel>
 
     fun createChannel(
         name: String,

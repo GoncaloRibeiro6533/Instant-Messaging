@@ -5,8 +5,6 @@ sealed class ChannelError {
 
     data object InvalidChannelName : ChannelError()
 
-    data object ChannelAlreadyExists : ChannelError()
-
     data object InvalidVisibility : ChannelError()
 
     data object NegativeIdentifier : ChannelError()
@@ -18,6 +16,10 @@ sealed class ChannelError {
     data object Unauthorized : ChannelError()
 
     data object ChannelNameAlreadyExists : ChannelError()
+
+    data object InvalidSkip : ChannelError()
+
+    data object InvalidLimit : ChannelError()
 }
 
 @Named
@@ -29,11 +31,21 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    fun getChannelByName(name: String): Either<ChannelError, Channel> =
+    fun getChannelByName(
+        userId: Int,
+        name: String,
+        limit: Int = 10,
+        skip: Int = 0,
+    ): Either<ChannelError, List<Channel>> =
         trxManager.run {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
-            val channel = channelRepo.getChannelByName(name)
-            return@run if (channel != null) success(channel) else failure(ChannelError.ChannelNotFound)
+            if (limit < 0) return@run failure(ChannelError.InvalidLimit)
+            if (skip < 0) return@run failure(ChannelError.InvalidSkip)
+            val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
+            val channels = channelRepo.getChannelByName(name, limit, skip)
+            val userChannels = channelRepo.getChannelsOfUser(user)
+            val filteredChannels = channels.filter { userChannels.contains(it) || it.visibility == Visibility.PUBLIC }
+            return@run success(filteredChannels)
         }
 
     fun createChannel(
@@ -49,8 +61,8 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (!Visibility.entries.toTypedArray().contains(visibility)) {
                 return@run failure(ChannelError.InvalidVisibility)
             }
-            if (channelRepo.getChannelByName(name) != null) {
-                return@run failure(ChannelError.ChannelAlreadyExists)
+            if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) {
+                return@run failure(ChannelError.ChannelNameAlreadyExists)
             }
             val channel = channelRepo.createChannel(name, user, visibility)
             channelRepo.addUserToChannel(user, channel, Role.READ_WRITE)
@@ -98,7 +110,7 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
-            if (channelRepo.getChannelByName(name) != null) return@run failure(ChannelError.ChannelNameAlreadyExists)
+            if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
             return@run success(channelRepo.updateChannelName(channel, name))
         }
 
