@@ -14,7 +14,7 @@ interface UserRepository {
     ): User
 
     fun updateUsername(
-        userId: Int,
+        user: User,
         newUsername: String,
     ): User
 

@@ -12,7 +12,7 @@ class UserServiceTests {
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
-        userService = UserService(trxManager)
+        userService = UserService(trxManager, UsersDomain())
         invitationService = InvitationService(trxManager)
         channelService = ChannelService(trxManager)
     }
@@ -22,7 +22,7 @@ class UserServiceTests {
         val result =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(result)
@@ -32,10 +32,10 @@ class UserServiceTests {
     @Test
     fun `register first user should return NotFirstUser when first user already exists`() {
         val firstUser =
-            userService.addFirstUser("admin", "password", "admin@mail.com")
+            userService.addFirstUser("admin", "Strong_Password123", "admin@mail.com")
         assertIs<Success<User>>(firstUser)
         val secondUser =
-            userService.addFirstUser("Bob", "password", "bob@mail.com")
+            userService.addFirstUser("Bob", "Strong_Password123", "bob@mail.com")
         assertIs<Failure<UserError>>(secondUser)
         assertEquals(UserError.NotFirstUser, secondUser.value)
     }
@@ -45,11 +45,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val result = userService.loginUser(admin.value.username, "password")
+        val result = userService.loginUser(admin.value.username, "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(result)
         assertEquals(admin.value, result.value.user)
     }
@@ -59,11 +59,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.getUserById(admin.value.id, logged.value.token)
         assertIs<Success<User>>(result)
@@ -75,7 +75,7 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
@@ -89,11 +89,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.findUserByUsername("admin", logged.value.token)
         assertIs<Success<List<User>>>(result)
@@ -105,11 +105,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val newUsername = "newUsername"
         val result = userService.updateUsername(logged.value.token, newUsername)
@@ -122,11 +122,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.getUserById(-1, logged.value.token)
         assertIs<Failure<UserError>>(result)
@@ -138,11 +138,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.getUserById(100, logged.value.token)
         assertIs<Failure<UserError>>(result)
@@ -154,7 +154,7 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
@@ -168,11 +168,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -189,7 +189,7 @@ class UserServiceTests {
             userService.createUser(
                 "",
                 "bob@mail.com",
-                "password",
+                "Strong_Password123",
                 registerInvitation.value.id,
             )
         assertIs<Failure<UserError>>(result)
@@ -201,11 +201,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -234,11 +234,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -256,7 +256,7 @@ class UserServiceTests {
                 .createUser(
                     "a".repeat(User.MAX_USERNAME_LENGTH + 1),
                     "bob@mail.com",
-                    "password",
+                    "Strong_Password123",
                     registerInvitation.value.id,
                 )
         assertIs<Failure<UserError>>(result)
@@ -268,11 +268,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -289,7 +289,7 @@ class UserServiceTests {
             userService.createUser(
                 "admin",
                 "bob@mail.com",
-                "password",
+                "Strong_Password123",
                 registerInvitation.value.id,
             )
         assertIs<Failure<UserError>>(result)
@@ -297,7 +297,7 @@ class UserServiceTests {
 
     @Test
     fun `loginUser should  return  when username is blank`() {
-        val result = userService.loginUser("", "password")
+        val result = userService.loginUser("", "Strong_Password123")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UsernameCannotBeBlank, result.value)
     }
@@ -311,7 +311,7 @@ class UserServiceTests {
 
     @Test
     fun `loginUser should return NoMatchingUsername when username is invalid`() {
-        val result = userService.loginUser("invalidUsername", "password")
+        val result = userService.loginUser("invalidUsername", "Strong_Password123")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.NoMatchingUsername, result.value)
     }
@@ -321,7 +321,7 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
@@ -335,11 +335,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.updateUsername(logged.value.token, "")
         assertIs<Failure<UserError>>(result)
@@ -351,11 +351,11 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(user)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result =
             userService
@@ -369,11 +369,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -386,9 +386,9 @@ class UserServiceTests {
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
-        val newUser = userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
+        val newUser = userService.createUser("Bob", "bob@mail.com", "Strong_Password123", registerInvitation.value.id)
         assertIs<Success<User>>(newUser)
-        val logged2 = userService.loginUser("Bob", "password")
+        val logged2 = userService.loginUser("Bob", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged2)
         val result = userService.updateUsername(logged2.value.token, "admin")
         assertIs<Failure<UserError>>(result)
@@ -407,11 +407,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -425,7 +425,7 @@ class UserServiceTests {
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user =
-            userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
+            userService.createUser("Bob", "bob@mail.com", "Strong_Password123", registerInvitation.value.id)
         assertIs<Success<User>>(user)
         val result = userService.deleteUser("invalidToken")
         assertIs<Failure<UserError>>(result)
@@ -437,7 +437,7 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
@@ -451,11 +451,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.deleteUser(logged.value.token)
         assertIs<Success<User>>(result)
@@ -467,11 +467,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "Bob123",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("Bob123", "password")
+        val logged = userService.loginUser("Bob123", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val channel = channelService.createChannel("channel", admin.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -484,7 +484,7 @@ class UserServiceTests {
                 logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
-        userService.createUser("Bob", "bob@mail.com", "password", registerInvitation.value.id)
+        userService.createUser("Bob", "bob@mail.com", "Strong_Password123", registerInvitation.value.id)
         userService.clear()
         val result = userService.findUserByUsername("Bob", "token")
         assertIs<Failure<UserError>>(result)
@@ -503,11 +503,11 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
         val result = userService.logoutUser(logged.value.token)
         assertIs<Success<Unit>>(result)
@@ -518,13 +518,13 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "password",
+                "Strong_Password123",
                 "admin@mail.com",
             )
         assertIs<Success<User>>(admin)
-        val logged = userService.loginUser("admin", "password")
+        val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val logged2 = userService.loginUser("admin", "password")
+        val logged2 = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged2)
         val result = userService.logoutUser(logged.value.token)
         assertIs<Success<Unit>>(result)
