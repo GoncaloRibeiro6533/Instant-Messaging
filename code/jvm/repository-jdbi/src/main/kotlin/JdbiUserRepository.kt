@@ -47,7 +47,6 @@ class JdbiUserRepository(
             .bind("id", user.id)
             .execute()
             .let { user.copy(username = newUsername) }
-
     }
 
     override fun getByUsernameAndPassword(

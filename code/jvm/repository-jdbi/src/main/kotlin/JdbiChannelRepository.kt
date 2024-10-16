@@ -11,7 +11,11 @@ class JdbiChannelRepository(
             .orElse(null)
     }
 
-    override fun getChannelByName(name: String, limit :Int, skip :Int): List<Channel> {
+    override fun getChannelByName(
+        name: String,
+        limit: Int,
+        skip: Int,
+    ): List<Channel> {
         return handle.createQuery("SELECT * FROM dbo.channel WHERE name = :name LIMIT :limit OFFSET :skip")
             .bind("name", name)
             .bind("limit", limit)
@@ -53,7 +57,9 @@ class JdbiChannelRepository(
         channel: Channel,
         role: Role,
     ): Channel {
-        return handle.createUpdate("INSERT INTO dbo.user_channel_role (user_id, channel_id, role_name) VALUES (:user_id, :channel_id, :role)")
+        return handle.createUpdate(
+            "INSERT INTO dbo.user_channel_role (user_id, channel_id, role_name) VALUES (:user_id, :channel_id, :role)",
+        )
             .bind("user_id", user.id)
             .bind("channel_id", channel.id)
             .bind("role", role)

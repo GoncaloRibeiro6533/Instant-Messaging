@@ -1,2 +1,1 @@
-class JbdiMessageRepositoryTest {
-}
+class JbdiMessageRepositoryTest
