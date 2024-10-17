@@ -37,7 +37,7 @@ class UserControllerTests {
             trxManager.run {
                 messageRepo.clear()
                 channelRepo.clear()
-                // invitationRepo.clear() TODO change queries on repo
+                invitationRepo.clear()
                 sessionRepo.clear()
                 userRepo.clear()
             }
