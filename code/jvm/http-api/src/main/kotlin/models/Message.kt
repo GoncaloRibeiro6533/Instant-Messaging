@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 
 data class MessageInputModel(
     val channelId: Int,
-    val userId: Int,
     val content: String,
 )
 

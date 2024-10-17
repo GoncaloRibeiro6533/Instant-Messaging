@@ -13,8 +13,6 @@ sealed class ChannelError {
 
     data object UserAlreadyInChannel : ChannelError()
 
-    data object Unauthorized : ChannelError()
-
     data object ChannelNameAlreadyExists : ChannelError()
 
     data object InvalidSkip : ChannelError()
@@ -31,10 +29,8 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    // todo nao funciona no controller
     fun getChannelByName(
         userId: Int,
-        // token: String,
         name: String,
         limit: Int = 10,
         skip: Int = 0,
@@ -43,8 +39,6 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (limit < 0) return@run failure(ChannelError.InvalidLimit)
             if (skip < 0) return@run failure(ChannelError.InvalidSkip)
-            // val userSession = sessionRepo.findByToken(userId) ?: return@run failure(ChannelError.UserNotFound)
-            // val user = userRepo.findById(userSession.userId) ?: return@run failure(ChannelError.UserNotFound)
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             val channels = channelRepo.getChannelByName(name, limit, skip)
             val userChannels = channelRepo.getChannelsOfUser(user)
@@ -56,11 +50,9 @@ class ChannelService(private val trxManager: TransactionManager) {
         name: String,
         creatorId: Int,
         visibility: Visibility,
-        // token: String,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
-            // userRepo.findByToken(token) ?: return@run failure(ChannelError.Unauthorized)
             val user = userRepo.findById(creatorId) ?: return@run failure(ChannelError.UserNotFound)
             if (!Visibility.entries.toTypedArray().contains(visibility)) {
                 return@run failure(ChannelError.InvalidVisibility)

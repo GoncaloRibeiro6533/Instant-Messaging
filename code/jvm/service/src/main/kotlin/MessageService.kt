@@ -30,17 +30,13 @@ sealed class MessageError {
 class MessageService(private val trxManager: TransactionManager) {
     fun findMessageById(
         id: Int,
-        token: String,
+        userId: Int,
     ): Either<MessageError, Message?> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(MessageError.SessionExpired)
-            }
+            userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (id < 0) return@run failure(MessageError.NegativeIdentifier)
             val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
-            if (!channelRepo.getChannelMembers(msg.channel).contains(session.userId)) return@run failure(MessageError.UserNotInChannel)
+            if (!channelRepo.getChannelMembers(msg.channel).contains(userId)) return@run failure(MessageError.UserNotInChannel)
             return@run success(msg)
         }
 
@@ -48,19 +44,12 @@ class MessageService(private val trxManager: TransactionManager) {
         channelId: Int,
         userId: Int,
         text: String,
-        token: String,
     ): Any =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(MessageError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(MessageError.SessionExpired)
-            }
             val user = userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (text.isBlank()) return@run failure(MessageError.InvalidText)
             if (userId < 0) return@run failure(MessageError.InvalidUserId)
-            if (session.userId != userId) return@run failure(MessageError.Unauthorized)
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)

@@ -2,7 +2,10 @@ package models.channel
 
 import Visibility
 
-data class CreateChannelInputModel(val name: String, val creatorId: Int, val visibility: Visibility)
+data class CreateChannelInputModel(
+    val name: String,
+    val visibility: Visibility
+)
 
 data class ChannelOutputModel(
     val id: Int,

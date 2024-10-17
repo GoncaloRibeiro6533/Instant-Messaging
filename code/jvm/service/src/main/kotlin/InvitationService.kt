@@ -32,8 +32,6 @@ sealed class InvitationError {
     data object CantInviteToPublicChannel : InvitationError()
 
     data object ChannelNotFound : InvitationError()
-
-    data object SessionExpired : InvitationError()
 }
 
 @Named
@@ -116,14 +114,8 @@ class InvitationService(private val trxManager: TransactionManager) {
 
     fun acceptChannelInvitation(
         invitationId: Int,
-        token: String,
     ): Either<InvitationError, Channel> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(InvitationError.SessionExpired)
-            }
             val invitation: ChannelInvitation =
                 (
                     invitationRepo.findChannelInvitationById(invitationId)
@@ -138,14 +130,8 @@ class InvitationService(private val trxManager: TransactionManager) {
 
     fun declineInvitation(
         invitationId: Int,
-        token: String,
     ): Either<InvitationError, Unit> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(InvitationError.SessionExpired)
-            }
             invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
             invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(Unit)

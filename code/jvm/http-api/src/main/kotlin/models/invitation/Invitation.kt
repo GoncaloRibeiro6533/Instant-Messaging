@@ -6,7 +6,6 @@ import models.user.UserIdentifiers
 import java.time.LocalDateTime
 
 data class InvitationInputModel(
-    val senderId: Int,
     val receiverId: Int,
     val email: String,
     val channelId: Int,

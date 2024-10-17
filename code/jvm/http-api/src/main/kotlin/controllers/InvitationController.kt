@@ -7,14 +7,7 @@ import InvitationService
 import Success
 import models.invitation.InvitationInputModel
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
-import java.security.Principal
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/invitation")
@@ -22,15 +15,13 @@ class InvitationController(private val invitationService: InvitationService) {
     @PostMapping("/channel")
     fun createChannelInvitation(
         @RequestBody invitationInputModel: InvitationInputModel,
-        @RequestHeader("Authorization") token: String,
-        principal: Principal,
+        user: AuthenticatedUser,
     ): ResponseEntity<Any> {
-        val senderId = principal.name.toInt()
 
         val result =
             invitationInputModel.channelId.let {
                 invitationService.createChannelInvitation(
-                    senderId,
+                    user.user.id,
                     invitationInputModel.receiverId,
                     invitationInputModel.channelId,
                     invitationInputModel.role,
@@ -62,15 +53,12 @@ class InvitationController(private val invitationService: InvitationService) {
     @PostMapping("/register")
     fun createRegisterInvitation(
         @RequestBody invitationInputModel: InvitationInputModel,
-        @RequestHeader("Authorization") token: String,
-        principal: Principal,
-    ): ResponseEntity<Any> {
-        val senderId = principal.name.toInt()
-
+        user: AuthenticatedUser,
+        ): ResponseEntity<Any> {
         val result =
             invitationInputModel.email.let {
                 invitationService.createRegisterInvitation(
-                    senderId,
+                    user.user.id,
                     invitationInputModel.email,
                     invitationInputModel.channelId,
                     invitationInputModel.role,
@@ -100,14 +88,12 @@ class InvitationController(private val invitationService: InvitationService) {
     @PostMapping("/accept")
     fun acceptRegisterInvitation(
         @RequestParam invitationId: Int,
-        @RequestHeader("Authorization") token: String,
+        user: AuthenticatedUser,
     ): ResponseEntity<Any> {
         val result =
             invitationService.acceptChannelInvitation(
                 invitationId,
-                token,
             )
-
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
@@ -131,7 +117,6 @@ class InvitationController(private val invitationService: InvitationService) {
             invitationService.getInvitationsOfUser(
                 user.user.id,
             )
-
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
@@ -155,7 +140,6 @@ class InvitationController(private val invitationService: InvitationService) {
             invitationService.getRegisterInvitationById(
                 invitationId,
             )
-
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->

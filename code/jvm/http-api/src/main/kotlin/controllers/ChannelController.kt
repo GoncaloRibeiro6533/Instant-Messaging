@@ -1,5 +1,6 @@
 package controllers
 
+import AuthenticatedUser
 import ChannelService
 import Failure
 import Role
@@ -48,15 +49,14 @@ class ChannelController(
             }
         }
     }
-/* //todo tem de ser com token?
     @GetMapping("/{name}")
     fun getChannelByName(
         @PathVariable name: String,
-        @RequestHeader("Authorization") token: String,
+        user : AuthenticatedUser,
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @RequestParam(required = false, defaultValue = "0") skip: Int,
     ): ResponseEntity<Any> {
-        return when (val result = channelService.getChannelByName(token, name, limit, skip)) {
+        return when (val result = channelService.getChannelByName(user.user.id, name, limit, skip)) {
             is Success -> {
                 val outputModel =
                     result.value.map {
@@ -81,17 +81,18 @@ class ChannelController(
         }
     }
 
- */
+
 
     @PostMapping
     fun createChannel(
         @RequestBody request: CreateChannelInputModel,
+        user: AuthenticatedUser,
     ): ResponseEntity<Any> {
         return when (
             val result =
                 channelService.createChannel(
                     name = request.name,
-                    creatorId = request.creatorId,
+                    creatorId = user.user.id,
                     visibility = request.visibility,
                 )
         ) {
