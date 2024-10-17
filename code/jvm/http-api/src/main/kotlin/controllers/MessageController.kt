@@ -1,5 +1,6 @@
 package controllers
 
+import AuthenticatedUser
 import Failure
 import MessageService
 import Success
@@ -80,14 +81,14 @@ class MessageController(private val messageService: MessageService) {
         @PathVariable channelId: Int,
         @RequestParam limit: Int,
         @RequestParam skip: Int,
-        @RequestHeader("Authorization") token: String,
+        user: AuthenticatedUser,
     ): ResponseEntity<Any> {
         val result =
             messageService.getMsgHistory(
                 channelId,
                 limit,
                 skip,
-                token,
+                user.user.id,
             )
 
         return when (result) {

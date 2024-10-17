@@ -70,20 +70,11 @@ class InvitationServiceTests {
                 user.value.id,
                 channel2.value.id,
                 Role.READ_WRITE,
-                logged2.value.token,
             )
         assertIs<Success<ChannelInvitation>>(invitation)
-        val invitations = invitationService.getInvitationsOfUser(user.value.id, logged.value.token)
+        val invitations = invitationService.getInvitationsOfUser(user.value.id)
         assertIs<Success<List<Invitation>>>(invitations)
         assertEquals(invitation.value, invitations.value[0])
-    }
-
-    @Test
-    fun `getInvitationsOfUser should return Unauthorized if token is invalid`() {
-        val result =
-            invitationService.getInvitationsOfUser(1, "invalidToken")
-        assertIs<Failure<InvitationError>>(result)
-        assertEquals(InvitationError.Unauthorized, result.value)
     }
 
     @Test
@@ -93,21 +84,21 @@ class InvitationServiceTests {
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = invitationService.getInvitationsOfUser(-1, logged.value.token)
+        val result = invitationService.getInvitationsOfUser(-1)
         assertIs<Failure<InvitationError>>(result)
         assertEquals(InvitationError.NegativeIdentifier, result.value)
     }
 
     @Test
-    fun `getInvitationsOfUser should return Unauthorized error if userId does not exist`() {
+    fun `getInvitationsOfUser should return UserNotFound error if userId does not exist`() {
         val user =
             userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = invitationService.getInvitationsOfUser(2, logged.value.token)
+        val result = invitationService.getInvitationsOfUser(9999)
         assertIs<Failure<InvitationError>>(result)
-        assertEquals(InvitationError.Unauthorized, result.value)
+        assertEquals(InvitationError.UserNotFound, result.value)
     }
 
     @Test
@@ -171,7 +162,6 @@ class InvitationServiceTests {
                 user2.value.id,
                 channel.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<ChannelInvitation>>(channelInvitation)
         val result =
@@ -221,7 +211,6 @@ class InvitationServiceTests {
                 user2.value.id,
                 channel.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<ChannelInvitation>>(invitation)
         invitationService.acceptChannelInvitation(invitation.value.id, logged2.value.token)

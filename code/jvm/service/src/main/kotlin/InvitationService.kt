@@ -38,18 +38,10 @@ sealed class InvitationError {
 
 @Named
 class InvitationService(private val trxManager: TransactionManager) {
-    fun getInvitationsOfUser(
-        userId: Int,
-        token: String,
-    ): Either<InvitationError, List<Invitation>> =
+    fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<Invitation>> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(InvitationError.SessionExpired)
-            }
-            val user = userRepo.findById(session.userId) ?: return@run failure(InvitationError.UserNotFound)
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
+            val user = userRepo.findById(userId) ?: return@run failure(InvitationError.UserNotFound)
             if (user.id != userId) return@run failure(InvitationError.Unauthorized)
             val invitations = invitationRepo.getInvitationsOfUser(user)
             return@run success(invitations)
@@ -97,19 +89,13 @@ class InvitationService(private val trxManager: TransactionManager) {
         receiverId: Int,
         channelId: Int,
         role: Role,
-        token: String,
     ): Either<InvitationError, ChannelInvitation> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(InvitationError.SessionExpired)
-            }
             if (senderId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (receiverId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             if (role !in Role.entries.toTypedArray()) return@run failure(InvitationError.InvalidRole)
-            val authenticatedUser = userRepo.findById(session.userId) ?: return@run failure(InvitationError.Unauthorized)
+            val authenticatedUser = userRepo.findById(senderId) ?: return@run failure(InvitationError.Unauthorized)
             val receiver = userRepo.findById(receiverId) ?: return@run failure(InvitationError.InvalidReceiver)
             val channel = channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
             if (authenticatedUser == receiver) return@run failure(InvitationError.InvalidReceiver)
@@ -160,7 +146,7 @@ class InvitationService(private val trxManager: TransactionManager) {
                 sessionRepo.deleteSession(token)
                 return@run failure(InvitationError.SessionExpired)
             }
-            val invitation = invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
+            invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
             invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(Unit)
         }

@@ -1,5 +1,6 @@
 package controllers
 
+import AuthenticatedUser
 import Failure
 import InvitationError
 import InvitationService
@@ -33,7 +34,6 @@ class InvitationController(private val invitationService: InvitationService) {
                     invitationInputModel.receiverId,
                     invitationInputModel.channelId,
                     invitationInputModel.role,
-                    token,
                 )
             }
 
@@ -126,16 +126,10 @@ class InvitationController(private val invitationService: InvitationService) {
     }
 
     @GetMapping("")
-    fun getInvitations(
-        @RequestHeader("Authorization") token: String,
-        principal: Principal,
-    ): ResponseEntity<Any> {
-        val userId = principal.name.toInt()
-
+    fun getInvitations(user: AuthenticatedUser): ResponseEntity<Any> {
         val result =
             invitationService.getInvitationsOfUser(
-                userId,
-                token,
+                user.user.id,
             )
 
         return when (result) {
