@@ -5,8 +5,6 @@ sealed class ChannelError {
 
     data object InvalidChannelName : ChannelError()
 
-    data object ChannelAlreadyExists : ChannelError()
-
     data object InvalidVisibility : ChannelError()
 
     data object NegativeIdentifier : ChannelError()
@@ -129,10 +127,5 @@ class ChannelService(private val trxManager: TransactionManager) {
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
             return@run success(channelRepo.leaveChannel(user, channel))
-        }
-
-    fun clear() =
-        trxManager.run {
-            channelRepo.clear()
         }
 }

@@ -72,15 +72,9 @@ class UserService(private val trxManager: TransactionManager, private val usersD
         }
 
     fun getUserById(
-        id: Int,
-        token: String,
+        id: Int
     ): Either<UserError, User> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(UserError.SessionExpired)
-            }
             if (id < 0) return@run failure(UserError.NegativeIdentifier)
             val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
             return@run success(user)
@@ -190,8 +184,10 @@ class UserService(private val trxManager: TransactionManager, private val usersD
             return@run success(userDeleted)
         }
 
-    fun clear() =
+
+    fun getUserByToken(token: String): User? =
         trxManager.run {
-            userRepo.clear()
+            val session = sessionRepo.findByToken(token) ?: return@run null
+            return@run userRepo.findById(session.userId)
         }
 }

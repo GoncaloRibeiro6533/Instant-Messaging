@@ -86,9 +86,4 @@ class MessageService(private val trxManager: TransactionManager) {
             if (!channelRepo.getChannelMembers(channel).contains(session.userId)) return@run failure(MessageError.UserNotInChannel)
             return@run success(messageRepo.findByChannel(channel, limit, skip))
         }
-
-    fun clear() =
-        trxManager.run {
-            messageRepo.clear()
-        }
 }

@@ -171,8 +171,4 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(Unit)
         }
 
-    fun clear() =
-        trxManager.run {
-            invitationRepo.clear()
-        }
 }

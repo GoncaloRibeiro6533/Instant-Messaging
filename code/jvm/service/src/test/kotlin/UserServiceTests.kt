@@ -1,4 +1,5 @@
 
+import mocks.MockUserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -8,6 +9,7 @@ class UserServiceTests {
     private lateinit var userService: UserService
     private lateinit var invitationService: InvitationService
     private lateinit var channelService: ChannelService
+    private val userRepo = MockUserRepository()
 
     @BeforeEach
     fun setUp() {
@@ -65,24 +67,11 @@ class UserServiceTests {
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = userService.getUserById(admin.value.id, logged.value.token)
+        val result = userService.getUserById(admin.value.id)
         assertIs<Success<User>>(result)
         assertEquals(admin.value, result.value)
     }
 
-    @Test
-    fun `should return Unauthorized if token is not valid`() {
-        val user =
-            userService.addFirstUser(
-                "admin",
-                "Strong_Password123",
-                "admin@mail.com",
-            )
-        assertIs<Success<User>>(user)
-        val result = userService.getUserById(user.value.id, "invalidToken")
-        assertIs<Failure<UserError>>(result)
-        assertEquals(UserError.Unauthorized, result.value)
-    }
 
     @Test
     fun `should return user by username`() {
@@ -128,7 +117,7 @@ class UserServiceTests {
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = userService.getUserById(-1, logged.value.token)
+        val result = userService.getUserById(-1)
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.NegativeIdentifier, result.value)
     }
@@ -144,7 +133,7 @@ class UserServiceTests {
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
-        val result = userService.getUserById(100, logged.value.token)
+        val result = userService.getUserById(100)
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UserNotFound, result.value)
     }
@@ -484,7 +473,7 @@ class UserServiceTests {
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         userService.createUser("Bob", "bob@mail.com", "Strong_Password123", registerInvitation.value.id)
-        userService.clear()
+        userRepo.clear()
         val result = userService.findUserByUsername("Bob", "token")
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.Unauthorized, result.value)
