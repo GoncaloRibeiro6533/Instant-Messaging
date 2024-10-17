@@ -7,7 +7,13 @@ import InvitationService
 import Success
 import models.invitation.InvitationInputModel
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api/invitation")
@@ -66,7 +72,7 @@ class InvitationController(private val invitationService: InvitationService) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
                 when (result.value) {
-                    is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
                     is InvitationError.InvalidEmail -> ResponseEntity.badRequest().body(result.value)
                     is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
                     is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
@@ -157,7 +163,7 @@ class InvitationController(private val invitationService: InvitationService) {
         val result =
             invitationService.declineChannelInvitation(
                 invitationId,
-                )
+            )
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
@@ -171,6 +177,4 @@ class InvitationController(private val invitationService: InvitationService) {
             }
         }
     }
-
-
 }
