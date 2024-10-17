@@ -8,7 +8,7 @@ class ChannelRepoMockTests {
     private val repoUsers =
         MockUserRepository().also {
             user =
-                it.create(
+                it.createUser(
                     "Bob",
                     "bob@mail.com",
                     "password",
@@ -38,7 +38,7 @@ class ChannelRepoMockTests {
     @Test
     fun `Test get channel members`() {
         val channel1 = repoChannels.createChannel("channel3", user, Visibility.PUBLIC)
-        val user1 = repoUsers.create("user1", "user1@mail.com", "password1")
+        val user1 = repoUsers.createUser("user1", "user1@mail.com", "password1")
         repoChannels.addUserToChannel(user, channel1, Role.READ_WRITE)
         repoChannels.addUserToChannel(user1, channel1, Role.READ_WRITE)
         val members = repoChannels.getChannelMembers(channel1)

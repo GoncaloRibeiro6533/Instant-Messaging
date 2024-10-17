@@ -8,7 +8,7 @@ class UserRepoMockTests {
     private var user: User
     private val repoUsers =
         MockUserRepository().also {
-            user = it.create("Bob", "bob@mail.com", "password")
+            user = it.createUser("Bob", "bob@mail.com", "password")
         }
     private val repoChannels = MockChannelRepository()
 
@@ -44,7 +44,7 @@ class UserRepoMockTests {
 
     @Test
     fun `Test update username`() {
-        val user = repoUsers.create("Alice", "alice@mail.com", "password")
+        val user = repoUsers.createUser("Alice", "alice@mail.com", "password")
         val updatedUser = repoUsers.updateUsername(user, "Alice2")
         assertEquals("Alice2", updatedUser.username)
     }
@@ -57,7 +57,7 @@ class UserRepoMockTests {
 
     @Test
     fun `Test delete user`() {
-        val user = repoUsers.create("John", "john@mail.com", "password")
+        val user = repoUsers.createUser("John", "john@mail.com", "password")
         repoUsers.delete(user.id)
         assertEquals(null, repoUsers.findById(user.id))
     }

@@ -8,7 +8,7 @@ import User
 import UserError
 import UserService
 import models.Problem
-import models.user.UserCredentialsInput
+import models.user.UserLoginCredentialsInput
 import models.user.UserRegisterInput
 import models.user.UsernameUpdateInput
 import org.springframework.http.HttpStatus
@@ -38,6 +38,7 @@ class UserController(
                 userRegisterInput.email.trim(),
                 userRegisterInput.password,
             )
+        println("result is $result")
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
@@ -85,12 +86,12 @@ class UserController(
 
     @PostMapping("/login")
     fun login(
-        @RequestBody userCredentialsInput: UserCredentialsInput,
+        @RequestBody userLoginInput: UserLoginCredentialsInput,
     ): ResponseEntity<*> {
         val result: Either<UserError, AuthenticatedUser> =
             userService.loginUser(
-                userCredentialsInput.username.trim(),
-                userCredentialsInput.password,
+                userLoginInput.username.trim(),
+                userLoginInput.password,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)

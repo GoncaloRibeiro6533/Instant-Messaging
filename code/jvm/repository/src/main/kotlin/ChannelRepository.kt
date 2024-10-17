@@ -34,4 +34,6 @@ interface ChannelRepository {
         user: User,
         channel: Channel,
     ): Channel
+
+    fun clear(): Unit
 }

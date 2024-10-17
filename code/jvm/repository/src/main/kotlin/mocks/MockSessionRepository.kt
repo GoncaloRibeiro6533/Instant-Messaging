@@ -43,4 +43,8 @@ class MockSessionRepository : SessionRepository {
             false
         }
     }
+
+    override fun clear() {
+        sessions.clear()
+    }
 }

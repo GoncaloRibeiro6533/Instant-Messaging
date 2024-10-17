@@ -4,18 +4,11 @@ import ChannelService
 import Failure
 import Role
 import Success
-import models.channel.ChannelInputModel
 import models.channel.ChannelOutputModel
+import models.channel.CreateChannelInputModel
 import models.user.UserIdentifiers
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/channels")
@@ -48,37 +41,44 @@ class ChannelController(
             }
         }
     }
-
-   /* @GetMapping("/{name}")
+/* //todo tem de ser com token?
+    @GetMapping("/{name}")
     fun getChannelByName(
         @PathVariable name: String,
+        @RequestHeader("Authorization") token: String,
+        @RequestParam(required = false, defaultValue = "10") limit: Int,
+        @RequestParam(required = false, defaultValue = "0") skip: Int,
     ): ResponseEntity<Any> {
-        return when (val result = channelService.getChannelByName(name)) {
+        return when (val result = channelService.getChannelByName(token, name, limit, skip)) {
             is Success -> {
                 val outputModel =
-                    ChannelOutputModel(
-                        id = result.value.id,
-                        name = result.value.name,
-                        creator = result.value.creator.username,
-                        visibility = result.value.visibility,
-                    )
+                    result.value.map {
+                        ChannelOutputModel(
+                            id = it.id,
+                            name = it.name,
+                            creator = it.creator.username,
+                            visibility = it.visibility,
+                        )
+                    }
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
                 when (result.value) {
                     is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.InvalidChannelName -> ResponseEntity.badRequest().body(result.value)
+                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }
         }
-    }*/
+    }
+
+ */
 
     @PostMapping
     fun createChannel(
-        @RequestBody request: ChannelInputModel,
+        @RequestBody request: CreateChannelInputModel,
     ): ResponseEntity<Any> {
         return when (
             val result =

@@ -56,7 +56,7 @@ class UserService(private val trxManager: TransactionManager, private val usersD
         if (email.isBlank()) return@run failure(UserError.EmailCannotBeBlank)
         if (!usersDomain.isValidEmail(email)) return@run failure(UserError.InvalidEmail)
         if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
-        val user = userRepo.create(username, email, usersDomain.hashedWithSha256(password))
+        val user = userRepo.createUser(username, email, usersDomain.hashedWithSha256(password))
         return@run success(user)
     }
 
@@ -128,7 +128,7 @@ class UserService(private val trxManager: TransactionManager, private val usersD
                 return@run failure(UserError.UsernameAlreadyExists)
             }
             if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
-            val user = userRepo.create(username, email, usersDomain.hashedWithSha256(password))
+            val user = userRepo.createUser(username, email, usersDomain.hashedWithSha256(password))
             invitationRepo.updateRegisterInvitation(invitation)
             channelRepo.addUserToChannel(user, invitation.channel, invitation.role)
             return@run success(user)

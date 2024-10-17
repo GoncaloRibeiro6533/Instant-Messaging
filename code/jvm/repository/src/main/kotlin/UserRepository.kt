@@ -7,7 +7,7 @@ interface UserRepository {
         skip: Int,
     ): List<User>
 
-    fun create(
+    fun createUser(
         username: String,
         email: String,
         password: String,

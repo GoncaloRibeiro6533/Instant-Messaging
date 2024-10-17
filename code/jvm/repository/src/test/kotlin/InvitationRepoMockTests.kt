@@ -2,7 +2,6 @@ import mocks.MockChannelRepository
 import mocks.MockInvitationRepo
 import mocks.MockUserRepository
 import org.junit.jupiter.api.Test
-import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -14,8 +13,8 @@ class InvitationRepoMockTests {
     private var channel: Channel
     private val repoUsers =
         MockUserRepository().also {
-            user = it.create("Bob", "bob@mail.com", "password")
-            user2 = it.create("John", "john@mail.com", "password")
+            user = it.createUser("Bob", "bob@mail.com", "password")
+            user2 = it.createUser("John", "john@mail.com", "password")
         }
     private val repoChannels =
         MockChannelRepository().also {

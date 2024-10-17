@@ -19,7 +19,7 @@ class MockUserRepository : UserRepository {
             .drop(skip)
             .take(limit)
 
-    override fun create(
+    override fun createUser(
         username: String,
         email: String,
         password: String,
