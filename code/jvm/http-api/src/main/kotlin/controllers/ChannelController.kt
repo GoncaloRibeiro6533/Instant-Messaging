@@ -49,10 +49,11 @@ class ChannelController(
             }
         }
     }
+
     @GetMapping("/{name}")
     fun getChannelByName(
         @PathVariable name: String,
-        user : AuthenticatedUser,
+        user: AuthenticatedUser,
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @RequestParam(required = false, defaultValue = "0") skip: Int,
     ): ResponseEntity<Any> {
@@ -80,8 +81,6 @@ class ChannelController(
             }
         }
     }
-
-
 
     @PostMapping
     fun createChannel(

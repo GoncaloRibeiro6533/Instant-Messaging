@@ -51,12 +51,11 @@ class UserControllerTests {
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
-        val user =
-            controllerUser.registerFirstUser(
-                UserRegisterInput("admin", "Admin_123dsad", "admin@mail.com"),
-            ).let { resp ->
-                assertEquals(HttpStatus.CREATED, resp.statusCode)
-            }
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
+        ).let { resp ->
+            assertEquals(HttpStatus.CREATED, resp.statusCode)
+        }
     }
 
     @ParameterizedTest
@@ -66,12 +65,11 @@ class UserControllerTests {
 
         // when: creating an user
         // then: the response is a 400 with a proper Location header
-        val user =
-            controllerUser.registerFirstUser(
-                UserRegisterInput("admin", "adminmail.com", "Admin_123dsad"),
-            ).let { resp ->
-                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
-            }
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "adminmail.com", "Admin_123dsad"),
+        ).let { resp ->
+            assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
+        }
     }
 
     @ParameterizedTest
@@ -81,12 +79,11 @@ class UserControllerTests {
 
         // when: creating an user
         // then: the response is a 400 with a proper Location header
-        val user =
-            controllerUser.registerFirstUser(
-                UserRegisterInput("admin", "Admin_123dsad", "1234"),
-            )
-                .let { resp ->
-                    assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
-                }
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "admin@mail.com", "1234"),
+        )
+            .let { resp ->
+                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
+            }
     }
 }

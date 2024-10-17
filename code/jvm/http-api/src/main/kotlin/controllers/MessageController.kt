@@ -47,7 +47,7 @@ class MessageController(private val messageService: MessageService) {
     fun sendMessage(
         @RequestBody messageInputModel: MessageInputModel,
         user: AuthenticatedUser,
-        ): ResponseEntity<Any> {
+    ): ResponseEntity<Any> {
         val result =
             messageService.sendMessage(
                 messageInputModel.channelId,
@@ -67,7 +67,6 @@ class MessageController(private val messageService: MessageService) {
                     is MessageError.UserNotInChannel -> ResponseEntity.notFound().build()
                     else -> ResponseEntity.internalServerError().body(result.value)
                 }
-
             else -> {
                 ResponseEntity.internalServerError().body("Internal server error")
             }

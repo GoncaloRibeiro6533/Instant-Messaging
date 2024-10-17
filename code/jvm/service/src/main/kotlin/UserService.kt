@@ -44,8 +44,8 @@ sealed class UserError {
 class UserService(private val trxManager: TransactionManager, private val usersDomain: UsersDomain) {
     fun addFirstUser(
         username: String,
-        password: String,
         email: String,
+        password: String,
     ) = trxManager.run {
         if (userRepo.findAll().isNotEmpty()) return@run failure(UserError.NotFirstUser)
         if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)

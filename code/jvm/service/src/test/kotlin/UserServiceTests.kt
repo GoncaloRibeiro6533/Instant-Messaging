@@ -22,8 +22,8 @@ class UserServiceTests {
         val result =
             userService.addFirstUser(
                 "",
-                "Strong_Password123",
                 "mailnotvalid",
+                "Strong_Password123",
             )
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.UsernameCannotBeBlank, result.value)
@@ -48,8 +48,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -87,8 +87,8 @@ class UserServiceTests {
         val result =
             userService.addFirstUser(
                 "admin",
-                "",
                 "mailnotvalid",
+                "",
             )
         assertIs<Failure<UserError>>(result)
         assertEquals(UserError.PasswordCannotBeBlank, result.value)
@@ -99,8 +99,8 @@ class UserServiceTests {
         val result =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(result)
         assertEquals("admin", result.value.username)
@@ -109,10 +109,10 @@ class UserServiceTests {
     @Test
     fun `register first user should return NotFirstUser when first user already exists`() {
         val firstUser =
-            userService.addFirstUser("admin", "Strong_Password123", "admin@mail.com")
+            userService.addFirstUser("admin", "admin@mail.com", "Strong_Password123")
         assertIs<Success<User>>(firstUser)
         val secondUser =
-            userService.addFirstUser("Bob", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("Bob", "bob@mail.com", "Strong_Password123")
         assertIs<Failure<UserError>>(secondUser)
         assertEquals(UserError.NotFirstUser, secondUser.value)
     }
@@ -122,8 +122,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val result = userService.loginUser(admin.value.username, "Strong_Password123")
@@ -136,8 +136,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -152,8 +152,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -168,8 +168,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -185,8 +185,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -201,8 +201,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -217,8 +217,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -249,8 +249,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -281,8 +281,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -314,8 +314,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -366,8 +366,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val result = userService.loginUser("admin", "invalidPassword")
@@ -380,8 +380,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -396,8 +396,8 @@ class UserServiceTests {
         val user =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -414,8 +414,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -444,8 +444,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -459,8 +459,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")
@@ -485,18 +485,19 @@ class UserServiceTests {
         assertIs<Failure<UserError>>(admin)
         assertEquals(UserError.InvitationNotFound, admin.value)
     }
-
+/*
     @Test
     fun `tries to logout with a sessionExpired`() {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         // TODO val session =
     }
+ */
 
     @Test
     fun `deleteUSer should return UserNotFound when user is not found`() {
@@ -506,12 +507,12 @@ class UserServiceTests {
     }
 
     @Test
-    fun `deleteUSer should succeds`() {
+    fun `deleteUSer should succeeds`() {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val delete = userService.deleteUser(admin.value.id)
@@ -529,8 +530,8 @@ class UserServiceTests {
         val admin =
             userService.addFirstUser(
                 "admin",
-                "Strong_Password123",
                 "admin@mail.com",
+                "Strong_Password123",
             )
         assertIs<Success<User>>(admin)
         val logged = userService.loginUser("admin", "Strong_Password123")

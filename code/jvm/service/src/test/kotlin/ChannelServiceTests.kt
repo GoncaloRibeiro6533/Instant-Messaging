@@ -18,7 +18,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test to get a channel ID`() {
-        val user = userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        val user = userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -30,7 +30,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test to get a channel by name`() {
-        val user = userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        val user = userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -42,7 +42,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test to create a channel`() {
-        val user = userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        val user = userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val name = "channel2"
         val visibility = Visibility.PUBLIC
@@ -55,7 +55,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test to get channels of a user`() {
-        val user = userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        val user = userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -66,7 +66,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test to get members of a channel`() {
-        val user = userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+        val user = userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -79,7 +79,7 @@ class ChannelServiceTests {
     @Test
     fun `Test to add users to a channel`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+            userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -112,7 +112,7 @@ class ChannelServiceTests {
     @Test
     fun `Test getChannelByName with blank name`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+            userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val exception = channelService.getChannelByName(user.value.id, "", 1, 0)
         assertIs<Failure<ChannelError>>(exception)
@@ -143,7 +143,7 @@ class ChannelServiceTests {
     @Test
     fun `Test getChannelByName with non-existent name`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "user@mail.com")
+            userService.addFirstUser("user", "user@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channels = channelService.getChannelByName(user.value.id, "non-existent", 1, 0)
         assertIs<Success<List<Channel>>>(channels)
@@ -153,7 +153,7 @@ class ChannelServiceTests {
     @Test
     fun `Test createChannel with existing name`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -186,7 +186,7 @@ class ChannelServiceTests {
     @Test
     fun `addUserToChannel should throw exception for negative user ID`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -198,7 +198,7 @@ class ChannelServiceTests {
     @Test
     fun `addUserToChannel with negative Channel ID`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -210,7 +210,7 @@ class ChannelServiceTests {
     @Test
     fun `addUserToChannel with non-existent user ID`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -222,7 +222,7 @@ class ChannelServiceTests {
     @Test
     fun `addUserToChannel with non-existent channel ID`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -234,7 +234,7 @@ class ChannelServiceTests {
     @Test
     fun `getChannelsOfUser with a user without channels`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val result = channelService.getChannelsOfUser(user.value.id)
         assertIs<Success<List<Channel>>>(result)
@@ -244,7 +244,7 @@ class ChannelServiceTests {
     @Test
     fun `try to add a user to a channel that is already in it`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)

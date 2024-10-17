@@ -17,7 +17,6 @@ class InvitationController(private val invitationService: InvitationService) {
         @RequestBody invitationInputModel: InvitationInputModel,
         user: AuthenticatedUser,
     ): ResponseEntity<Any> {
-
         val result =
             invitationInputModel.channelId.let {
                 invitationService.createChannelInvitation(
@@ -54,7 +53,7 @@ class InvitationController(private val invitationService: InvitationService) {
     fun createRegisterInvitation(
         @RequestBody invitationInputModel: InvitationInputModel,
         user: AuthenticatedUser,
-        ): ResponseEntity<Any> {
+    ): ResponseEntity<Any> {
         val result =
             invitationInputModel.email.let {
                 invitationService.createRegisterInvitation(

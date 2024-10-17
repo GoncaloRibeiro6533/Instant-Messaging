@@ -13,11 +13,7 @@ sealed class InvitationError {
 
     data object InvitationExpired : InvitationError()
 
-    data object InvalidSender : InvitationError()
-
     data object InvalidReceiver : InvitationError()
-
-    data object InvalidIsUsed : InvitationError()
 
     data object Unauthorized : InvitationError()
 
@@ -112,9 +108,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(createdInvitation)
         }
 
-    fun acceptChannelInvitation(
-        invitationId: Int,
-    ): Either<InvitationError, Channel> =
+    fun acceptChannelInvitation(invitationId: Int): Either<InvitationError, Channel> =
         trxManager.run {
             val invitation: ChannelInvitation =
                 (
@@ -128,9 +122,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    fun declineInvitation(
-        invitationId: Int,
-    ): Either<InvitationError, Unit> =
+    fun declineInvitation(invitationId: Int): Either<InvitationError, Unit> =
         trxManager.run {
             invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
             invitationRepo.deleteChannelInvitationById(invitationId)

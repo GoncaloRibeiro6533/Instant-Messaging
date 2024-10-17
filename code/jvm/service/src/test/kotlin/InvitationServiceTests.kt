@@ -19,7 +19,7 @@ class InvitationServiceTests {
     @Test
     fun `createRegisterInvitation should succeed`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel =
             channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
@@ -43,7 +43,7 @@ class InvitationServiceTests {
     @Test
     fun `getInvitationsOfUser should return the invitations of the user with the given id`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val channel =
             channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
@@ -80,7 +80,7 @@ class InvitationServiceTests {
     @Test
     fun `getInvitationsOfUser should return NegativeIdentifier error if userId is negative`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -92,7 +92,7 @@ class InvitationServiceTests {
     @Test
     fun `getInvitationsOfUser should return UserNotFound error if userId does not exist`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -111,7 +111,7 @@ class InvitationServiceTests {
     @Test
     fun `getRegisterInvitationById should return the register invitation with the given id`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -132,7 +132,7 @@ class InvitationServiceTests {
     @Test
     fun `acceptChannelInvitation should succeed`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -165,25 +165,18 @@ class InvitationServiceTests {
             )
         assertIs<Success<ChannelInvitation>>(channelInvitation)
         val result =
-            invitationService.acceptChannelInvitation(channelInvitation.value.id, logged2.value.token)
+            invitationService.acceptChannelInvitation(channelInvitation.value.id)
         assertIs<Success<ChannelInvitation>>(result)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
         assertIs<Success<List<Channel>>>(channelsOfUser2)
         assertEquals(channel.value, channelsOfUser2.value[1])
     }
 
-    @Test
-    fun `acceptChannelInvitation should return Unauthorized if token is invalid`() {
-        val result =
-            invitationService.acceptChannelInvitation(1, "invalidToken")
-        assertIs<Failure<InvitationError>>(result)
-        assertEquals(InvitationError.Unauthorized, result.value)
-    }
 
     @Test
     fun `acceptChannelInvitation should return AlreadyUsed error if invitation was already used`() {
         val user =
-            userService.addFirstUser("user", "Strong_Password123", "bob@mail.com")
+            userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
         assertIs<Success<AuthenticatedUser>>(logged)
@@ -213,8 +206,8 @@ class InvitationServiceTests {
                 Role.READ_WRITE,
             )
         assertIs<Success<ChannelInvitation>>(invitation)
-        invitationService.acceptChannelInvitation(invitation.value.id, logged2.value.token)
-        val result = invitationService.acceptChannelInvitation(invitation.value.id, logged2.value.token)
+        invitationService.acceptChannelInvitation(invitation.value.id)
+        val result = invitationService.acceptChannelInvitation(invitation.value.id)
         assertIs<Failure<InvitationError>>(result)
         assertEquals(InvitationError.InvitationAlreadyUsed, result.value)
     }

@@ -4,7 +4,7 @@ import Visibility
 
 data class CreateChannelInputModel(
     val name: String,
-    val visibility: Visibility
+    val visibility: Visibility,
 )
 
 data class ChannelOutputModel(
