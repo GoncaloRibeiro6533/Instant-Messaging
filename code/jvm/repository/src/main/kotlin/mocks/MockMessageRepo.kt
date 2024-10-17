@@ -7,7 +7,6 @@ import User
 import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
-
     private val messages = mutableListOf<Message>()
 
     override fun findById(id: Int): Message? {
@@ -54,5 +53,4 @@ class MockMessageRepo : MessageRepository {
     override fun findAll(): List<Message> {
         return messages
     }
-
 }

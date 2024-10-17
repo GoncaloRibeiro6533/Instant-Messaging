@@ -25,7 +25,6 @@ dependencies {
     implementation(project(":service"))
     implementation(project(":repository"))
 
-
     // To use Spring MVC
     implementation("org.springframework:spring-webmvc:6.1.13")
 

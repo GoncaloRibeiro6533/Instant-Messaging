@@ -4,8 +4,8 @@ import ChannelService
 import Failure
 import Role
 import Success
-import models.channel.CreateChannelInputModel
 import models.channel.ChannelOutputModel
+import models.channel.CreateChannelInputModel
 import models.user.UserIdentifiers
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -41,14 +41,14 @@ class ChannelController(
             }
         }
     }
-
+/* //todo tem de ser com token?
     @GetMapping("/{name}")
     fun getChannelByName(
         @PathVariable name: String,
         @RequestHeader("Authorization") token: String,
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @RequestParam(required = false, defaultValue = "0") skip: Int,
-        ): ResponseEntity<Any> {
+    ): ResponseEntity<Any> {
         return when (val result = channelService.getChannelByName(token, name, limit, skip)) {
             is Success -> {
                 val outputModel =
@@ -73,6 +73,8 @@ class ChannelController(
             }
         }
     }
+
+ */
 
     @PostMapping
     fun createChannel(

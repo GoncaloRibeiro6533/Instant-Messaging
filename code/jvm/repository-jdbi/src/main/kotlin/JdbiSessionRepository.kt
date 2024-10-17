@@ -4,7 +4,8 @@ class JdbiSessionRepository(
     private val handle: Handle,
 ) : SessionRepository {
     override fun findByToken(token: String): Session? {
-        return handle.createQuery("SELECT * FROM session WHERE token = :token",
+        return handle.createQuery(
+            "SELECT * FROM session WHERE token = :token",
         ).bind("token", token)
             .mapTo(Session::class.java)
             .findFirst()
@@ -12,7 +13,8 @@ class JdbiSessionRepository(
     }
 
     override fun findByUserId(userId: Int): List<Session> {
-        return handle.createQuery("SELECT * FROM session WHERE user_id = :userId",
+        return handle.createQuery(
+            "SELECT * FROM session WHERE user_id = :userId",
         ).bind("userId", userId)
             .mapTo(Session::class.java)
             .list()
@@ -46,7 +48,8 @@ class JdbiSessionRepository(
     }
 
     override fun deleteSession(token: String): Boolean {
-        return handle.createUpdate("DELETE FROM session WHERE token = :token",
+        return handle.createUpdate(
+            "DELETE FROM session WHERE token = :token",
         ).bind("token", token)
             .execute() > 0
     }

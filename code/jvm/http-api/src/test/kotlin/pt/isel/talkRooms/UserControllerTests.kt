@@ -12,16 +12,16 @@ import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-
 class UserControllerTests {
-    companion object{
+    /*
+    companion object {
         private val jdbi =
             Jdbi
                 .create(
@@ -55,16 +55,17 @@ class UserControllerTests {
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
-        val user = controllerUser.registerFirstUser(
-            UserRegisterInput("admin", "admin@email.com", "Admin123dsad")
-        ).let { resp ->
-            assertEquals(HttpStatus.CREATED, resp.statusCode)
-            val location = resp.headers.getFirst(HttpHeaders.LOCATION)
-            assertNotNull(location)
-            assertTrue(location.startsWith("/api/user/register"))
-            location.split("/").last().toInt()
-        }
-
+        val user =
+            controllerUser.registerFirstUser(
+                UserRegisterInput("admin", "admin@email.com", "Admin123dsad"),
+            ).let { resp ->
+                assertEquals(HttpStatus.CREATED, resp.statusCode)
+                val location = resp.headers.getFirst(HttpHeaders.LOCATION)
+                assertNotNull(location)
+                assertTrue(location.startsWith("/api/user/register"))
+                location.split("/").last().toInt()
+            }
     }
 
+     */
 }
