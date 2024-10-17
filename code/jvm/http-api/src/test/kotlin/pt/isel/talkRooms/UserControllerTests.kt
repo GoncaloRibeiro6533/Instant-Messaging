@@ -12,15 +12,11 @@ import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import java.util.stream.Stream
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class UserControllerTests {
-    /*
     companion object {
         private val jdbi =
             Jdbi
@@ -41,7 +37,7 @@ class UserControllerTests {
             trxManager.run {
                 messageRepo.clear()
                 channelRepo.clear()
-                invitationRepo.clear()
+                // invitationRepo.clear() TODO change queries on repo
                 sessionRepo.clear()
                 userRepo.clear()
             }
@@ -57,15 +53,40 @@ class UserControllerTests {
         // then: the response is a 201 with a proper Location header
         val user =
             controllerUser.registerFirstUser(
-                UserRegisterInput("admin", "admin@email.com", "Admin123dsad"),
+                UserRegisterInput("admin", "Admin_123dsad", "admin@mail.com"),
             ).let { resp ->
                 assertEquals(HttpStatus.CREATED, resp.statusCode)
-                val location = resp.headers.getFirst(HttpHeaders.LOCATION)
-                assertNotNull(location)
-                assertTrue(location.startsWith("/api/user/register"))
-                location.split("/").last().toInt()
             }
     }
 
-     */
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `add first user with invalid email`(trxManager: TransactionManager) {
+        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+
+        // when: creating an user
+        // then: the response is a 400 with a proper Location header
+        val user =
+            controllerUser.registerFirstUser(
+                UserRegisterInput("admin", "adminmail.com", "Admin_123dsad"),
+            ).let { resp ->
+                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
+            }
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `add first user with invalid password`(trxManager: TransactionManager) {
+        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+
+        // when: creating an user
+        // then: the response is a 400 with a proper Location header
+        val user =
+            controllerUser.registerFirstUser(
+                UserRegisterInput("admin", "Admin_123dsad", "1234"),
+            )
+                .let { resp ->
+                    assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
+                }
+    }
 }

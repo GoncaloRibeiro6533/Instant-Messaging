@@ -21,6 +21,10 @@ sealed class Problem(
             .header("Content-Type", MEDIA_TYPE)
             .body(this)
 
+    data object InvalidIdentifier : Problem(URI("$PROBLEM_URI_PATH/invalid-identifier"))
+
+    data object WeakPassword : Problem(URI("$PROBLEM_URI_PATH/weak-password"))
+
     data object NotFirstUser : Problem(URI("$PROBLEM_URI_PATH/not-first-user"))
 
     data object NegativeIdentifier : Problem(URI("$PROBLEM_URI_PATH/negative-identifier"))

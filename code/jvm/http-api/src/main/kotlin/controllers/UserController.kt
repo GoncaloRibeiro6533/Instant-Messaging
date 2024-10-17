@@ -44,8 +44,11 @@ class UserController(
             is Failure ->
                 when (result.value) {
                     is UserError.NotFirstUser -> Problem.NotFirstUser.response(HttpStatus.CONFLICT)
+                    is UserError.InvalidEmail -> Problem.InvalidEmail.response(HttpStatus.BAD_REQUEST)
+                    is UserError.EmailCannotBeBlank -> Problem.EmailCannotBeBlank.response(HttpStatus.BAD_REQUEST)
                     is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
                     is UserError.PasswordCannotBeBlank -> Problem.PasswordCannotBeBlank.response(HttpStatus.BAD_REQUEST)
+                    is UserError.WeakPassword -> Problem.WeakPassword.response(HttpStatus.BAD_REQUEST)
                     is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
                     else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
                 }

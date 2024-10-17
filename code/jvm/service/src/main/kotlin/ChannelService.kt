@@ -33,10 +33,10 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    //todo nao funciona no controller
+    // todo nao funciona no controller
     fun getChannelByName(
         userId: Int,
-        //token: String,
+        // token: String,
         name: String,
         limit: Int = 10,
         skip: Int = 0,
@@ -45,8 +45,8 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (limit < 0) return@run failure(ChannelError.InvalidLimit)
             if (skip < 0) return@run failure(ChannelError.InvalidSkip)
-            //val userSession = sessionRepo.findByToken(userId) ?: return@run failure(ChannelError.UserNotFound)
-            //val user = userRepo.findById(userSession.userId) ?: return@run failure(ChannelError.UserNotFound)
+            // val userSession = sessionRepo.findByToken(userId) ?: return@run failure(ChannelError.UserNotFound)
+            // val user = userRepo.findById(userSession.userId) ?: return@run failure(ChannelError.UserNotFound)
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             val channels = channelRepo.getChannelByName(name, limit, skip)
             val userChannels = channelRepo.getChannelsOfUser(user)
