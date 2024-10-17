@@ -44,8 +44,7 @@ class JdbiUserRepository(
     ): User {
         handle.createUpdate(
             """
-            UPDATE dbo.User set username = :newUsername
-            WHERE id = :id
+            UPDATE dbo.User set username = :newUsername WHERE id = :id
             """.trimIndent(),
         ).bind("newUsername", newUsername)
             .bind("id", user.id)
