@@ -109,15 +109,12 @@ class UserController(
     }
 
     @PostMapping("/logout")
-    fun logout(
-        user: AuthenticatedUser,
-    ): ResponseEntity<*> {
+    fun logout(user: AuthenticatedUser): ResponseEntity<*> {
         val result: Either<UserError, Unit> = userService.logoutUser(user.token)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
                 when (result.value) {
-                    is UserError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
                     is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
                     else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
                 }
@@ -127,12 +124,12 @@ class UserController(
     @PutMapping("/edit/username")
     fun editUsername(
         @RequestBody usernameUpdateInput: UsernameUpdateInput,
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result: Either<UserError, User> =
             userService.updateUsername(
+                user.user.id,
                 usernameUpdateInput.newUsername.trim(),
-                user.token,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
@@ -141,7 +138,6 @@ class UserController(
                     is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
                     is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
                     is UserError.UsernameAlreadyExists -> Problem.UsernameAlreadyInUse.response(HttpStatus.CONFLICT)
-                    is UserError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
                     is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
                     else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
                 }
@@ -151,14 +147,13 @@ class UserController(
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable id: Int,
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        val result: Either<UserError, User> = userService.getUserById(id, user.token)
+        val result: Either<UserError, User> = userService.getUserById(id)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
                 when (result.value) {
-                    is UserError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
                     is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
                     is UserError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)
                     is UserError.UserNotFound -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
@@ -172,15 +167,14 @@ class UserController(
         @PathVariable username: String,
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @RequestParam(required = false, defaultValue = "0") skip: Int,
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result: Either<UserError, List<User>> =
-            userService.findUserByUsername(username, user.token, limit, skip)
+            userService.findUserByUsername(username, limit, skip)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
                 when (result.value) {
-                    is UserError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
                     is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
                     is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
                     is UserError.NegativeLimit -> Problem.NegativeLimit.response(HttpStatus.BAD_REQUEST)
@@ -195,11 +189,10 @@ class UserController(
         user: AuthenticatedUser,
         @RequestHeader("Authorization") token: String,
     ): ResponseEntity<*> {
-        return when (val result: Either<UserError, Unit> = userService.deleteUser(user.token)) {
+        return when (val result: Either<UserError, Unit> = userService.deleteUser(user.user.id)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
                 when (result.value) {
-                    is UserError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
                     is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
                     else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
                 }

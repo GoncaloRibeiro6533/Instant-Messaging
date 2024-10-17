@@ -9,8 +9,6 @@ sealed class UserError {
 
     data object NoMatchingPassword : UserError()
 
-    data object Unauthorized : UserError()
-
     data object UsernameToLong : UserError()
 
     data object NegativeIdentifier : UserError()
@@ -62,18 +60,14 @@ class UserService(private val trxManager: TransactionManager, private val usersD
 
     fun logoutUser(token: String) =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(UserError.SessionExpired)
-            }
+            val user =
+                sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
+                    ?: return@run failure(UserError.SessionExpired)
             sessionRepo.deleteSession(token)
             return@run success(Unit)
         }
 
-    fun getUserById(
-        id: Int
-    ): Either<UserError, User> =
+    fun getUserById(id: Int): Either<UserError, User> =
         trxManager.run {
             if (id < 0) return@run failure(UserError.NegativeIdentifier)
             val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
@@ -82,16 +76,10 @@ class UserService(private val trxManager: TransactionManager, private val usersD
 
     fun findUserByUsername(
         username: String,
-        token: String,
         limit: Int = 10,
         skip: Int = 0,
     ): Either<UserError, List<User>> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(UserError.SessionExpired)
-            }
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (limit < 0) return@run failure(UserError.NegativeLimit)
             if (skip < 0) return@run failure(UserError.NegativeSkip)
@@ -140,25 +128,16 @@ class UserService(private val trxManager: TransactionManager, private val usersD
             val userAuthenticated =
                 userRepo.findByUsernameAndPassword(username, usersDomain.hashedWithSha256(password))
                     ?: return@run failure(UserError.NoMatchingPassword)
-            val sessions = sessionRepo.findByUserId(userAuthenticated.id)
-            if (sessions.size >= User.MAX_SESSIONS) {
-                sessionRepo.deleteSession(sessions.first().token)
-            }
             val session = sessionRepo.createSession(userAuthenticated.id, usersDomain.generateToken())
             return@run success(AuthenticatedUser(userAuthenticated, session.token))
         }
 
     fun updateUsername(
-        token: String,
+        userId: Int,
         newUsername: String,
     ): Either<UserError, User> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(UserError.SessionExpired)
-            }
-            val user = userRepo.findById(session.userId) ?: return@run failure(UserError.UserNotFound)
+            val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
             if (newUsername.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
@@ -168,22 +147,12 @@ class UserService(private val trxManager: TransactionManager, private val usersD
             return@run success(userEdited)
         }
 
-    fun deleteUser(token: String): Either<UserError, Unit> =
+    fun deleteUser(userId: Int): Either<UserError, Unit> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.Unauthorized)
-            val user = userRepo.findById(session.userId) ?: return@run failure(UserError.UserNotFound)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(UserError.SessionExpired)
-            }
-            sessionRepo.findByUserId(session.userId).forEach { sessionRepo.deleteSession(it.token) }
-            val invitations = invitationRepo.getInvitationsOfUser(user)
-            invitations.forEach { invitationRepo.deleteChannelInvitationById(it.id) }
-            channelRepo.getChannelsOfUser(user).forEach { channelRepo.leaveChannel(user, it) }
-            val userDeleted = userRepo.delete(session.userId)
+            val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
+            val userDeleted = userRepo.delete(userId)
             return@run success(userDeleted)
         }
-
 
     fun getUserByToken(token: String): User? =
         trxManager.run {

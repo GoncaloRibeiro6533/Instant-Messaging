@@ -74,7 +74,6 @@ class InvitationController(private val invitationService: InvitationService) {
                     invitationInputModel.email,
                     invitationInputModel.channelId,
                     invitationInputModel.role,
-                    token,
                 )
             }
 

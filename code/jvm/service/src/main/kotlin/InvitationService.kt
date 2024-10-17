@@ -68,18 +68,12 @@ class InvitationService(private val trxManager: TransactionManager) {
         email: String,
         channelId: Int,
         role: Role,
-        token: String,
     ): Either<InvitationError, RegisterInvitation> =
         trxManager.run {
-            val session = sessionRepo.findByToken(token) ?: return@run failure(InvitationError.Unauthorized)
-            if (session.expired()) {
-                sessionRepo.deleteSession(token)
-                return@run failure(InvitationError.SessionExpired)
-            }
             if (senderId < 0) {
                 return@run failure(InvitationError.NegativeIdentifier)
             }
-            val user = userRepo.findById(session.userId) ?: return@run failure(InvitationError.Unauthorized)
+            val user = userRepo.findById(senderId) ?: return@run failure(InvitationError.Unauthorized)
             if (email.isBlank()) {
                 return@run failure(InvitationError.InvalidEmail)
             }
@@ -170,5 +164,4 @@ class InvitationService(private val trxManager: TransactionManager) {
             invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(Unit)
         }
-
 }

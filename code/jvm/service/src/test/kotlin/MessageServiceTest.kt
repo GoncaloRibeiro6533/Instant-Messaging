@@ -105,7 +105,6 @@ class MessageServiceTest {
                 "alice@mail.com",
                 ch.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
 
@@ -201,7 +200,6 @@ class MessageServiceTest {
                 "alice@mail.com",
                 ch.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
 
@@ -339,7 +337,6 @@ class MessageServiceTest {
                 "alice@mail.com",
                 ch.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user2 =

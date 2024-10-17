@@ -32,28 +32,12 @@ class InvitationServiceTests {
                 "alice@mail.com",
                 channel.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(result)
         assertEquals(channel.value, result.value.channel)
         assertEquals(user.value, result.value.sender)
         assertEquals("alice@mail.com", result.value.email)
         assertEquals(Role.READ_WRITE, result.value.role)
-    }
-
-    @Test
-    fun `createRegisterInvitation should return Unauthorized if token is invalid`() {
-        val result =
-            invitationService
-                .createRegisterInvitation(
-                    1,
-                    "bob@mail.com",
-                    1,
-                    Role.READ_WRITE,
-                    "invalidToken",
-                )
-        assertIs<Failure<InvitationError>>(result)
-        assertEquals(InvitationError.Unauthorized, result.value)
     }
 
     @Test
@@ -72,7 +56,6 @@ class InvitationServiceTests {
                 "alice@mail.com",
                 channel.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(result)
         val user2 = userService.createUser("user2", "alice@mail.com", "Strong_Password123", result.value.id)
@@ -149,7 +132,6 @@ class InvitationServiceTests {
                 "alice@mail.com",
                 channel.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(invitation)
         val result = invitationService.getRegisterInvitationById(invitation.value.id)
@@ -171,7 +153,6 @@ class InvitationServiceTests {
                 "alice@mail.com",
                 ch.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
 
@@ -224,7 +205,6 @@ class InvitationServiceTests {
                 "alice@mail.com",
                 ch.value.id,
                 Role.READ_WRITE,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user2 =

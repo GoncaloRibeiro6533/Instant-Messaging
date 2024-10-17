@@ -91,7 +91,6 @@ class ChannelServiceTests {
                 "bob@mail.com",
                 channel.value.id,
                 Role.READ_ONLY,
-                logged.value.token,
             )
         assertIs<Success<RegisterInvitation>>(invitation)
         val user2 = userService.createUser("user2", "bob@mail.com", "Strong_Password123", invitation.value.id)
