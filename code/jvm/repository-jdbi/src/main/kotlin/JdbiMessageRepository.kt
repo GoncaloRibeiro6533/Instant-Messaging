@@ -66,7 +66,7 @@ class JdbiMessageRepository(
     override fun deleteMessagesByChannel(channelId: Int): List<Message> =
         handle.createUpdate(
             """
-            DELETE FROM message
+            DELETE FROM dbo.message
             WHERE channel_id = :channelId
             """,
         ).bind("channelId", channelId)
@@ -77,7 +77,7 @@ class JdbiMessageRepository(
     override fun findAll(): List<Message> =
         handle.createQuery(
             """
-            SELECT * FROM message
+            SELECT * FROM dbo.message
             """,
         ).mapTo(Message::class.java)
             .list()
@@ -85,7 +85,7 @@ class JdbiMessageRepository(
     override fun clear() {
         handle.createUpdate(
             """
-            DELETE FROM message
+            DELETE FROM dbo.message
             """,
         ).execute()
     }

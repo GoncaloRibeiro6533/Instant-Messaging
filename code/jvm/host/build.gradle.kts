@@ -44,4 +44,3 @@ tasks.withType<Test> {
 kotlin {
     jvmToolchain(21)
 }
-

@@ -41,7 +41,7 @@ class UserServiceTests {
     }
 
     @Test
-    fun `login user should succed and return user`() {
+    fun `login user should succeed and return user`() {
         val admin =
             userService.addFirstUser(
                 "admin",

@@ -88,4 +88,9 @@ class JdbiChannelRepository(
             .execute()
             .let { channel }
     }
+
+    override fun clear() {
+        handle.createUpdate("DELETE FROM dbo.channel")
+            .execute()
+    }
 }

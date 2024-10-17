@@ -15,4 +15,6 @@ interface SessionRepository {
     ): List<Session>
 
     fun deleteSession(token: String): Boolean
+
+    fun clear(): Unit
 }

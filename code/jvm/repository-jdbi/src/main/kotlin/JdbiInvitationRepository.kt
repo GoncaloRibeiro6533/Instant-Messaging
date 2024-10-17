@@ -48,4 +48,9 @@ class JdbiInvitationRepository(
     override fun getInvitationsOfUser(user: User): List<Invitation> {
         TODO("Not yet implemented")
     }
+
+    override fun clear() {
+        handle.createUpdate("DELETE FROM dbo.invitation")
+            .execute()
+    }
 }

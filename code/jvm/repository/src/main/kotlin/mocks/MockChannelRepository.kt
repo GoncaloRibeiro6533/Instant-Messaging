@@ -87,4 +87,10 @@ class MockChannelRepository : ChannelRepository {
         usersInChannel.remove(channel.id to UserRole(user.id, Role.READ_WRITE))
         return channel
     }
+
+    override fun clear() {
+        channels.clear()
+        usersInChannel.clear()
+        currentId = 0
+    }
 }

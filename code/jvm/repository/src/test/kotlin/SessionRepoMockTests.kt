@@ -8,7 +8,7 @@ class SessionRepoMockTests {
     private val repoUsers =
         MockUserRepository().also {
             user =
-                it.create(
+                it.createUser(
                     "Bob",
                     "bob@mail.com",
                     "password",

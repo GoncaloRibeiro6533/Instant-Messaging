@@ -7,24 +7,6 @@ import User
 import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
-    /*companion object {
-        val ana = User(1, "Ana", "user1@mail.com","token1")
-        val joana = User(2, "Joana", "user1@mail.com","token2")
-        val joao = User(3, "João", "user1@mail.com","token3")
-
-        val channel1 = Channel(1, "Aulas de DAW", ana, Visibility.PUBLIC)
-
-        val initMsg1 = "Olá, tudo bem?"
-        val initMsg2 = "Tudo e convosco?"
-        val initMsg3 = "Também!"
-
-        val messages = mutableListOf(
-            Message(1, ana.id, channel1.id, initMsg1, LocalDateTime.now()),
-            Message(2, joana.id, channel1.id, initMsg2, LocalDateTime.now()),
-            Message(3, ana.id, channel1.id, initMsg3, LocalDateTime.now())
-        )
-
-    }*/
 
     private val messages = mutableListOf<Message>()
 
@@ -72,4 +54,5 @@ class MockMessageRepo : MessageRepository {
     override fun findAll(): List<Message> {
         return messages
     }
+
 }

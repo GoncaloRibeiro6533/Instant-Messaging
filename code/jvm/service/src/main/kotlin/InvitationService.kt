@@ -170,4 +170,9 @@ class InvitationService(private val trxManager: TransactionManager) {
             invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(Unit)
         }
+
+    fun clear() =
+        trxManager.run {
+            invitationRepo.clear()
+        }
 }

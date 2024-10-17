@@ -24,7 +24,7 @@ class JdbiUserRepository(
             .list()
     }
 
-    override fun create(
+    override fun createUser(
         username: String,
         email: String,
         password: String,

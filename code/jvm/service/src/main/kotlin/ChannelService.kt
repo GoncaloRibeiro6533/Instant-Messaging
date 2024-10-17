@@ -34,7 +34,7 @@ class ChannelService(private val trxManager: TransactionManager) {
         }
 
     fun getChannelByName(
-        userId: Int,
+        token: String,
         name: String,
         limit: Int = 10,
         skip: Int = 0,
@@ -43,7 +43,8 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (limit < 0) return@run failure(ChannelError.InvalidLimit)
             if (skip < 0) return@run failure(ChannelError.InvalidSkip)
-            val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
+            val userSession = sessionRepo.findByToken(token) ?: return@run failure(ChannelError.UserNotFound)
+            val user = userRepo.findById(userSession.userId) ?: return@run failure(ChannelError.UserNotFound)
             val channels = channelRepo.getChannelByName(name, limit, skip)
             val userChannels = channelRepo.getChannelsOfUser(user)
             val filteredChannels = channels.filter { userChannels.contains(it) || it.visibility == Visibility.PUBLIC }
@@ -125,5 +126,10 @@ class ChannelService(private val trxManager: TransactionManager) {
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
             return@run success(channelRepo.leaveChannel(user, channel))
+        }
+
+    fun clear() =
+        trxManager.run {
+            channelRepo.clear()
         }
 }

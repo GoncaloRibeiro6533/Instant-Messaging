@@ -95,4 +95,11 @@ class MockInvitationRepo : InvitationRepository {
     override fun getInvitationsOfUser(user: User): List<Invitation> {
         return channelInvitations.filter { it.receiver.id == user.id }
     }
+
+    override fun clear() {
+        channelInvitations.clear()
+        currentIdChannelInvitations = 0
+        registerInvitations.clear()
+        currentIdRegisterInvitation = 0
+    }
 }
