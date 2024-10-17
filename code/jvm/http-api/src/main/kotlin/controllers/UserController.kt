@@ -38,7 +38,6 @@ class UserController(
                 userRegisterInput.email.trim(),
                 userRegisterInput.password,
             )
-        println("result is $result")
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
@@ -111,9 +110,9 @@ class UserController(
 
     @PostMapping("/logout")
     fun logout(
-        @RequestHeader("Authorization") token: String,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        val result: Either<UserError, Unit> = userService.logoutUser(token)
+        val result: Either<UserError, Unit> = userService.logoutUser(user.token)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
@@ -128,12 +127,12 @@ class UserController(
     @PutMapping("/edit/username")
     fun editUsername(
         @RequestBody usernameUpdateInput: UsernameUpdateInput,
-        @RequestHeader("Authorization") token: String,
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
         val result: Either<UserError, User> =
             userService.updateUsername(
                 usernameUpdateInput.newUsername.trim(),
-                token,
+                user.token,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
@@ -152,9 +151,9 @@ class UserController(
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable id: Int,
-        @RequestHeader("Authorization") token: String,
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
-        val result: Either<UserError, User> = userService.getUserById(id, token)
+        val result: Either<UserError, User> = userService.getUserById(id, user.token)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
@@ -171,12 +170,12 @@ class UserController(
     @GetMapping("/search/{username}")
     fun searchUser(
         @PathVariable username: String,
-        @RequestHeader("Authorization") token: String,
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @RequestParam(required = false, defaultValue = "0") skip: Int,
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
         val result: Either<UserError, List<User>> =
-            userService.findUserByUsername(username, token, limit, skip)
+            userService.findUserByUsername(username, user.token, limit, skip)
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
@@ -193,9 +192,10 @@ class UserController(
 
     @PostMapping("/delete")
     fun deleteUser(
+        user: AuthenticatedUser,
         @RequestHeader("Authorization") token: String,
     ): ResponseEntity<*> {
-        return when (val result: Either<UserError, Unit> = userService.deleteUser(token)) {
+        return when (val result: Either<UserError, Unit> = userService.deleteUser(user.token)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
                 when (result.value) {
