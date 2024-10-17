@@ -31,8 +31,7 @@ class InvitationController(private val invitationService: InvitationService) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
                 when (result.value) {
-                    // is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
-                    // is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
                     is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
                     is InvitationError.InvalidChannel -> ResponseEntity.badRequest().body(result.value)
                     is InvitationError.InvalidRole -> ResponseEntity.badRequest().body(result.value)
@@ -63,19 +62,16 @@ class InvitationController(private val invitationService: InvitationService) {
                     invitationInputModel.role,
                 )
             }
-
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
                 when (result.value) {
-                    // is InvitationError.InvalidReceiver -> ResponseEntity.badRequest().body(result.value)
-                    // is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
-                    // is InvitationError.InvalidEmail -> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.NegativeIdentifier-> ResponseEntity.badRequest().body(result.value)
+                    is InvitationError.InvalidEmail -> ResponseEntity.badRequest().body(result.value)
                     is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
                     is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(result.value)
                     is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                    is InvitationError.UserNotFound -> ResponseEntity.notFound().build()
-
+                    is InvitationError.ChannelNotFound -> ResponseEntity.unprocessableEntity().body(result.value)
                     else -> ResponseEntity.badRequest().body(result.value)
                 }
             else -> {
@@ -132,7 +128,7 @@ class InvitationController(private val invitationService: InvitationService) {
     }
 
     @GetMapping("/register")
-    fun getRegisterInvitation(
+    fun getRegisterInvitationById(
         @RequestParam invitationId: Int,
     ): ResponseEntity<Any> {
         val result =
@@ -152,4 +148,29 @@ class InvitationController(private val invitationService: InvitationService) {
             }
         }
     }
+
+    @PutMapping("/decline")
+    fun declineInvitation(
+        @RequestParam invitationId: Int,
+        user: AuthenticatedUser,
+    ): ResponseEntity<Any> {
+        val result =
+            invitationService.declineChannelInvitation(
+                invitationId,
+                )
+        return when (result) {
+            is Success<*> -> ResponseEntity.ok(result.value)
+            is Failure<*> ->
+                when (result.value) {
+                    is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
+                    is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
+                    else -> ResponseEntity.badRequest().body(result.value)
+                }
+            else -> {
+                ResponseEntity.internalServerError().body("Internal server error")
+            }
+        }
+    }
+
+
 }

@@ -603,7 +603,7 @@ class InvitationServiceTests {
         assertIs<Success<List<Channel>>>(channelsOfUser2)
         assertEquals(1, channelsOfUser2.value.size)
     }
-/*
+/* //todo fazer teste de erro para o declineChannelInvitation
     @Test
     fun `test declineChannelInvitation with invitation not found`() {
         val user =
