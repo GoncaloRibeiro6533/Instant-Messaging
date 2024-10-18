@@ -51,5 +51,5 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost/postgres?user=postgres&password=password")
+    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost/postgres?user=postgres&password=postgres")
 }

@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS dbo.USER(
 CREATE TABLE IF NOT EXISTS dbo.SESSION(
 	token VARCHAR(36) UNIQUE NOT NULL,
 	user_id int NOT NULL,
-	expirationDate TIMESTAMP NOT NULL,
-	lastTimeUsed TIMESTAMP NOT NULL,
+    created_at bigint not null,
+    last_used_at bigint not null,
 	PRIMARY KEY (TOKEN, user_id),
 	CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES dbo.USER(id) ON DELETE CASCADE
 );

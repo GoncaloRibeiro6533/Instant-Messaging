@@ -139,7 +139,6 @@ class MessageServiceTest {
         assertIs<Success<Message?>>(result)
     }
 
-
     @Test
     fun `findMessageById should return NegativeIdentifier if id is negative`() {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")

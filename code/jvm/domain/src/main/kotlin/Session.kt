@@ -1,14 +1,16 @@
-import java.time.LocalDateTime
+import kotlinx.datetime.Instant
+
 
 data class Session(
-    val userId: Int,
     val token: String,
-    val expiration: LocalDateTime,
+    val userId: Int,
+    val createdAt: Instant,
+    val lastUsedAt: Instant,
 ) {
     init {
         require(token.isNotBlank()) { "Token must not be blank" }
-        require(expiration.isAfter(LocalDateTime.now())) { "Expiration must be in the future" }
+        //require(expiration.isAfter(LocalDateTime.now())) { "Expiration must be in the future" }
     }
 
-    fun expired(): Boolean = expiration.isBefore(LocalDateTime.now())
+    //fun expired(): Boolean = expiration.isBefore(LocalDateTime.now())
 }
