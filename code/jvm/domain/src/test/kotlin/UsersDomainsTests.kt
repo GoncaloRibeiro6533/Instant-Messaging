@@ -61,7 +61,7 @@ class UsersDomainsTests {
     @Test
     fun `token should be generated`() {
         val usersDomain = UsersDomain()
-        val result = usersDomain.generateToken()
+        val result = usersDomain.generateTokenValue()
         assertTrue(result.isNotEmpty())
     }
 
