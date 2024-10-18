@@ -8,7 +8,7 @@ class MockSessionRepository : SessionRepository {
     private val sessions = mutableListOf<Session>()
 
     override fun findByToken(token: String): Session? {
-        return sessions.firstOrNull { it.token == token }
+        return sessions.firstOrNull { it.token.validationInfo == token }
     }
 
     override fun findByUserId(userId: Int): List<Session> {
@@ -35,7 +35,7 @@ class MockSessionRepository : SessionRepository {
     }
 
     override fun deleteSession(token: String): Boolean {
-        val session = sessions.firstOrNull { it.token == token }
+        val session = sessions.firstOrNull { it.token.validationInfo == token }
         return if (session != null) {
             sessions.remove(session)
             true

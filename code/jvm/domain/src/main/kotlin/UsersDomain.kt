@@ -2,11 +2,9 @@ import jakarta.inject.Named
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.Base64.getUrlDecoder
 import java.util.Base64.getUrlEncoder
-import java.util.UUID
 
 const val MIN_PASSWORD_LENGTH = 12
 
@@ -47,7 +45,6 @@ class UsersDomain(
             validationInfo = passwordEncoder.encode(password),
         )
 
-
     fun isPasswordStrong(password: String): Boolean {
         if (password.length < MIN_PASSWORD_LENGTH) return false
         if (!password.any { it.isDigit() }) return false
@@ -78,5 +75,4 @@ class UsersDomain(
     }
 
     val maxNumberOfTokensPerUser = config.maxTokensPerUser
-
 }

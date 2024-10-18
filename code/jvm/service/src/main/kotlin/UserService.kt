@@ -1,4 +1,5 @@
 import jakarta.inject.Named
+import kotlinx.datetime.Clock
 
 sealed class UserError {
     data object UserNotFound : UserError()
@@ -41,7 +42,11 @@ sealed class UserError {
 }
 
 @Named
-class UserService(private val trxManager: TransactionManager, private val usersDomain: UsersDomain) {
+class UserService(
+    private val trxManager: TransactionManager,
+    private val usersDomain: UsersDomain,
+    private val clock: Clock,
+) {
     fun addFirstUser(
         username: String,
         email: String,
@@ -54,15 +59,15 @@ class UserService(private val trxManager: TransactionManager, private val usersD
         if (email.isBlank()) return@run failure(UserError.EmailCannotBeBlank)
         if (!usersDomain.isValidEmail(email)) return@run failure(UserError.InvalidEmail)
         if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
-        val user = userRepo.createUser(username, email, usersDomain.hashedWithSha256(password))
+        val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
+        val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
         return@run success(user)
     }
 
     fun logoutUser(token: String) =
         trxManager.run {
-            val user =
-                sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
-                    ?: return@run failure(UserError.SessionExpired)
+            sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
+                ?: return@run failure(UserError.SessionExpired)
             sessionRepo.deleteSession(token)
             return@run success(Unit)
         }
@@ -110,7 +115,8 @@ class UserService(private val trxManager: TransactionManager, private val usersD
                 return@run failure(UserError.UsernameAlreadyExists)
             }
             if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
-            val user = userRepo.createUser(username, email, usersDomain.hashedWithSha256(password))
+            val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
+            val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
             invitationRepo.updateRegisterInvitation(invitation)
             channelRepo.addUserToChannel(user, invitation.channel, invitation.role)
             return@run success(user)
@@ -121,15 +127,28 @@ class UserService(private val trxManager: TransactionManager, private val usersD
         password: String,
     ): Either<UserError, AuthenticatedUser> =
         trxManager.run {
-            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
-            userRepo.findByUsername(username, 1, 0).firstOrNull()
-                ?: return@run failure(UserError.NoMatchingUsername)
-            val userAuthenticated =
-                userRepo.findByUsernameAndPassword(username, usersDomain.hashedWithSha256(password))
-                    ?: return@run failure(UserError.NoMatchingPassword)
-            val session = sessionRepo.createSession(userAuthenticated.id, usersDomain.generateToken())
-            return@run success(AuthenticatedUser(userAuthenticated, session.token))
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            val user =
+                userRepo.findByUsername(username, 1, 0).firstOrNull()
+                    ?: return@run failure(UserError.NoMatchingUsername)
+            val repoPassword = userRepo.findPasswordOfUser(user)
+            val passwordValidationInfo = PasswordValidationInfo(repoPassword)
+            if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
+                if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
+                    return@run failure(UserError.NoMatchingPassword)
+                }
+            }
+            val now = clock.now()
+            val newSession =
+                Session(
+                    token = usersDomain.createTokenValidationInformation(usersDomain.generateTokenValue()),
+                    userId = user.id,
+                    createdAt = now,
+                    lastUsedAt = now,
+                )
+            sessionRepo.createSession(user.id, newSession)
+            return@run success(AuthenticatedUser(user, newSession.token.validationInfo))
         }
 
     fun updateUsername(
@@ -149,7 +168,7 @@ class UserService(private val trxManager: TransactionManager, private val usersD
 
     fun deleteUser(userId: Int): Either<UserError, Unit> =
         trxManager.run {
-            val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
+            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
             val userDeleted = userRepo.delete(userId)
             return@run success(userDeleted)
         }

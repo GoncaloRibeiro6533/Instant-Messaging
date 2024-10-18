@@ -26,10 +26,10 @@ class JdbiSessionRepository(
     ): Session {
         return handle.createUpdate(
             "INSERT INTO dbo.session(token, user_id, created_at, last_used_at) " +
-                    "VALUES (:token, :user_id, :created_at, :last_used_at)",
-            ).bind("token", token)
+                "VALUES (:token, :user_id, :created_at, :last_used_at)",
+        ).bind("token", token)
             .bind("user_id", userId)
-            .bind("created_at", token.createdAt.epochSeconds )
+            .bind("created_at", token.createdAt.epochSeconds)
             .bind("last_used_at", token.lastUsedAt.epochSeconds)
             .executeAndReturnGeneratedKeys()
             .mapTo(Session::class.java)
@@ -61,6 +61,4 @@ class JdbiSessionRepository(
         handle.createUpdate("DELETE FROM dbo.session")
             .execute()
     }
-
-
 }

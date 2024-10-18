@@ -88,4 +88,11 @@ class JdbiUserRepository(
             .findFirst()
             .orElse(null)
     }
+
+    override fun findPasswordOfUser(user: User): String {
+        return handle.createQuery("SELECT password FROM dbo.User WHERE id = :id")
+            .bind("id", user.id)
+            .mapTo(String::class.java)
+            .one()
+    }
 }

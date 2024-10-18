@@ -1,3 +1,3 @@
 data class TokenValidationInfo(
-   val validationInfo: String
+    val validationInfo: String,
 )

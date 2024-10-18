@@ -31,4 +31,6 @@ interface UserRepository {
     fun findAll(): List<User>
 
     fun findByEmail(email: String): User?
+
+    fun findPasswordOfUser(user: User): String
 }

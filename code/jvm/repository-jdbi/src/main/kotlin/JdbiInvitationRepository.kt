@@ -13,7 +13,7 @@ class JdbiInvitationRepository(
             """
             INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id)
             VALUES (:role, :used, :channel_id, :email, :sender)
-            """
+            """,
         )
             .bind("sender_id", sender.id)
             .bind("email", email)
@@ -23,7 +23,6 @@ class JdbiInvitationRepository(
             .mapTo(RegisterInvitation::class.java)
             .one()
     }
-
 
     override fun createChannelInvitation(
         sender: User,
@@ -35,7 +34,7 @@ class JdbiInvitationRepository(
             """
             INSERT INTO dbo.CHANNEL_INVITATION (role_name, used, channel_id, invited_id, inviter_id)
             VALUES (:role, :used, :channel_id, :receiver, :sender)
-            """
+            """,
         )
             .bind("sender_id", sender.id)
             .bind("receiver_id", receiver.id)
@@ -46,36 +45,31 @@ class JdbiInvitationRepository(
             .one()
     }
 
-
     override fun findRegisterInvitationById(invitationId: Int): Invitation? {
         return handle.createQuery(
             """
             SELECT * FROM dbo.REGISTER_INVITATION
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", invitationId)
             .mapTo(RegisterInvitation::class.java)
             .findFirst()
             .orElse(null)
-
     }
-
 
     override fun findChannelInvitationById(invitationId: Int): Invitation? {
         return handle.createQuery(
             """
             SELECT * FROM dbo.CHANNEL_INVITATION
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", invitationId)
             .mapTo(ChannelInvitation::class.java)
             .findFirst()
             .orElse(null)
-
     }
-
 
     override fun updateRegisterInvitation(invitation: Invitation): Invitation {
         return handle.createUpdate(
@@ -83,7 +77,7 @@ class JdbiInvitationRepository(
             UPDATE dbo.REGISTER_INVITATION
             SET used = :used
             WHERE id = :id
-            """
+            """,
         )
             .bind("used", invitation.isUsed)
             .bind("id", invitation.id)
@@ -91,7 +85,6 @@ class JdbiInvitationRepository(
             .mapTo(RegisterInvitation::class.java)
             .one()
     }
-
 
     override fun updateChannelInvitation(invitation: Invitation): Invitation {
         return handle.createUpdate(
@@ -99,7 +92,7 @@ class JdbiInvitationRepository(
             UPDATE dbo.CHANNEL_INVITATION
             SET used = :used
             WHERE id = :id
-            """
+            """,
         )
             .bind("used", invitation.isUsed)
             .bind("id", invitation.id)
@@ -108,13 +101,12 @@ class JdbiInvitationRepository(
             .one()
     }
 
-
     override fun deleteRegisterInvitationById(invitationId: Int): Invitation {
         return handle.createUpdate(
             """
             DELETE FROM dbo.REGISTER_INVITATION
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", invitationId)
             .executeAndReturnGeneratedKeys()
@@ -122,13 +114,12 @@ class JdbiInvitationRepository(
             .one()
     }
 
-
     override fun deleteChannelInvitationById(invitationId: Int): Invitation {
         return handle.createUpdate(
             """
             DELETE FROM dbo.CHANNEL_INVITATION
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", invitationId)
             .executeAndReturnGeneratedKeys()
@@ -136,19 +127,17 @@ class JdbiInvitationRepository(
             .one()
     }
 
-
     override fun getInvitationsOfUser(user: User): List<Invitation> {
         return handle.createQuery(
             """
             SELECT * FROM dbo.CHANNEL_INVITATION
             WHERE invited_id = :user_id
-            """
+            """,
         )
             .bind("user_id", user.id)
             .mapTo(ChannelInvitation::class.java)
             .list()
     }
-
 
     override fun clear() {
         handle.createUpdate("DELETE FROM dbo.REGISTER_INVITATION")

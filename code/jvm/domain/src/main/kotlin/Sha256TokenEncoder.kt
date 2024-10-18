@@ -1,7 +1,6 @@
 import java.security.MessageDigest
 import java.util.Base64
 
-
 class Sha256TokenEncoder : TokenEncoder {
     override fun createValidationInformation(token: String): TokenValidationInfo = TokenValidationInfo(hash(token))
 

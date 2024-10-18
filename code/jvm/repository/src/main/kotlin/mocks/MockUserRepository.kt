@@ -66,4 +66,7 @@ class MockUserRepository : UserRepository {
     override fun findAll() = users.toList()
 
     override fun findByEmail(email: String) = users.firstOrNull { it.email == email }
+
+    // TODO remove double bang
+    override fun findPasswordOfUser(user: User): String = passwordsHash[user.id]!!
 }

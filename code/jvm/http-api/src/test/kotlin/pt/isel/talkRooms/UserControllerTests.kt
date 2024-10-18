@@ -1,10 +1,12 @@
 package pt.isel.talkRooms
 
+import Sha256TokenEncoder
 import TransactionManager
 import TransactionManagerInMem
 import TransactionManagerJdbi
 import UserService
 import UsersDomain
+import UsersDomainConfig
 import configureWithAppRequirements
 import controllers.UserController
 import models.user.UserLoginCredentialsInput
@@ -14,8 +16,12 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 class UserControllerTests {
     companion object {
@@ -45,10 +51,31 @@ class UserControllerTests {
         }
     }
 
+    private fun createUserService(
+        trxManager: TransactionManager,
+        testClock: TestClock,
+        tokenTtl: Duration = 30.days,
+        tokenRollingTtl: Duration = 30.minutes,
+        maxTokensPerUser: Int = 3,
+    ) = UserService(
+        trxManager,
+        UsersDomain(
+            BCryptPasswordEncoder(),
+            Sha256TokenEncoder(),
+            UsersDomainConfig(
+                tokenSizeInBytes = 256 / 8,
+                tokenTtl = tokenTtl,
+                tokenRollingTtl,
+                maxTokensPerUser = maxTokensPerUser,
+            ),
+        ),
+        testClock,
+    )
+
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add first user`(trxManager: TransactionManager) {
-        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
@@ -62,7 +89,7 @@ class UserControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add first user with invalid email`(trxManager: TransactionManager) {
-        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
 
         // when: creating an user
         // then: the response is a 400 with a proper Location header
@@ -76,7 +103,7 @@ class UserControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add first user with invalid password`(trxManager: TransactionManager) {
-        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
 
         // when: creating an user
         // then: the response is a 400 with a proper Location header
@@ -91,7 +118,7 @@ class UserControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `register first user then login`(trxManager: TransactionManager) {
-        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
@@ -104,7 +131,7 @@ class UserControllerTests {
         // when: login with the created user
         // then: the response is a 200 with a proper Location header
         controllerUser.login(
-            UserLoginCredentialsInput("admin2", "Admin_123dsad")
+            UserLoginCredentialsInput("admin2", "Admin_123dsad"),
         ).let { resp ->
             assertEquals(HttpStatus.OK, resp.statusCode)
         }

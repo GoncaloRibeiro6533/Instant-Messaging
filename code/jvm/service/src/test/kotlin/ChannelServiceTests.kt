@@ -1,18 +1,43 @@
 import org.junit.jupiter.api.BeforeEach
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 class ChannelServiceTests {
     private lateinit var channelService: ChannelService
     private lateinit var userService: UserService
     private lateinit var invitationService: InvitationService
 
+    private fun createUserService(
+        trxManager: TransactionManager,
+        testClock: TestClock,
+        tokenTtl: Duration = 30.days,
+        tokenRollingTtl: Duration = 30.minutes,
+        maxTokensPerUser: Int = 3,
+    ) = UserService(
+        trxManager,
+        UsersDomain(
+            BCryptPasswordEncoder(),
+            Sha256TokenEncoder(),
+            UsersDomainConfig(
+                tokenSizeInBytes = 256 / 8,
+                tokenTtl = tokenTtl,
+                tokenRollingTtl,
+                maxTokensPerUser = maxTokensPerUser,
+            ),
+        ),
+        testClock,
+    )
+
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
         channelService = ChannelService(trxManager)
-        userService = UserService(trxManager, UsersDomain())
+        userService = createUserService(trxManager, TestClock())
         invitationService = InvitationService(trxManager)
     }
 
