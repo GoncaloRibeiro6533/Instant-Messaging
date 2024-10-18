@@ -1,6 +1,6 @@
-import mocks.MockChannelRepository
-import mocks.MockInvitationRepo
-import mocks.MockUserRepository
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockInvitationRepo
+import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Test
 import pt.isel.*
 import kotlin.test.assertEquals

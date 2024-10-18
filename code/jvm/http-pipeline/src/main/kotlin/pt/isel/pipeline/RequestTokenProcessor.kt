@@ -1,8 +1,8 @@
 package pt.isel.pipeline
 
-import pt.isel.AuthenticatedUser
-import UserService
+import pt.isel.UserService
 import org.springframework.stereotype.Component
+import pt.isel.AuthenticatedUser
 
 
 @Component

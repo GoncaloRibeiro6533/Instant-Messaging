@@ -1,16 +1,16 @@
 package pt.isel.talkRooms
 
 import pt.isel.Sha256TokenEncoder
-import TransactionManager
-import TransactionManagerInMem
-import TransactionManagerJdbi
-import UserService
+import pt.isel.TransactionManager
+import pt.isel.TransactionManagerInMem
+import pt.isel.TransactionManagerJdbi
+import pt.isel.UserService
 import pt.isel.UsersDomain
 import pt.isel.UsersDomainConfig
-import configureWithAppRequirements
-import controllers.UserController
-import models.user.UserLoginCredentialsInput
-import models.user.UserRegisterInput
+import pt.isel.configureWithAppRequirements
+import pt.isel.controllers.UserController
+import pt.isel.models.user.UserLoginCredentialsInput
+import pt.isel.models.user.UserRegisterInput
 import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource

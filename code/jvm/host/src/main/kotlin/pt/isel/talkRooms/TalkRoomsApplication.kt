@@ -3,8 +3,8 @@ package pt.isel.talkRooms
 import pt.isel.pipeline.AuthenticatedUserArgumentResolver
 import pt.isel.pipeline.AuthenticationInterceptor
 import pt.isel.Sha256TokenEncoder
-import TransactionManagerJdbi
-import configureWithAppRequirements
+import pt.isel.TransactionManagerJdbi
+import pt.isel.configureWithAppRequirements
 import kotlinx.datetime.Clock
 import org.jdbi.v3.core.Jdbi
 import org.postgresql.ds.PGSimpleDataSource
@@ -12,14 +12,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
-/*
+
 @Configuration
+@ComponentScan("pt.isel")
 class PipelineConfigurer(
     val authenticationInterceptor: AuthenticationInterceptor,
     val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
@@ -33,7 +35,7 @@ class PipelineConfigurer(
     }
 }
 
- */
+
 
 
 @SpringBootApplication

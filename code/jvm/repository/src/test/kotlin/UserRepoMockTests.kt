@@ -1,5 +1,5 @@
-import mocks.MockChannelRepository
-import mocks.MockUserRepository
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

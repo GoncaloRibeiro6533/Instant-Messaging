@@ -1,6 +1,6 @@
-import mocks.MockChannelRepository
-import mocks.MockMessageRepo
-import mocks.MockUserRepository
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockMessageRepo
+import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import pt.isel.Channel

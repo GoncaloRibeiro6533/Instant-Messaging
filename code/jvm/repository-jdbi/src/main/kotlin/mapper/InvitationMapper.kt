@@ -1,3 +1,0 @@
-package mapper
-
-class InvitationMapper

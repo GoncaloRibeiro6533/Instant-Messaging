@@ -1,5 +1,5 @@
-import mocks.MockChannelRepository
-import mocks.MockUserRepository
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockUserRepository
 import pt.isel.Role
 import pt.isel.User
 import pt.isel.Visibility

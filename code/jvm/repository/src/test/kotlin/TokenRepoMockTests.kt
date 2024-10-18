@@ -1,6 +1,6 @@
 import kotlinx.datetime.Clock
-import mocks.MockSessionRepository
-import mocks.MockUserRepository
+import pt.isel.mocks.MockSessionRepository
+import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import pt.isel.Token
