@@ -1,6 +1,9 @@
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import pt.isel.Sha256TokenEncoder
+import pt.isel.UsersDomain
+import pt.isel.UsersDomainConfig
 import kotlin.time.Duration.Companion.hours
 
 class UsersDomainsTests {

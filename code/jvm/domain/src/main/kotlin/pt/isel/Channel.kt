@@ -1,3 +1,5 @@
+package pt.isel
+
 data class Channel(
     val id: Int,
     val name: String,

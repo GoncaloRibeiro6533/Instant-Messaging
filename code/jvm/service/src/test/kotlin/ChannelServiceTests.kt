@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import pt.isel.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

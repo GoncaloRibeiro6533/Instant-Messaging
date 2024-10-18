@@ -1,5 +1,6 @@
 import jakarta.inject.Named
 import kotlinx.datetime.Clock
+import pt.isel.*
 
 sealed class UserError {
     data object UserNotFound : UserError()
@@ -140,15 +141,15 @@ class UserService(
                 }
             }
             val now = clock.now()
-            val newSession =
-                Session(
+            val newToken =
+                Token(
                     token = usersDomain.createTokenValidationInformation(usersDomain.generateTokenValue()),
                     userId = user.id,
                     createdAt = now,
                     lastUsedAt = now,
                 )
-            sessionRepo.createSession(user.id, newSession)
-            return@run success(AuthenticatedUser(user, newSession.token.validationInfo))
+            sessionRepo.createSession(user.id, newToken)
+            return@run success(AuthenticatedUser(user, newToken.token.validationInfo))
         }
 
     fun updateUsername(

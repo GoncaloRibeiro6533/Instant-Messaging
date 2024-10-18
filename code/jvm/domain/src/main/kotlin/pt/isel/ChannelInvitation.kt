@@ -1,9 +1,11 @@
+package pt.isel
+
 import java.time.LocalDateTime
 
-class RegisterInvitation(
+class ChannelInvitation(
     id: Int,
     sender: User,
-    val email: String,
+    val receiver: User,
     val channel: Channel,
     val role: Role,
     isUsed: Boolean = false,
@@ -11,22 +13,22 @@ class RegisterInvitation(
 ) : Invitation(id, sender, isUsed, timestamp) {
     init {
         require(id >= 0) { "id must be greater than 0" }
-        require(email.isNotBlank()) { "Email must not be blank" }
-        require(sender.email != email) { "Sender and receiver email must be different" }
+        require(role in Role.entries.toTypedArray()) { "Invalid role" }
+        require(sender != receiver) { "Sender and receiver must be different" }
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
-    private fun copy() = RegisterInvitation(id, sender, email, channel, role, true, timestamp)
+    private fun copy() = ChannelInvitation(id, sender, receiver, channel, role, true, timestamp)
 
     override fun markAsUsed() = copy()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is RegisterInvitation) return false
+        if (other !is ChannelInvitation) return false
 
         if (id != other.id) return false
         if (sender != other.sender) return false
-        if (email != other.email) return false
+        if (receiver != other.receiver) return false
         if (channel != other.channel) return false
         if (role != other.role) return false
         if (isUsed != other.isUsed) return false

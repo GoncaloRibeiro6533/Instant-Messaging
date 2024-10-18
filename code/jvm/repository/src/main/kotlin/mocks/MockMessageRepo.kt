@@ -1,9 +1,9 @@
 package mocks
 
-import Channel
-import Message
+import pt.isel.Channel
+import pt.isel.Message
 import MessageRepository
-import User
+import pt.isel.User
 import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {

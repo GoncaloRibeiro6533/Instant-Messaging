@@ -3,6 +3,10 @@ import mocks.MockMessageRepo
 import mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.Channel
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
 
 class MessageRepoMockTests {
     private var user: User

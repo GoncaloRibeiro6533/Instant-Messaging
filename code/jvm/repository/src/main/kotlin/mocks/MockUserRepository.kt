@@ -1,6 +1,6 @@
 package mocks
 
-import User
+import pt.isel.User
 import UserRepository
 
 class MockUserRepository : UserRepository {

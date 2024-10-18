@@ -1,10 +1,10 @@
 package controllers
 
-import AuthenticatedUser
+import pt.isel.AuthenticatedUser
 import Either
 import Failure
 import Success
-import User
+import pt.isel.User
 import UserError
 import UserService
 import models.Problem

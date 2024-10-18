@@ -1,10 +1,10 @@
 package mocks
 
-import Channel
+import pt.isel.Channel
 import ChannelRepository
-import Role
-import User
-import Visibility
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
 
 class MockChannelRepository : ChannelRepository {
     private data class UserRole(

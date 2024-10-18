@@ -1,4 +1,5 @@
 import jakarta.inject.Named
+import pt.isel.Message
 
 sealed class MessageError {
     data object MessageNotFound : MessageError()

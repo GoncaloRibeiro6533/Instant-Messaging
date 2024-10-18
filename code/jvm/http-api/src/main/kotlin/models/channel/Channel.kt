@@ -1,6 +1,6 @@
 package models.channel
 
-import Visibility
+import pt.isel.Visibility
 
 data class CreateChannelInputModel(
     val name: String,

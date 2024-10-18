@@ -1,12 +1,12 @@
 package mocks
 
-import Channel
-import ChannelInvitation
-import Invitation
+import pt.isel.Channel
+import pt.isel.ChannelInvitation
+import pt.isel.Invitation
 import InvitationRepository
-import RegisterInvitation
-import Role
-import User
+import pt.isel.RegisterInvitation
+import pt.isel.Role
+import pt.isel.User
 import java.time.LocalDateTime
 
 class MockInvitationRepo : InvitationRepository {

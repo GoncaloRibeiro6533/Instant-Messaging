@@ -1,6 +1,10 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.assertThrows
+import pt.isel.Channel
+import pt.isel.Message
+import pt.isel.User
+import pt.isel.Visibility
 import java.time.LocalDateTime
 import kotlin.test.Test
 

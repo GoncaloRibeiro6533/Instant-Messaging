@@ -1,3 +1,5 @@
+import pt.isel.*
+
 interface InvitationRepository {
     fun createRegisterInvitation(
         sender: User,

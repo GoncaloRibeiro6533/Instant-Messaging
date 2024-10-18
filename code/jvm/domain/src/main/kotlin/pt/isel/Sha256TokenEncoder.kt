@@ -1,3 +1,5 @@
+package pt.isel
+
 import java.security.MessageDigest
 import java.util.Base64
 

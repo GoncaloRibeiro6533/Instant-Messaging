@@ -2,6 +2,7 @@ import mocks.MockChannelRepository
 import mocks.MockInvitationRepo
 import mocks.MockUserRepository
 import org.junit.jupiter.api.Test
+import pt.isel.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

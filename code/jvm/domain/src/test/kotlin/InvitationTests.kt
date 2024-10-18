@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
+import pt.isel.*
 import java.time.LocalDateTime
 import kotlin.test.Test
 

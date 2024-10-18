@@ -1,10 +1,10 @@
 package controllers
 
-import AuthenticatedUser
+import pt.isel.AuthenticatedUser
 import ChannelError
 import ChannelService
 import Failure
-import Role
+import pt.isel.Role
 import Success
 import models.channel.ChannelOutputModel
 import models.channel.CreateChannelInputModel

@@ -1,6 +1,8 @@
+package pt.isel
+
 import kotlinx.datetime.Instant
 
-data class Session(
+data class Token(
     val token: TokenValidationInfo,
     val userId: Int,
     val createdAt: Instant,

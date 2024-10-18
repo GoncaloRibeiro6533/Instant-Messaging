@@ -1,11 +1,15 @@
+package pt.isel.pipeline
+
+import pt.isel.AuthenticatedUser
+import UserService
 import org.springframework.stereotype.Component
-import java.net.Authenticator
+
 
 @Component
 class RequestTokenProcessor(
-    val userService: UserService,
+    private val usersService: UserService,
 ) {
-    fun processToken(authorizationValue: String?): AuthenticatedUser? {
+    fun processAuthorizationHeaderValue(authorizationValue: String?): AuthenticatedUser? {
         if (authorizationValue == null) {
             return null
         }
@@ -16,7 +20,7 @@ class RequestTokenProcessor(
         if (parts[0].lowercase() != SCHEME) {
             return null
         }
-        return userService.getUserByToken(parts[1])?.let {
+        return usersService.getUserByToken(parts[1])?.let {
             AuthenticatedUser(
                 it,
                 parts[1],

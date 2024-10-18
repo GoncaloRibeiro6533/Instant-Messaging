@@ -1,26 +1,26 @@
 package mocks
 
-import Session
+import pt.isel.Token
 import SessionRepository
 import kotlinx.datetime.Instant
 
 class MockSessionRepository : SessionRepository {
-    private val sessions = mutableListOf<Session>()
+    private val tokens = mutableListOf<Token>()
 
-    override fun findByToken(token: String): Session? {
-        return sessions.firstOrNull { it.token.validationInfo == token }
+    override fun findByToken(token: String): Token? {
+        return tokens.firstOrNull { it.token.validationInfo == token }
     }
 
-    override fun findByUserId(userId: Int): List<Session> {
-        return sessions.filter { it.userId == userId }
+    override fun findByUserId(userId: Int): List<Token> {
+        return tokens.filter { it.userId == userId }
     }
 
     override fun createSession(
         userId: Int,
-        token: Session,
-    ): Session {
-        val session = Session(token.token, userId, Instant.DISTANT_FUTURE, Instant.DISTANT_PAST)
-        sessions.add(session)
+        token: Token,
+    ): Token {
+        val session = Token(token.token, userId, Instant.DISTANT_FUTURE, Instant.DISTANT_PAST)
+        tokens.add(session)
         return session
     }
 
@@ -28,16 +28,16 @@ class MockSessionRepository : SessionRepository {
         userId: Int,
         limit: Int,
         skip: Int,
-    ): List<Session> {
-        return sessions.filter { it.userId == userId }
+    ): List<Token> {
+        return tokens.filter { it.userId == userId }
             .drop(skip)
             .take(limit)
     }
 
     override fun deleteSession(token: String): Boolean {
-        val session = sessions.firstOrNull { it.token.validationInfo == token }
+        val session = tokens.firstOrNull { it.token.validationInfo == token }
         return if (session != null) {
-            sessions.remove(session)
+            tokens.remove(session)
             true
         } else {
             false
@@ -45,6 +45,6 @@ class MockSessionRepository : SessionRepository {
     }
 
     override fun clear() {
-        sessions.clear()
+        tokens.clear()
     }
 }

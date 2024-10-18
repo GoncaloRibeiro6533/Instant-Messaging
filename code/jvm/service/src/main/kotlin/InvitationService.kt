@@ -1,4 +1,5 @@
 import jakarta.inject.Named
+import pt.isel.*
 
 sealed class InvitationError {
     data object InvitationNotFound : InvitationError()

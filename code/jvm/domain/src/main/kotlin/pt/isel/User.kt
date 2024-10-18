@@ -1,3 +1,5 @@
+package pt.isel
+
 data class User(
     val id: Int,
     val username: String,

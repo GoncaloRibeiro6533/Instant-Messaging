@@ -1,3 +1,5 @@
+package pt.isel
+
 import java.time.LocalDateTime
 
 data class Message(

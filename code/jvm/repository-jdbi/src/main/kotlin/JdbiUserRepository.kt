@@ -1,4 +1,5 @@
 import org.jdbi.v3.core.Handle
+import pt.isel.User
 
 class JdbiUserRepository(
     private val handle: Handle,

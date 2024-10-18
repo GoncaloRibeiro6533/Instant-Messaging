@@ -1,12 +1,12 @@
 package pt.isel.talkRooms
 
-import Sha256TokenEncoder
+import pt.isel.Sha256TokenEncoder
 import TransactionManager
 import TransactionManagerInMem
 import TransactionManagerJdbi
 import UserService
-import UsersDomain
-import UsersDomainConfig
+import pt.isel.UsersDomain
+import pt.isel.UsersDomainConfig
 import configureWithAppRequirements
 import controllers.UserController
 import models.user.UserLoginCredentialsInput

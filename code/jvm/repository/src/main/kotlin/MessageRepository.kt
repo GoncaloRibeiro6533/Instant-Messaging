@@ -1,3 +1,7 @@
+import pt.isel.Channel
+import pt.isel.Message
+import pt.isel.User
+
 interface MessageRepository {
     fun findById(id: Int): Message?
 

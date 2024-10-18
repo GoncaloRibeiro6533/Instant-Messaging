@@ -1,8 +1,7 @@
-@file:Suppress("ktlint")
 package mapper
 
 /*
-class SessionMapper : ColumnMapper<Session> {
+class SessionMapper : ColumnMapper<Token> {
     @Throws(SQLException::class)
     override fun map(
         r: java.sql.ResultSet,
@@ -11,7 +10,7 @@ class SessionMapper : ColumnMapper<Session> {
     ) {
        //TODO: Implement this method
         return
-        /* return Session(
+        /* return Token(
             TokenValidationInfo(r.getString("token")),
             r.getInt("user_id"),
             r.getTimestamp("expirationdate").toLocalDateTime(),

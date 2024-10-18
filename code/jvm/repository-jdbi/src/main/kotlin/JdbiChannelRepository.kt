@@ -1,4 +1,8 @@
 import org.jdbi.v3.core.Handle
+import pt.isel.Channel
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
 
 class JdbiChannelRepository(
     private val handle: Handle,

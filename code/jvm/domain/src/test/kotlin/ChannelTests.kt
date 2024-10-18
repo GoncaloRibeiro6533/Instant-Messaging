@@ -1,5 +1,8 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
+import pt.isel.Channel
+import pt.isel.User
+import pt.isel.Visibility
 import kotlin.test.Test
 
 class ChannelTests {

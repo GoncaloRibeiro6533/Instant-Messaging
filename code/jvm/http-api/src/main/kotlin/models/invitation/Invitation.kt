@@ -1,6 +1,6 @@
 package models.invitation
 
-import Role
+import pt.isel.Role
 import models.channel.ChannelOutputModel
 import models.user.UserIdentifiers
 import java.time.LocalDateTime

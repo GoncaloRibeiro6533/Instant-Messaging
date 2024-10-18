@@ -1,6 +1,6 @@
 package controllers
 
-import AuthenticatedUser
+import pt.isel.AuthenticatedUser
 import Failure
 import MessageError
 import MessageService

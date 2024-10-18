@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.3.4"
+    id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -40,6 +40,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
 

@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.3.4"
-    id("io.spring.dependency-management") version "1.1.6"
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
@@ -14,8 +14,10 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":domain"))
     implementation(project(":http-api"))
     implementation(project(":repository-jdbi"))
+    implementation(project(":http-pipeline"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

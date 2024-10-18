@@ -1,3 +1,7 @@
+import pt.isel.Channel
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
 
 
 interface ChannelRepository {

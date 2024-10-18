@@ -1,4 +1,7 @@
 import org.jdbi.v3.core.Handle
+import pt.isel.Channel
+import pt.isel.Message
+import pt.isel.User
 
 class JdbiMessageRepository(
     private val handle: Handle,

@@ -1,3 +1,5 @@
+package pt.isel
+
 import kotlin.time.Duration
 
 data class UsersDomainConfig(

@@ -1,3 +1,5 @@
+import pt.isel.User
+
 interface UserRepository {
     fun findById(id: Int): User?
 
