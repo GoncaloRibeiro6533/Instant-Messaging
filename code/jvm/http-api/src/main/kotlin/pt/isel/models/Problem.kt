@@ -6,7 +6,7 @@ import java.net.URI
 
 private const val MEDIA_TYPE = "application/problem+json"
 private const val PROBLEM_URI_PATH =
-    "https://github.com/isel-leic-daw/2024-daw-leic53d-g06-53d/blob/b26a7732d54844c719815efe16314a6d576ee2c9/docs/talkRooms/problems"
+    "https://github.com/isel-leic-daw/2024-daw-leic53d-g06-53d/tree/main/docs/talkRooms/problems"
 
 sealed class Problem(
     typeUri: URI,
@@ -22,6 +22,10 @@ sealed class Problem(
             .body(this)
 
     data object InvalidIdentifier : Problem(URI("$PROBLEM_URI_PATH/invalid-identifier"))
+
+    data object NoMatchingUsername : Problem(URI("$PROBLEM_URI_PATH/no-matching-username"))
+
+    data object NoMatchingPassword : Problem(URI("$PROBLEM_URI_PATH/no-matching-password"))
 
     data object WeakPassword : Problem(URI("$PROBLEM_URI_PATH/weak-password"))
 

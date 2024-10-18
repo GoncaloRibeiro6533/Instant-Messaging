@@ -66,34 +66,6 @@ class UserService(
         return@run success(user)
     }
 
-    fun logoutUser(token: String) =
-        trxManager.run {
-            sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
-                ?: return@run failure(UserError.SessionExpired)
-            sessionRepo.deleteSession(token)
-            return@run success(true)
-        }
-
-    fun getUserById(id: Int): Either<UserError, User> =
-        trxManager.run {
-            if (id < 0) return@run failure(UserError.NegativeIdentifier)
-            val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
-            return@run success(user)
-        }
-
-    fun findUserByUsername(
-        username: String,
-        limit: Int = 10,
-        skip: Int = 0,
-    ): Either<UserError, List<User>> =
-        trxManager.run {
-            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
-            if (limit < 0) return@run failure(UserError.NegativeLimit)
-            if (skip < 0) return@run failure(UserError.NegativeSkip)
-            val users = userRepo.findByUsername(username, limit, skip)
-            return@run success(users)
-        }
-
     fun createUser(
         username: String,
         email: String,
@@ -132,8 +104,9 @@ class UserService(
             if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             val user =
-                userRepo.findByUsername(username, 1, 0).firstOrNull()
-                    ?: return@run failure(UserError.NoMatchingUsername)
+                userRepo.findByUsername(username, 1, 0).firstOrNull {
+                    it.username == username
+                } ?: return@run failure(UserError.NoMatchingUsername)
             val repoPassword = userRepo.findPasswordOfUser(user)
             val passwordValidationInfo = PasswordValidationInfo(repoPassword)
             if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
@@ -151,6 +124,34 @@ class UserService(
                 )
             sessionRepo.createSession(user.id, newToken, usersDomain.maxNumberOfTokensPerUser)
             return@run success(AuthenticatedUser(user, newToken.token.validationInfo))
+        }
+
+    fun logoutUser(token: String) =
+        trxManager.run {
+            sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
+                ?: return@run failure(UserError.SessionExpired)
+            sessionRepo.deleteSession(token)
+            return@run success(true)
+        }
+
+    fun getUserById(id: Int): Either<UserError, User> =
+        trxManager.run {
+            if (id < 0) return@run failure(UserError.NegativeIdentifier)
+            val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
+            return@run success(user)
+        }
+
+    fun findUserByUsername(
+        username: String,
+        limit: Int = 10,
+        skip: Int = 0,
+    ): Either<UserError, List<User>> =
+        trxManager.run {
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            if (limit < 0) return@run failure(UserError.NegativeLimit)
+            if (skip < 0) return@run failure(UserError.NegativeSkip)
+            val users = userRepo.findByUsername(username, limit, skip)
+            return@run success(users)
         }
 
     fun updateUsername(
