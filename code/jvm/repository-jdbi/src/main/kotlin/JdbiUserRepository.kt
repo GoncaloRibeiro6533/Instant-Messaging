@@ -4,7 +4,7 @@ class JdbiUserRepository(
     private val handle: Handle,
 ) : UserRepository {
     override fun findById(id: Int): User? {
-        return handle.createQuery("SELECT id, name, email FROM dbo.User WHERE id = :id")
+        return handle.createQuery("SELECT id, email, username FROM dbo.User WHERE id = :id")
             .bind("id", id)
             .mapTo(User::class.java)
             .findFirst()

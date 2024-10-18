@@ -2,7 +2,7 @@ package mocks
 
 import Session
 import SessionRepository
-import java.time.LocalDateTime
+import kotlinx.datetime.Instant
 
 class MockSessionRepository : SessionRepository {
     private val sessions = mutableListOf<Session>()
@@ -17,9 +17,9 @@ class MockSessionRepository : SessionRepository {
 
     override fun createSession(
         userId: Int,
-        token: String,
+        token: Session,
     ): Session {
-        val session = Session(userId, token, LocalDateTime.now().plusDays(7))
+        val session = Session(token.token, userId, Instant.DISTANT_FUTURE, Instant.DISTANT_PAST)
         sessions.add(session)
         return session
     }

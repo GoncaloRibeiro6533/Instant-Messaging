@@ -6,7 +6,7 @@ class JdbiMessageRepository(
     override fun findById(id: Int): Message? =
         handle.createQuery(
             """
-        SELECT * FROM message WHERE id = :id
+        SELECT * FROM dbo.message WHERE id = :id
         """,
         ).bind("id", id)
             .mapTo(Message::class.java)
@@ -22,7 +22,7 @@ class JdbiMessageRepository(
     ): Message =
         handle.createUpdate(
             """
-        INSERT INTO message(creationtime, user_id, channel_id, message) values 
+        INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
         (now(), :userId, :channelId, :message)
         """,
         ).bind("user", sender.id)
@@ -39,7 +39,7 @@ class JdbiMessageRepository(
     ): List<Message> {
         return handle.createQuery(
             """
-            SELECT * FROM message WHERE channel_id = :channelId ORDER BY creationtime DESC
+            SELECT * FROM dbo.message WHERE channel_id = :channelId ORDER BY creationtime DESC
             LIMIT :limit OFFSET :skip
             """,
         ).bind("channelId", channel.id)
@@ -52,7 +52,7 @@ class JdbiMessageRepository(
     override fun deleteMessageById(id: Int): Message =
         handle.createUpdate(
             """
-            DELETE FROM message WHERE id = :id
+            DELETE FROM dbo.message WHERE id = :id
             """,
         ).bind("id", id)
             .executeAndReturnGeneratedKeys()

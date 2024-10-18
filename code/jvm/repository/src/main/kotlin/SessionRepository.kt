@@ -5,7 +5,7 @@ interface SessionRepository {
 
     fun createSession(
         userId: Int,
-        token: String,
+        token: Session,
     ): Session
 
     fun getSessionHistory(

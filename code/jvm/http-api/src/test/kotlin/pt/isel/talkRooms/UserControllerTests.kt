@@ -96,7 +96,7 @@ class UserControllerTests {
         // when: creating an user
         // then: the response is a 201 with a proper Location header
         controllerUser.registerFirstUser(
-            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
+            UserRegisterInput("admin2", "admin123@mail.com", "Admin_123dsad"),
         ).let { resp ->
             assertEquals(HttpStatus.CREATED, resp.statusCode)
         }
@@ -104,7 +104,7 @@ class UserControllerTests {
         // when: login with the created user
         // then: the response is a 200 with a proper Location header
         controllerUser.login(
-            UserLoginCredentialsInput("admin", "Admin_123dsad")
+            UserLoginCredentialsInput("admin2", "Admin_123dsad")
         ).let { resp ->
             assertEquals(HttpStatus.OK, resp.statusCode)
         }

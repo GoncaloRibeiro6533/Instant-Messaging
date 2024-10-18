@@ -19,6 +19,8 @@ dependencies {
     implementation("org.jdbi:jdbi3-postgres:3.37.1")
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // To use Kotlin specific date and time functions
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     testImplementation(kotlin("test"))
 }
 
