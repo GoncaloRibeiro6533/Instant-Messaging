@@ -7,6 +7,7 @@ import UserService
 import UsersDomain
 import configureWithAppRequirements
 import controllers.UserController
+import models.user.UserLoginCredentialsInput
 import models.user.UserRegisterInput
 import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
@@ -85,5 +86,27 @@ class UserControllerTests {
             .let { resp ->
                 assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode)
             }
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `register first user then login`(trxManager: TransactionManager) {
+        val controllerUser = UserController(UserService(trxManager, UsersDomain()))
+
+        // when: creating an user
+        // then: the response is a 201 with a proper Location header
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
+        ).let { resp ->
+            assertEquals(HttpStatus.CREATED, resp.statusCode)
+        }
+
+        // when: login with the created user
+        // then: the response is a 200 with a proper Location header
+        controllerUser.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).let { resp ->
+            assertEquals(HttpStatus.OK, resp.statusCode)
+        }
     }
 }
