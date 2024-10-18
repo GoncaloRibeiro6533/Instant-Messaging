@@ -8,6 +8,7 @@ interface SessionRepository {
     fun createSession(
         userId: Int,
         token: Token,
+        maxTokens: Int,
     ): Token
 
     fun getSessionHistory(

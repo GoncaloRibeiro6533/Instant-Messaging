@@ -19,6 +19,8 @@ import pt.isel.User
 import pt.isel.UserError
 import pt.isel.UserService
 import pt.isel.models.Problem
+import pt.isel.models.user.UserIdentifiers
+import pt.isel.models.user.UserList
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import pt.isel.models.user.UsernameUpdateInput
@@ -82,7 +84,7 @@ class UserController(
 
     @PostMapping("/logout")
     fun logout(user: AuthenticatedUser): ResponseEntity<*> {
-        return when (val result: Either<UserError, Unit> = userService.logoutUser(user.token)) {
+        return when (val result: Either<UserError, Boolean> = userService.logoutUser(user.token)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
                 handleUserError(result.value)
@@ -128,7 +130,10 @@ class UserController(
         val result: Either<UserError, List<User>> =
             userService.findUserByUsername(username, limit, skip)
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success -> {
+                val userList = result.value.map { UserIdentifiers(it.id, it.username) }
+                ResponseEntity.status(HttpStatus.OK).body(UserList(userList, result.value.size))
+            }
             is Failure ->
                 handleUserError(result.value)
         }
@@ -146,7 +151,7 @@ class UserController(
         }
     }
 
-    fun handleUserError(error: UserError?): ResponseEntity<*> {
+    fun handleUserError(error: UserError): ResponseEntity<*> {
         return when (error) {
             is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
             is UserError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)

@@ -71,7 +71,7 @@ class UserService(
             sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
                 ?: return@run failure(UserError.SessionExpired)
             sessionRepo.deleteSession(token)
-            return@run success(Unit)
+            return@run success(true)
         }
 
     fun getUserById(id: Int): Either<UserError, User> =
@@ -149,7 +149,7 @@ class UserService(
                     createdAt = now,
                     lastUsedAt = now,
                 )
-            sessionRepo.createSession(user.id, newToken)
+            sessionRepo.createSession(user.id, newToken, usersDomain.maxNumberOfTokensPerUser)
             return@run success(AuthenticatedUser(user, newToken.token.validationInfo))
         }
 

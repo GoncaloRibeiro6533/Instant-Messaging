@@ -18,7 +18,12 @@ class MockSessionRepository : SessionRepository {
     override fun createSession(
         userId: Int,
         token: Token,
+        maxTokens: Int,
     ): Token {
+        tokens.filter { it.userId == userId }
+            .sortedByDescending { it.lastUsedAt }
+            .drop(maxTokens - 1)
+            .forEach { tokens.remove(it) }
         val session = Token(token.token, userId, Instant.DISTANT_FUTURE, Instant.DISTANT_PAST)
         tokens.add(session)
         return session
