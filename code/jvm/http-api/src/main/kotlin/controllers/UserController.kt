@@ -41,16 +41,7 @@ class UserController(
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.NotFirstUser -> Problem.NotFirstUser.response(HttpStatus.CONFLICT)
-                    is UserError.InvalidEmail -> Problem.InvalidEmail.response(HttpStatus.BAD_REQUEST)
-                    is UserError.EmailCannotBeBlank -> Problem.EmailCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.PasswordCannotBeBlank -> Problem.PasswordCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.WeakPassword -> Problem.WeakPassword.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -69,20 +60,7 @@ class UserController(
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)
-                    is UserError.InvitationNotFound -> Problem.InvitationNotFound.response(HttpStatus.BAD_REQUEST)
-                    is UserError.InvitationAlreadyUsed -> Problem.InvitationAlreadyUsed.response(HttpStatus.CONFLICT)
-                    is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.PasswordCannotBeBlank -> Problem.PasswordCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.EmailCannotBeBlank -> Problem.EmailCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.InvalidEmail -> Problem.InvalidEmail.response(HttpStatus.BAD_REQUEST)
-                    is UserError.EmailAlreadyInUse -> Problem.EmailAlreadyInUse.response(HttpStatus.CONFLICT)
-                    is UserError.EmailDoesNotMatchInvite -> Problem.EmailDoesNotMatchInvite.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameAlreadyExists -> Problem.UsernameAlreadyInUse.response(HttpStatus.CONFLICT)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -98,26 +76,16 @@ class UserController(
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.PasswordCannotBeBlank -> Problem.PasswordCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.NoMatchingUsername -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
-                    is UserError.NoMatchingPassword -> Problem.InvalidPassword.response(HttpStatus.UNAUTHORIZED)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
     @PostMapping("/logout")
     fun logout(user: AuthenticatedUser): ResponseEntity<*> {
-        val result: Either<UserError, Unit> = userService.logoutUser(user.token)
-        return when (result) {
+        return when (val result: Either<UserError, Unit> = userService.logoutUser(user.token)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
-                when (result.value) {
-                    is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -134,13 +102,7 @@ class UserController(
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UsernameAlreadyExists -> Problem.UsernameAlreadyInUse.response(HttpStatus.CONFLICT)
-                    is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -149,16 +111,10 @@ class UserController(
         @PathVariable id: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        val result: Either<UserError, User> = userService.getUserById(id)
-        return when (result) {
+        return when (val result: Either<UserError, User> = userService.getUserById(id)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
-                    is UserError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)
-                    is UserError.UserNotFound -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -174,13 +130,7 @@ class UserController(
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
-                when (result.value) {
-                    is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
-                    is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
-                    is UserError.NegativeLimit -> Problem.NegativeLimit.response(HttpStatus.BAD_REQUEST)
-                    is UserError.NegativeSkip -> Problem.NegativeSkip.response(HttpStatus.BAD_REQUEST)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
         }
     }
 
@@ -192,10 +142,32 @@ class UserController(
         return when (val result: Either<UserError, Unit> = userService.deleteUser(user.user.id)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->
-                when (result.value) {
-                    is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
-                    else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.value)
-                }
+                handleUserError(result.value)
+        }
+    }
+
+    fun handleUserError(error: UserError?): ResponseEntity<*> {
+        return when (error) {
+            is UserError.SessionExpired -> Problem.SessionExpired.response(HttpStatus.UNAUTHORIZED)
+            is UserError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)
+            is UserError.UserNotFound -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
+            is UserError.UsernameAlreadyExists -> Problem.UsernameAlreadyInUse.response(HttpStatus.CONFLICT)
+            is UserError.UsernameCannotBeBlank -> Problem.UsernameCannotBeBlank.response(HttpStatus.BAD_REQUEST)
+            is UserError.PasswordCannotBeBlank -> Problem.PasswordCannotBeBlank.response(HttpStatus.BAD_REQUEST)
+            is UserError.EmailCannotBeBlank -> Problem.EmailCannotBeBlank.response(HttpStatus.BAD_REQUEST)
+            is UserError.InvalidEmail -> Problem.InvalidEmail.response(HttpStatus.BAD_REQUEST)
+            is UserError.EmailAlreadyInUse -> Problem.EmailAlreadyInUse.response(HttpStatus.CONFLICT)
+            is UserError.EmailDoesNotMatchInvite -> Problem.EmailDoesNotMatchInvite.response(HttpStatus.BAD_REQUEST)
+            is UserError.UsernameToLong -> Problem.UsernameToLong.response(HttpStatus.BAD_REQUEST)
+            is UserError.NoMatchingUsername -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
+            is UserError.NoMatchingPassword -> Problem.InvalidPassword.response(HttpStatus.UNAUTHORIZED)
+            is UserError.NotFirstUser -> Problem.NotFirstUser.response(HttpStatus.CONFLICT)
+            is UserError.WeakPassword -> Problem.WeakPassword.response(HttpStatus.BAD_REQUEST)
+            is UserError.NegativeLimit -> Problem.NegativeLimit.response(HttpStatus.BAD_REQUEST)
+            is UserError.NegativeSkip -> Problem.NegativeSkip.response(HttpStatus.BAD_REQUEST)
+            is UserError.InvitationNotFound -> Problem.InvitationNotFound.response(HttpStatus.BAD_REQUEST)
+            is UserError.InvitationAlreadyUsed -> Problem.InvitationAlreadyUsed.response(HttpStatus.CONFLICT)
+            else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
         }
     }
 }

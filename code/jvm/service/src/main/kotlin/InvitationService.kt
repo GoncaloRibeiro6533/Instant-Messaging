@@ -115,10 +115,10 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Unit> =
+    fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Invitation> =
         trxManager.run {
             invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
-            invitationRepo.deleteChannelInvitationById(invitationId)
-            return@run success(Unit)
+            val declined = invitationRepo.deleteChannelInvitationById(invitationId)
+            return@run success(declined)
         }
 }

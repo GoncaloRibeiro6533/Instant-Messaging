@@ -1,6 +1,7 @@
 package controllers
 
 import AuthenticatedUser
+import ChannelError
 import ChannelService
 import Failure
 import Role
@@ -39,14 +40,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -71,14 +65,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -108,16 +95,7 @@ class ChannelController(
                     .body(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.InvalidChannelName -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.UserNotFound -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.InvalidVisibility -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.ChannelNameAlreadyExists -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -137,14 +115,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -166,14 +137,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -195,16 +159,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.UserAlreadyInChannel -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -225,16 +180,7 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.InvalidChannelName -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.ChannelNameAlreadyExists -> ResponseEntity.badRequest().body(result.value)
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
         }
     }
 
@@ -255,15 +201,22 @@ class ChannelController(
                 ResponseEntity.ok(outputModel)
             }
             is Failure ->
-                when (result.value) {
-                    is ChannelError.UserNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleChannelError(result.value)
+        }
+    }
+
+    fun handleChannelError(error: ChannelError): ResponseEntity<Any> {
+        return when (error) {
+            is ChannelError.ChannelNotFound -> ResponseEntity.notFound().build()
+            is ChannelError.InvalidChannelName -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.InvalidVisibility -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.NegativeIdentifier -> ResponseEntity.badRequest().body(error)
+            is ChannelError.UserNotFound -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.UserAlreadyInChannel -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.ChannelNameAlreadyExists -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.InvalidSkip -> ResponseEntity.unprocessableEntity().body(error)
+            is ChannelError.InvalidLimit -> ResponseEntity.unprocessableEntity().body(error)
+            else -> ResponseEntity.internalServerError().body("Internal server error")
         }
     }
 }

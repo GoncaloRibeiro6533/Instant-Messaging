@@ -2,6 +2,7 @@ package controllers
 
 import AuthenticatedUser
 import Failure
+import MessageError
 import MessageService
 import Success
 import models.MessageInputModel
@@ -31,15 +32,7 @@ class MessageController(private val messageService: MessageService) {
         return when (result) {
             is Success -> ResponseEntity.ok(result.value)
             is Failure ->
-                when (result.value) {
-                    is MessageError.MessageNotFound -> ResponseEntity.notFound().build()
-                    is MessageError.UserNotInChannel -> ResponseEntity.unprocessableEntity().body(result.value)
-                    else -> ResponseEntity.badRequest().body(result.value)
-                }
-
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleMessageError(result.value)
         }
     }
 
@@ -58,18 +51,7 @@ class MessageController(private val messageService: MessageService) {
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
-                when (result.value) {
-                    // is MessageError.InvalidChannelId -> ResponseEntity.badRequest().body(result.value)
-                    // is MessageError.InvalidText -> ResponseEntity.badRequest().body(result.value)
-                    // is MessageError.InvalidUserId -> ResponseEntity.badRequest().body(result.value)
-                    is MessageError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                    is MessageError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is MessageError.UserNotInChannel -> ResponseEntity.notFound().build()
-                    else -> ResponseEntity.internalServerError().body(result.value)
-                }
-            else -> {
-                ResponseEntity.internalServerError().body("Internal server error")
-            }
+                handleMessageError(result.value)
         }
     }
 
@@ -91,14 +73,23 @@ class MessageController(private val messageService: MessageService) {
         return when (result) {
             is Success -> ResponseEntity.ok(result.value)
             is Failure ->
-                when (result.value) {
-                    // is MessageError.InvalidChannelId -> ResponseEntity.badRequest().body(result.value)
-                    // is MessageError.InvalidLimit -> ResponseEntity.badRequest().body(result.value)
-                    // is MessageError.InvalidSkip -> ResponseEntity.badRequest().body(result.value)
-                    is MessageError.ChannelNotFound -> ResponseEntity.notFound().build()
-                    is MessageError.Unauthorized -> ResponseEntity.unprocessableEntity().body(result.value)
-                    else -> ResponseEntity.internalServerError().body(result.value)
-                }
+           handleMessageError(result.value)
+        }
+    }
+
+    fun handleMessageError(error: Any?): ResponseEntity<Any> {
+        return when (error) {
+            is MessageError.MessageNotFound -> ResponseEntity.notFound().build()
+            is MessageError.InvalidChannelId -> ResponseEntity.badRequest().body(error)
+            is MessageError.InvalidText -> ResponseEntity.badRequest().body(error)
+            is MessageError.InvalidLimit -> ResponseEntity.badRequest().body(error)
+            is MessageError.InvalidSkip -> ResponseEntity.badRequest().body(error)
+            is MessageError.NegativeIdentifier -> ResponseEntity.badRequest().body(error)
+            is MessageError.Unauthorized -> ResponseEntity.unprocessableEntity().body(error)
+            is MessageError.UserNotFound -> ResponseEntity.notFound().build()
+            is MessageError.InvalidUserId -> ResponseEntity.badRequest().body(error)
+            is MessageError.UserNotInChannel -> ResponseEntity.unprocessableEntity().body(error)
+            else -> ResponseEntity.internalServerError().body(error)
         }
     }
 }
