@@ -1,8 +1,13 @@
+import org.junit.jupiter.api.Test
+import pt.isel.Channel
+import pt.isel.ChannelInvitation
+import pt.isel.RegisterInvitation
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
 import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockInvitationRepo
 import pt.isel.mocks.MockUserRepository
-import org.junit.jupiter.api.Test
-import pt.isel.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

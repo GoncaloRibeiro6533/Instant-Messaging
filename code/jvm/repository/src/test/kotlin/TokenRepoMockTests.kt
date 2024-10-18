@@ -1,11 +1,11 @@
 import kotlinx.datetime.Clock
-import pt.isel.mocks.MockSessionRepository
-import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import pt.isel.Token
 import pt.isel.TokenValidationInfo
 import pt.isel.User
+import pt.isel.mocks.MockSessionRepository
+import pt.isel.mocks.MockUserRepository
 
 class TokenRepoMockTests {
     private var user: User

@@ -1,8 +1,8 @@
 package pt.isel.mocks
 
-import pt.isel.Token
-import pt.isel.SessionRepository
 import kotlinx.datetime.Instant
+import pt.isel.SessionRepository
+import pt.isel.Token
 
 class MockSessionRepository : SessionRepository {
     private val tokens = mutableListOf<Token>()

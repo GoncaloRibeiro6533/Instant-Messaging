@@ -1,11 +1,5 @@
 package pt.isel.controllers
 
-import pt.isel.AuthenticatedUser
-import pt.isel.Failure
-import pt.isel.MessageError
-import pt.isel.MessageService
-import pt.isel.Success
-import pt.isel.models.MessageInputModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,6 +8,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import pt.isel.AuthenticatedUser
+import pt.isel.Failure
+import pt.isel.MessageError
+import pt.isel.MessageService
+import pt.isel.Success
+import pt.isel.models.MessageInputModel
 
 @RestController
 @RequestMapping("api/messages")
@@ -73,7 +73,7 @@ class MessageController(private val messageService: MessageService) {
         return when (result) {
             is Success -> ResponseEntity.ok(result.value)
             is Failure ->
-           handleMessageError(result.value)
+                handleMessageError(result.value)
         }
     }
 

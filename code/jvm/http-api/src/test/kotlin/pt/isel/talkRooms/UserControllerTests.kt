@@ -1,5 +1,11 @@
 package pt.isel.talkRooms
 
+import org.jdbi.v3.core.Jdbi
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import org.postgresql.ds.PGSimpleDataSource
+import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.Sha256TokenEncoder
 import pt.isel.TransactionManager
 import pt.isel.TransactionManagerInMem
@@ -11,12 +17,6 @@ import pt.isel.configureWithAppRequirements
 import pt.isel.controllers.UserController
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
-import org.jdbi.v3.core.Jdbi
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
-import org.postgresql.ds.PGSimpleDataSource
-import org.springframework.http.HttpStatus
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.time.Duration

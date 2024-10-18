@@ -1,8 +1,8 @@
-import pt.isel.mocks.MockChannelRepository
-import pt.isel.mocks.MockUserRepository
 import pt.isel.Role
 import pt.isel.User
 import pt.isel.Visibility
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockUserRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,16 +1,5 @@
 package pt.isel.controllers
 
-import pt.isel.AuthenticatedUser
-import pt.isel.Either
-import pt.isel.Failure
-import pt.isel.Success
-import pt.isel.User
-import pt.isel.UserError
-import pt.isel.UserService
-import pt.isel.models.Problem
-import pt.isel.models.user.UserLoginCredentialsInput
-import pt.isel.models.user.UserRegisterInput
-import pt.isel.models.user.UsernameUpdateInput
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,6 +11,17 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import pt.isel.AuthenticatedUser
+import pt.isel.Either
+import pt.isel.Failure
+import pt.isel.Success
+import pt.isel.User
+import pt.isel.UserError
+import pt.isel.UserService
+import pt.isel.models.Problem
+import pt.isel.models.user.UserLoginCredentialsInput
+import pt.isel.models.user.UserRegisterInput
+import pt.isel.models.user.UsernameUpdateInput
 
 @RestController
 @RequestMapping("api/user")

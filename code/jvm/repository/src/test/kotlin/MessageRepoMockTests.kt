@@ -1,12 +1,12 @@
-import pt.isel.mocks.MockChannelRepository
-import pt.isel.mocks.MockMessageRepo
-import pt.isel.mocks.MockUserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import pt.isel.Channel
 import pt.isel.Role
 import pt.isel.User
 import pt.isel.Visibility
+import pt.isel.mocks.MockChannelRepository
+import pt.isel.mocks.MockMessageRepo
+import pt.isel.mocks.MockUserRepository
 
 class MessageRepoMockTests {
     private var user: User

@@ -1,11 +1,11 @@
 package pt.isel.pipeline
 
-import pt.isel.AuthenticatedUser
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
+import pt.isel.AuthenticatedUser
 
 @Component
 class AuthenticationInterceptor(

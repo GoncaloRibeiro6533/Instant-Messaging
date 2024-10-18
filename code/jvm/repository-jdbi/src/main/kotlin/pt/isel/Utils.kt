@@ -1,9 +1,9 @@
 package pt.isel
 
-import pt.isel.mapper.InstantMapper
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.postgres.PostgresPlugin
+import pt.isel.mapper.InstantMapper
 import java.time.Instant
 
 fun Jdbi.configureWithAppRequirements(): Jdbi {

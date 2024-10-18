@@ -1,24 +1,25 @@
 package pt.isel.talkRooms
 
-import pt.isel.pipeline.AuthenticatedUserArgumentResolver
-import pt.isel.pipeline.AuthenticationInterceptor
-import pt.isel.Sha256TokenEncoder
-import pt.isel.TransactionManagerJdbi
-import pt.isel.configureWithAppRequirements
 import kotlinx.datetime.Clock
 import org.jdbi.v3.core.Jdbi
 import org.postgresql.ds.PGSimpleDataSource
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-
+import pt.isel.Sha256TokenEncoder
+import pt.isel.TransactionManagerJdbi
+import pt.isel.UsersDomainConfig
+import pt.isel.configureWithAppRequirements
+import pt.isel.pipeline.AuthenticatedUserArgumentResolver
+import pt.isel.pipeline.AuthenticationInterceptor
+import kotlin.time.Duration.Companion.hours
 
 @Configuration
 @ComponentScan("pt.isel")
@@ -34,9 +35,6 @@ class PipelineConfigurer(
         resolvers.add(authenticatedUserArgumentResolver)
     }
 }
-
-
-
 
 @SpringBootApplication
 class TalkRoomsApplication {
@@ -61,6 +59,15 @@ class TalkRoomsApplication {
 
     @Bean
     fun clock() = Clock.System
+
+    @Bean
+    fun usersDomainConfig() =
+        UsersDomainConfig(
+            tokenSizeInBytes = 256 / 8,
+            tokenTtl = 24.hours,
+            tokenRollingTtl = 1.hours,
+            maxTokensPerUser = 3,
+        )
 }
 
 fun main() {

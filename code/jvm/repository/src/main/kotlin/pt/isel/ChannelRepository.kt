@@ -1,6 +1,5 @@
 package pt.isel
 
-
 interface ChannelRepository {
     fun findById(id: Int): Channel?
 
