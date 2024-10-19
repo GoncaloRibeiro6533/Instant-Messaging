@@ -1,5 +1,6 @@
 package pt.isel
 
+import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
 
@@ -253,7 +254,7 @@ class JdbiInvitationRepository(
             channel = channel,
             role = Role.valueOf(rs.getString("role_name")),
             isUsed = rs.getBoolean("used"),
-            timestamp = rs.getTimestamp("timestamp").toLocalDateTime(),
+            timestamp = Instant.fromEpochSeconds(rs.getLong("timestamp")),
         )
     }
 
@@ -284,7 +285,7 @@ class JdbiInvitationRepository(
             channel = channel,
             role = Role.valueOf(rs.getString("role_name")),
             isUsed = rs.getBoolean("used"),
-            timestamp = rs.getTimestamp("timestamp").toLocalDateTime(),
+            timestamp = Instant.fromEpochSeconds(rs.getLong("timestamp")),
         )
     }
 }
