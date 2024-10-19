@@ -10,10 +10,14 @@ class JdbiChannelRepository(
     private val handle: Handle,
 ) : ChannelRepository {
     override fun findById(id: Int): Channel? {
-        return handle.createQuery("SELECT * FROM dbo.channel WHERE id = :id")
+        return handle.createQuery("""
+            SELECT * FROM dbo.channel c
+            JOIN dbo.user u ON c.creator_id = u.id
+            WHERE c.id = :id
+        """.trimIndent())
             .bind("id", id)
-            .mapTo(Channel::class.java)
-            .findFirst()
+            .map { rs, _ -> mapRowToChannel(rs) }
+            .findOne()
             .orElse(null)
     }
 
@@ -22,11 +26,15 @@ class JdbiChannelRepository(
         limit: Int,
         skip: Int,
     ): List<Channel> {
-        return handle.createQuery("SELECT * FROM dbo.channel WHERE name = :name LIMIT :limit OFFSET :skip")
+        return handle.createQuery("""
+            SELECT * FROM dbo.channel c
+            JOIN dbo.user u ON c.creator_id = u.id
+            WHERE c.name LIKE :name || '%' LIMIT :limit OFFSET :skip
+            """.trimIndent())
             .bind("name", name)
             .bind("limit", limit)
             .bind("skip", skip)
-            .mapTo(Channel::class.java)
+            .map { rs, _ -> mapRowToChannel(rs) }
             .list()
     }
 
@@ -35,19 +43,28 @@ class JdbiChannelRepository(
         creator: User,
         visibility: Visibility,
     ): Channel {
-        return handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
+        val id = handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
             .bind("name", name)
             .bind("creator_id", creator.id)
             .bind("visibility", visibility)
             .executeAndReturnGeneratedKeys()
-            .map(ChannelMapper(creator))
-            .one()
+        return Channel(
+            id.mapTo(Int::class.java).one(),
+            name,
+            creator,
+            visibility,
+        )
     }
 
     override fun getChannelsOfUser(user: User): List<Channel> {
-        return handle.createQuery("SELECT * FROM dbo.channel WHERE creator_id = :creator_id")
-            .bind("creator_id", user.id)
-            .mapTo(Channel::class.java)
+        return handle.createQuery("""
+            SELECT * FROM dbo.channel c
+            JOIN dbo.user_channel_role ucr ON c.id = ucr.channel_id
+            JOIN dbo.user u ON c.creator_id = u.id
+            WHERE ucr.user_id = :user_id
+        """.trimIndent())
+            .bind("user_id", user.id)
+            .map { rs, _ -> mapRowToChannel(rs) }
             .list()
     }
 
@@ -100,17 +117,18 @@ class JdbiChannelRepository(
             .execute()
     }
 
-    private class ChannelMapper(private val user: User) : RowMapper<Channel> {
-        override fun map(
-            rs: ResultSet,
-            ctx: StatementContext,
-        ): Channel {
-            return Channel(
-                id = rs.getInt("id"),
-                name = rs.getString("name"),
-                creator = user,
-                visibility = Visibility.valueOf(rs.getString("visibility")),
-            )
-        }
+
+    private fun mapRowToChannel(rs: ResultSet): Channel {
+        val user = User(
+            rs.getInt("creator_id"),
+            rs.getString("creator_username"),
+            rs.getString("creator_email"),
+        )
+        return Channel(
+            rs.getInt("id"),
+            rs.getString("name"),
+            user,
+            Visibility.valueOf(rs.getString("visibility")),
+        )
     }
 }
