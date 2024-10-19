@@ -35,7 +35,7 @@ class JdbiMessageRepository(
                     .bind("channel", channel.id)
                     .bind("text", text)
                     .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
-                return Message(
+        return Message(
                     id,
                     sender,
                     channel,
@@ -62,12 +62,13 @@ class JdbiMessageRepository(
             .list()
     }
 
-    override fun deleteMessageById(message: Message): Message {
+    override fun deleteMessageById(id: Int): Message? {
+        val message = findById(id)
         handle.createUpdate(
             """
             DELETE FROM dbo.message WHERE id = :id
             """,
-        ).bind("id", message.id)
+        ).bind("id", id)
             .executeAndReturnGeneratedKeys()
         return message
     }

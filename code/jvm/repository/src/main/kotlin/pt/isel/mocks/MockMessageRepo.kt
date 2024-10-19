@@ -34,8 +34,8 @@ class MockMessageRepo : MessageRepository {
             .take(limit)
     }
 
-    override fun deleteMessageById(message: Message): Message {
-        val message = messages.first { it.id == message.id }
+    override fun deleteMessageById(id: Int): Message {
+        val message = messages.first { it.id == id }
         messages.remove(message)
         return message
     }
