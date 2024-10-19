@@ -8,6 +8,7 @@ import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockMessageRepo
 import pt.isel.mocks.MockUserRepository
 import kotlin.test.DefaultAsserter.assertTrue
+import kotlin.test.assertTrue
 
 class MessageRepoMockTests {
     private var user: User
@@ -75,7 +76,7 @@ class MessageRepoMockTests {
     fun `Test delete messages by channel`() {
         val message1 = repoMessages.createMessage(user, channel, "message1")
         val message2 = repoMessages.createMessage(user, channel, "message2")
-        val messagesDeleted = repoMessages.deleteMessagesByChannel(channel.id)
+        val messagesDeleted: Boolean = repoMessages.deleteMessagesByChannel(channel.id)
         assertTrue(messagesDeleted)
     }
 

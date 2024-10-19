@@ -18,7 +18,7 @@ class RegisterInvitation(
         require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
-    private fun copy() = RegisterInvitation(id, sender, email, channel, role, true, timestamp)
+    fun copy() = RegisterInvitation(id, sender, email, channel, role, true, timestamp)
 
     override fun markAsUsed() = copy()
 

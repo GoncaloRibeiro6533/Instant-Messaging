@@ -19,13 +19,13 @@ interface InvitationRepository {
 
     fun findChannelInvitationById(invitationId: Int): Invitation?
 
-    fun updateRegisterInvitation(invitation: Invitation): Invitation
+    fun updateRegisterInvitation(invitation: RegisterInvitation): RegisterInvitation
 
-    fun updateChannelInvitation(invitation: Invitation): Invitation
+    fun updateChannelInvitation(invitation: ChannelInvitation): ChannelInvitation
 
-    fun deleteRegisterInvitationById(invitationId: Int): Invitation
+    fun deleteRegisterInvitationById(invitationId: Int): Boolean
 
-    fun deleteChannelInvitationById(invitationId: Int): Invitation
+    fun deleteChannelInvitationById(invitationId: Int): Boolean
 
     fun getInvitationsOfUser(user: User): List<Invitation>
 
