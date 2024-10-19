@@ -5,14 +5,14 @@ import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.user.UserIdentifiers
 import java.time.LocalDateTime
 
-data class InvitationInputModel(
+data class InvitationInputModelChannel(
     val receiverId: Int,
     val email: String,
     val channelId: Int,
     val role: Role,
 )
 
-data class InvitationOutputModel(
+data class InvitationOutputModelChannel(
     val id: Int,
     val sender: UserIdentifiers,
     val receiverId: Int,
@@ -21,7 +21,22 @@ data class InvitationOutputModel(
     val timestamp: LocalDateTime,
 )
 
+data class InvitationInputModelRegister(
+    val email: String,
+    val channelId: Int,
+    val role: Role,
+)
+
+data class InvitationOutputModelRegister(
+    val id: Int,
+    val sender: UserIdentifiers,
+    val email: String,
+    val channel: ChannelOutputModel,
+    val role: Role,
+    val timestamp: LocalDateTime,
+)
+
 data class InvitationsList(
     val nInvitations: Int,
-    val invitations: List<InvitationOutputModel>,
+    val invitations: List<InvitationOutputModelChannel>,
 )
