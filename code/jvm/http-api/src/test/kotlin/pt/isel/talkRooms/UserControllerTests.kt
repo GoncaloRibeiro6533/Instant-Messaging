@@ -1,20 +1,15 @@
 package pt.isel.talkRooms
 
+
 import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import pt.isel.Sha256TokenEncoder
-import pt.isel.TransactionManager
-import pt.isel.TransactionManagerInMem
-import pt.isel.TransactionManagerJdbi
-import pt.isel.UserService
-import pt.isel.UsersDomain
-import pt.isel.UsersDomainConfig
-import pt.isel.configureWithAppRequirements
+import pt.isel.controllers.InvitationController
 import pt.isel.controllers.UserController
+import pt.isel.models.invitation.InvitationInputModelRegister
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
@@ -22,6 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import pt.isel.*
 
 class UserControllerTests {
     companion object {
@@ -71,6 +67,11 @@ class UserControllerTests {
         ),
         testClock,
     )
+
+    private fun createInvitationService(trxManager: TransactionManager) =
+        InvitationService(
+            trxManager,
+        )
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -135,5 +136,37 @@ class UserControllerTests {
         ).let { resp ->
             assertEquals(HttpStatus.OK, resp.statusCode)
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `register user with invitation then login`(trxManager: TransactionManager) {
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
+        )
+            .let { resp ->
+                assertEquals(HttpStatus.CREATED, resp.statusCode)
+            }
+        val invitation =
+            InvitationController(createInvitationService(trxManager)).createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "bob@mail.com",
+                    1,
+                    Role.READ_ONLY,
+                ),
+                user =
+                    controllerUser.login(
+                        UserLoginCredentialsInput("admin", "Admin_123dsad"),
+                    ).body as AuthenticatedUser,
+            ).body as Invitation
+        val newUser =
+            UserController(createUserService(trxManager, TestClock())).register(
+                UserRegisterInput("bob", "bob@mail.com", "Bob_123dsad"),
+                invitation.id,
+            ).let {
+                assertEquals(HttpStatus.CREATED, it.statusCode)
+                it.body as User
+            }
     }
 }
