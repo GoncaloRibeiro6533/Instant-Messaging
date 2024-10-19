@@ -71,15 +71,25 @@ class MessageControllerTests {
             testClock,
         )
 
-        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager)
+        private fun createMessageService(
+            trxManager: TransactionManager,
+        ) = MessageService(trxManager)
 
-        private fun createMessageController(trxManager: TransactionManager) = MessageController(createMessageService(trxManager))
+        private fun createMessageController(
+            trxManager: TransactionManager,
+        ) = MessageController(createMessageService(trxManager))
 
-        private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
+        private fun createUserController(
+            trxManager: TransactionManager,
+        ) = UserController(createUserService(trxManager, TestClock()))
 
-        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
+        private fun createChannelService(
+            trxManager: TransactionManager,
+        ) = ChannelService(trxManager)
 
-        private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
+        private fun createChannelController(
+            trxManager: TransactionManager,
+        ) = ChannelController(createChannelService(trxManager))
     }
 
     @ParameterizedTest
@@ -90,29 +100,24 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
+            UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
-        val channelId =
-            (
-                channelController.createChannel(
-                    CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
-                ).body as ChannelOutputModel
-            ).id
+        val channelId = (channelController.createChannel(
+            CreateChannelInputModel("channel", Visibility.PUBLIC),
+            userLoggedIn
+        ).body as ChannelOutputModel).id
 
         val messageInputModel = MessageInputModel(channelId, "Hello, World!")
 
-        val result =
-            messageController.sendMessage(
-                messageInputModel,
-                userLoggedIn,
-            )
+        val result = messageController.sendMessage(
+            messageInputModel,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals("Hello, World!", (result.body as MessageOutputModel).content)
@@ -126,35 +131,29 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
-        val channelId =
-            (
-                channelController.createChannel(
-                    CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
-                ).body as ChannelOutputModel
-            ).id
+        val channelId = (channelController.createChannel(
+            CreateChannelInputModel("channel", Visibility.PUBLIC),
+            userLoggedIn
+        ).body as ChannelOutputModel).id
 
         val messageInputModel = MessageInputModel(channelId, "Hello, World!")
 
-        val message =
-            messageController.sendMessage(
-                messageInputModel,
-                userLoggedIn,
-            ).body as MessageOutputModel
+        val message = messageController.sendMessage(
+            messageInputModel,
+            userLoggedIn
+        ).body as MessageOutputModel
 
-        val result =
-            messageController.getMessageById(
-                message.id,
-                userLoggedIn,
-            )
+        val result = messageController.getMessageById(
+            message.id,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals("Hello, World!", (result.body as MessageOutputModel).content)
@@ -168,21 +167,17 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
-        val channelId =
-            (
-                channelController.createChannel(
-                    CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
-                ).body as ChannelOutputModel
-            ).id
+        val channelId = (channelController.createChannel(
+            CreateChannelInputModel("channel", Visibility.PUBLIC),
+            userLoggedIn
+        ).body as ChannelOutputModel).id
 
         val messageInputModel1 = MessageInputModel(channelId, "Msg 1")
         val messageInputModel2 = MessageInputModel(channelId, "Msg 2")
@@ -192,36 +187,35 @@ class MessageControllerTests {
 
         messageController.sendMessage(
             messageInputModel1,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel2,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel3,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel4,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel5,
-            userLoggedIn,
+            userLoggedIn
         )
 
-        val result =
-            messageController.getMsgHistory(
-                channelId,
-                10,
-                0,
-                userLoggedIn,
-            )
+        val result = messageController.getMsgHistory(
+            channelId,
+            10,
+            0,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals(5, (result.body as List<MessageOutputModel>).size)
@@ -235,21 +229,17 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
-        val channelId =
-            (
-                channelController.createChannel(
-                    CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
-                ).body as ChannelOutputModel
-            ).id
+        val channelId = (channelController.createChannel(
+            CreateChannelInputModel("channel", Visibility.PUBLIC),
+            userLoggedIn
+        ).body as ChannelOutputModel).id
 
         val messageInputModel1 = MessageInputModel(channelId, "Msg 1")
         val messageInputModel2 = MessageInputModel(channelId, "Msg 2")
@@ -259,39 +249,39 @@ class MessageControllerTests {
 
         messageController.sendMessage(
             messageInputModel1,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel2,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel3,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel4,
-            userLoggedIn,
+            userLoggedIn
         )
 
         messageController.sendMessage(
             messageInputModel5,
-            userLoggedIn,
+            userLoggedIn
         )
 
-        val result =
-            messageController.getMsgHistory(
-                channelId,
-                3,
-                2,
-                userLoggedIn,
-            )
+        val result = messageController.getMsgHistory(
+            channelId,
+            3,
+            2,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals(3, (result.body as List<MessageOutputModel>).size)
+
     }
 
     @ParameterizedTest
@@ -302,26 +292,24 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
         channelController.createChannel(
             CreateChannelInputModel("channel", Visibility.PUBLIC),
-            userLoggedIn,
+            userLoggedIn
         )
 
-        val result =
-            messageController.getMsgHistory(
-                1,
-                10,
-                0,
-                userLoggedIn,
-            )
+        val result = messageController.getMsgHistory(
+            1,
+            10,
+            0,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
@@ -334,24 +322,22 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
         channelController.createChannel(
             CreateChannelInputModel("channel", Visibility.PUBLIC),
-            userLoggedIn,
+            userLoggedIn
         )
 
-        val result =
-            messageController.getMessageById(
-                1,
-                userLoggedIn,
-            )
+        val result = messageController.getMessageById(
+            1,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
     }
@@ -363,21 +349,19 @@ class MessageControllerTests {
         val userController = createUserController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
         val messageInputModel = MessageInputModel(1, "Hello, World!")
 
-        val result =
-            messageController.sendMessage(
-                messageInputModel,
-                userLoggedIn,
-            )
+        val result = messageController.sendMessage(
+            messageInputModel,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
@@ -390,30 +374,28 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password"),
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
-        val userLoggedIn =
-            userController.login(
-                UserLoginCredentialsInput("admin", "password"),
-            ).body as AuthenticatedUser
+        val userLoggedIn = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
 
-        val channelId =
-            (
-                channelController.createChannel(
-                    CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
-                ).body as ChannelOutputModel
-            ).id
+        val channelId = (channelController.createChannel(
+            CreateChannelInputModel("channel", Visibility.PUBLIC),
+            userLoggedIn
+        ).body as ChannelOutputModel).id
 
         val messageInputModel = MessageInputModel(channelId, "")
 
-        val result =
-            messageController.sendMessage(
-                messageInputModel,
-                userLoggedIn,
-            )
+        val result = messageController.sendMessage(
+            messageInputModel,
+            userLoggedIn
+        )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
     }
-}
+
+
+    }

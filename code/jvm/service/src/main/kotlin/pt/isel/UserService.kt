@@ -74,7 +74,7 @@ class UserService(
     ): Either<UserError, User> =
         trxManager.run {
             if (inviteId < 0) return@run failure(UserError.NegativeIdentifier)
-            val invitation =
+            var invitation =
                 (invitationRepo.findRegisterInvitationById(inviteId) as? RegisterInvitation)
                     ?: return@run failure(UserError.InvitationNotFound)
             if (invitation.isUsed) return@run failure(UserError.InvitationAlreadyUsed)
@@ -85,11 +85,17 @@ class UserService(
             if (userRepo.findByEmail(email) != null) return@run failure(UserError.EmailAlreadyInUse)
             if (email != invitation.email) return@run failure(UserError.EmailDoesNotMatchInvite)
             if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
-            if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) return@run failure(UserError.UsernameAlreadyExists)
+            if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
+                return@run failure(UserError.UsernameAlreadyExists)
+            }
             if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
+
             val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
             val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
+
+            invitation = invitation.markAsUsed()
             invitationRepo.updateRegisterInvitation(invitation)
+
             channelRepo.addUserToChannel(user, invitation.channel, invitation.role)
             return@run success(user)
         }

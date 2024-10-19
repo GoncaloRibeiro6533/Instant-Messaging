@@ -8,7 +8,7 @@ import java.security.SecureRandom
 import java.util.Base64.getUrlDecoder
 import java.util.Base64.getUrlEncoder
 
-const val MIN_PASSWORD_LENGTH = 8
+const val MIN_PASSWORD_LENGTH = 12
 
 @Named
 class UsersDomain(

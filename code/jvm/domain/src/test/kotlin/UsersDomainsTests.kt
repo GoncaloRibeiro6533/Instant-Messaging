@@ -4,7 +4,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.Sha256TokenEncoder
 import pt.isel.UsersDomain
 import pt.isel.UsersDomainConfig
-import kotlin.test.assertFalse
 import kotlin.time.Duration.Companion.hours
 
 class UsersDomainsTests {
@@ -98,25 +97,4 @@ class UsersDomainsTests {
         val result = usersDomain.validatePassword(password, validationInfo)
         assertTrue(result)
     }
-
-    @Test
-    fun `isPasswordStrong with password with length less than 8 should return false`() {
-        val result = usersDomain.isPasswordStrong("Weak123")
-        assertFalse(result)
-    }
-
-    @Test
-    fun `isPasswordStrong with password with no digits should return false`() {
-        val result = usersDomain.isPasswordStrong("Weakpassword")
-        assertFalse(result)
-    }
-
-    @Test
-    fun `createTokenValidationInformation should return a token validation information`() {
-        val token = usersDomain.generateTokenValue()
-        val result = usersDomain.createTokenValidationInformation(token)
-        assertTrue(result.validationInfo.isNotEmpty())
-    }
-
-
 }

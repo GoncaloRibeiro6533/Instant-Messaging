@@ -1,6 +1,8 @@
 package pt.isel
 
+import kotlinx.datetime.LocalDateTime
 import org.jdbi.v3.core.Handle
+import java.sql.ResultSet
 
 class JdbiMessageRepository(
     private val handle: Handle,
@@ -8,10 +10,12 @@ class JdbiMessageRepository(
     override fun findById(id: Int): Message? =
         handle.createQuery(
             """
-        SELECT * FROM dbo.message WHERE id = :id
+        SELECT m.*, u.username, u.email, c.name, c.visibility 
+        FROM dbo.MESSAGE m JOIN dbo.USER u ON m.user_id = u.id JOIN dbo.channel c ON m.channel_id = c.id
+        WHERE m.id = :id;
         """,
         ).bind("id", id)
-            .mapTo(Message::class.java)
+            .map{ rs, _ -> mapRowToMessage(rs) }
             .findFirst()
             .orElse(
                 null,
@@ -21,18 +25,24 @@ class JdbiMessageRepository(
         sender: User,
         channel: Channel,
         text: String,
-    ): Message =
-        handle.createUpdate(
-            """
-        INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
-        (now(), :userId, :channelId, :message)
-        """,
-        ).bind("user", sender.id)
-            .bind("channel", channel.id)
-            .bind("text", text)
-            .executeAndReturnGeneratedKeys()
-            .mapTo(Message::class.java)
-            .one()
+    ): Message {
+                val id = handle.createUpdate(
+                    """
+                INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
+                (now(), :userId, :channelId, :message)
+                """,
+                ).bind("user", sender.id)
+                    .bind("channel", channel.id)
+                    .bind("text", text)
+                    .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
+                return Message(
+                    id,
+                    sender,
+                    channel,
+                    text,
+                    TODO()
+                )
+    }
 
     override fun findByChannel(
         channel: Channel,
@@ -41,42 +51,44 @@ class JdbiMessageRepository(
     ): List<Message> {
         return handle.createQuery(
             """
-            SELECT * FROM dbo.message WHERE channel_id = :channelId ORDER BY creationtime DESC
-            LIMIT :limit OFFSET :skip
+            SELECT m.*, u.username, u.email, c.name, c.visibility 
+            FROM dbo.MESSAGE m JOIN dbo.USER u ON m.user_id = u.id JOIN dbo.channel c ON m.channel_id = c.id 
+            WHERE m.channel_id = :channelId LIMIT :limit OFFSET :skip;
             """,
         ).bind("channelId", channel.id)
             .bind("limit", limit)
             .bind("skip", skip)
-            .mapTo(Message::class.java)
+            .map{ rs, _ -> mapRowToMessage(rs) }
             .list()
     }
 
-    override fun deleteMessageById(id: Int): Message =
+    override fun deleteMessageById(message: Message): Message {
         handle.createUpdate(
             """
             DELETE FROM dbo.message WHERE id = :id
             """,
-        ).bind("id", id)
+        ).bind("id", message.id)
             .executeAndReturnGeneratedKeys()
-            .mapTo(Message::class.java)
-            .one()
+        return message
+    }
 
-    override fun deleteMessagesByChannel(channelId: Int): List<Message> =
+
+    override fun deleteMessagesByChannel(channelId: Int): Boolean {
         handle.createUpdate(
             """
             DELETE FROM dbo.message WHERE channel_id = :channelId
             """,
         ).bind("channelId", channelId)
             .executeAndReturnGeneratedKeys()
-            .mapTo(Message::class.java)
-            .list()
+        return true
+    }
 
     override fun findAll(): List<Message> =
         handle.createQuery(
             """
             SELECT * FROM dbo.message
             """,
-        ).mapTo(Message::class.java)
+        ).map{ rs, _ -> mapRowToMessage(rs) }
             .list()
 
     override fun clear() {
@@ -85,5 +97,25 @@ class JdbiMessageRepository(
             DELETE FROM dbo.message
             """,
         ).execute()
+    }
+
+    private fun mapRowToMessage(rs: ResultSet): Message {
+        val user = User(
+            rs.getInt("user_id"),
+            rs.getString("username"),
+            rs.getString("email"),
+        )
+        return Message(
+            id = rs.getInt("id"),
+            sender = user,
+            channel = Channel(
+                id = rs.getInt("channel_id"),
+                name = rs.getString("channel_name"),
+                visibility = Visibility.valueOf(rs.getString("visibility")),
+                creator = user
+                ),
+            content = rs.getString("message"),
+            timestamp = rs.getTimestamp("creationtime").toLocalDateTime()
+        )
     }
 }

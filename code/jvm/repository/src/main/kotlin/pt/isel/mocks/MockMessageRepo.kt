@@ -34,16 +34,16 @@ class MockMessageRepo : MessageRepository {
             .take(limit)
     }
 
-    override fun deleteMessageById(id: Int): Message {
-        val message = messages.first { it.id == id }
+    override fun deleteMessageById(message: Message): Message {
+        val message = messages.first { it.id == message.id }
         messages.remove(message)
         return message
     }
 
-    override fun deleteMessagesByChannel(channelId: Int): List<Message> {
+    override fun deleteMessagesByChannel(channelId: Int): Boolean {
         val messagesToDelete = messages.filter { it.channel.id == channelId }
         messages.removeAll(messagesToDelete)
-        return messagesToDelete
+        return true
     }
 
     override fun clear() {
