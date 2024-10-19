@@ -15,7 +15,7 @@ interface MessageRepository {
         skip: Int,
     ): List<Message>
 
-    fun deleteMessageById(message: Message): Message
+    fun deleteMessageById(id: Int): Message?
 
     fun deleteMessagesByChannel(channelId: Int): Boolean
 
