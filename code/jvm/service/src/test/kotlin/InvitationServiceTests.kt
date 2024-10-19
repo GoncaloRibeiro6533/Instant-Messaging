@@ -645,7 +645,7 @@ class InvitationServiceTests {
             )
         assertIs<Success<ChannelInvitation>>(result)
         val declined = invitationService.declineChannelInvitation(result.value.id)
-        assertIs<Success<Unit>>(declined)
+        assertIs<Success<Boolean>>(declined)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
         assertIs<Success<List<Channel>>>(channelsOfUser2)
         assertEquals(1, channelsOfUser2.value.size)

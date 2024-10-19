@@ -90,14 +90,14 @@ class InvitationRepoMockTests {
     @Test
     fun `Test delete register invitation by id`() {
         val deletedInvitation = repoInvitations.deleteRegisterInvitationById(registerInvitation.id)
-        assertEquals(registerInvitation, deletedInvitation)
+        assertTrue(deletedInvitation)
         assertEquals(null, repoInvitations.findRegisterInvitationById(registerInvitation.id))
     }
 
     @Test
     fun `Test delete channel invitation by id`() {
         val deletedInvitation = repoInvitations.deleteChannelInvitationById(channelInvitation.id)
-        assertEquals(channelInvitation, deletedInvitation)
+        assertTrue(deletedInvitation)
         assertEquals(null, repoInvitations.findChannelInvitationById(channelInvitation.id))
     }
 }
