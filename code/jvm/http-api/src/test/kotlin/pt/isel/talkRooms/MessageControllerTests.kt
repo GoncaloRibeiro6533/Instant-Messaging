@@ -131,11 +131,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         val channelId = (channelController.createChannel(
@@ -167,11 +167,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         val channelId = (channelController.createChannel(
@@ -229,11 +229,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         val channelId = (channelController.createChannel(
@@ -292,11 +292,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         channelController.createChannel(
@@ -322,11 +322,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         channelController.createChannel(
@@ -349,11 +349,11 @@ class MessageControllerTests {
         val userController = createUserController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         val messageInputModel = MessageInputModel(1, "Hello, World!")
@@ -374,11 +374,11 @@ class MessageControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin", "email@test.com", "password")
+            UserRegisterInput("admin", "email@test.com", "Admin_123dsad")
         ).body as User
 
         val userLoggedIn = userController.login(
-            UserLoginCredentialsInput("admin", "password")
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
         ).body as AuthenticatedUser
 
         val channelId = (channelController.createChannel(
