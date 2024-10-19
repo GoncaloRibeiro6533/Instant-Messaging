@@ -55,7 +55,7 @@ class InvitationServiceTests {
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
-        invitationService = InvitationService(trxManager)
+        invitationService = InvitationService(trxManager, TestClock())
         userService = createUserService(trxManager, TestClock())
         channelService = ChannelService(trxManager)
     }
