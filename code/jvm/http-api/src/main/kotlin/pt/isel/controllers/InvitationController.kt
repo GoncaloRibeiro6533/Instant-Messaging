@@ -21,6 +21,25 @@ import pt.isel.models.invitation.InvitationInputModelRegister
 class InvitationController(
     private val invitationService: InvitationService,
 ) {
+    @PostMapping("/register")
+    fun createRegisterInvitation(
+        @RequestBody invitationInputModelRegister: InvitationInputModelRegister,
+        user: AuthenticatedUser,
+    ): ResponseEntity<Any> {
+        val result =
+            invitationService.createRegisterInvitation(
+                user.user.id,
+                invitationInputModelRegister.email,
+                invitationInputModelRegister.channelId,
+                invitationInputModelRegister.role,
+            )
+        return when (result) {
+            is Success<*> -> ResponseEntity.ok(result.value)
+            is Failure<*> ->
+                handleInvitationError(result.value)
+        }
+    }
+
     @PostMapping("/channel")
     fun createChannelInvitation(
         @RequestBody invitationInputModelChannel: InvitationInputModelChannel,
@@ -36,25 +55,6 @@ class InvitationController(
                 )
             }
 
-        return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
-                handleInvitationError(result.value)
-        }
-    }
-
-    @PostMapping("/register")
-    fun createRegisterInvitation(
-        @RequestBody invitationInputModelRegister: InvitationInputModelRegister,
-        user: AuthenticatedUser,
-    ): ResponseEntity<Any> {
-        val result =
-            invitationService.createRegisterInvitation(
-                user.user.id,
-                invitationInputModelRegister.email,
-                invitationInputModelRegister.channelId,
-                invitationInputModelRegister.role,
-            )
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->

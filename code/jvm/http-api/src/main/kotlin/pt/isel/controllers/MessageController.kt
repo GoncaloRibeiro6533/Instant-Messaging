@@ -18,24 +18,6 @@ import pt.isel.models.MessageInputModel
 @RestController
 @RequestMapping("api/messages")
 class MessageController(private val messageService: MessageService) {
-    @GetMapping("/{id}")
-    fun getMessageById(
-        @PathVariable id: Int,
-        user: AuthenticatedUser,
-    ): ResponseEntity<Any> {
-        val result =
-            messageService.findMessageById(
-                id,
-                user.user.id,
-            )
-
-        return when (result) {
-            is Success -> ResponseEntity.ok(result.value)
-            is Failure ->
-                handleMessageError(result.value)
-        }
-    }
-
     @PostMapping
     fun sendMessage(
         @RequestBody messageInputModel: MessageInputModel,
@@ -51,6 +33,24 @@ class MessageController(private val messageService: MessageService) {
         return when (result) {
             is Success<*> -> ResponseEntity.ok(result.value)
             is Failure<*> ->
+                handleMessageError(result.value)
+        }
+    }
+
+    @GetMapping("/{id}")
+    fun getMessageById(
+        @PathVariable id: Int,
+        user: AuthenticatedUser,
+    ): ResponseEntity<Any> {
+        val result =
+            messageService.findMessageById(
+                id,
+                user.user.id,
+            )
+
+        return when (result) {
+            is Success -> ResponseEntity.ok(result.value)
+            is Failure ->
                 handleMessageError(result.value)
         }
     }
