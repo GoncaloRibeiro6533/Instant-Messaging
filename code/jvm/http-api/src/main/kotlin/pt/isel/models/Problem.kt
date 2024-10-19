@@ -21,6 +21,34 @@ sealed class Problem(
             .header("Content-Type", MEDIA_TYPE)
             .body(this)
 
+    data object InvalidText : Problem(URI("$PROBLEM_URI_PATH/invalid-text"))
+
+    data object MessageNotFound : Problem(URI("$PROBLEM_URI_PATH/message-not-found"))
+
+    data object UserNotInChannel : Problem(URI("$PROBLEM_URI_PATH/user-not-in-channel"))
+
+    data object InvalidRole : Problem(URI("$PROBLEM_URI_PATH/invalid-role"))
+
+    data object InvalidChannel : Problem(URI("$PROBLEM_URI_PATH/invalid-channel"))
+
+    data object InvalidReceiver : Problem(URI("$PROBLEM_URI_PATH/invalid-receiver"))
+
+    data object SenderDoesntBelongToChannel : Problem(URI("$PROBLEM_URI_PATH/sender-doesnt-belong-to-channel"))
+
+    data object InvitationExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-expired"))
+
+    data object AlreadyInChannel : Problem(URI("$PROBLEM_URI_PATH/already-in-channel"))
+
+    data object CantInviteToPublicChannel : Problem(URI("$PROBLEM_URI_PATH/cant-invite-to-public-channel"))
+
+    data object ChannelNameAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/channel-name-already-exists"))
+
+    data object InvalidChannelName : Problem(URI("$PROBLEM_URI_PATH/invalid-channel-name"))
+
+    data object UserAlreadyInChannel : Problem(URI("$PROBLEM_URI_PATH/user-already-in-channel"))
+
+    data object InvalidVisibility : Problem(URI("$PROBLEM_URI_PATH/invalid-visibility"))
+
     data object InvalidIdentifier : Problem(URI("$PROBLEM_URI_PATH/invalid-identifier"))
 
     data object NoMatchingUsername : Problem(URI("$PROBLEM_URI_PATH/no-matching-username"))

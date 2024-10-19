@@ -24,8 +24,6 @@ sealed class MessageError {
     data object ChannelNotFound : MessageError()
 
     data object UserNotInChannel : MessageError()
-
-    data object SessionExpired : MessageError()
 }
 
 @Named
@@ -33,7 +31,7 @@ class MessageService(private val trxManager: TransactionManager) {
     fun findMessageById(
         id: Int,
         userId: Int,
-    ): Either<MessageError, Message?> =
+    ): Either<MessageError, Message> =
         trxManager.run {
             userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (id < 0) return@run failure(MessageError.NegativeIdentifier)
