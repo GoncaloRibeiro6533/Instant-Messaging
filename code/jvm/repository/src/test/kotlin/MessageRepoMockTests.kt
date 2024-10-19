@@ -7,6 +7,7 @@ import pt.isel.Visibility
 import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockMessageRepo
 import pt.isel.mocks.MockUserRepository
+import kotlin.test.DefaultAsserter.assertTrue
 
 class MessageRepoMockTests {
     private var user: User
@@ -59,14 +60,14 @@ class MessageRepoMockTests {
     @Test
     fun `Test delete message by id`() {
         val message = repoMessages.createMessage(user, channel, "message")
-        val messageDeleted = repoMessages.deleteMessageById(message.id)
+        val messageDeleted = repoMessages.deleteMessageById(message)
         assertEquals(message, messageDeleted)
     }
 
     @Test
     fun `Test delete message by id with one message`() {
         val message = repoMessages.createMessage(user, channel, "message")
-        val messageDeleted = repoMessages.deleteMessageById(message.id)
+        val messageDeleted = repoMessages.deleteMessageById(message)
         assertEquals(message, messageDeleted)
     }
 
@@ -75,7 +76,7 @@ class MessageRepoMockTests {
         val message1 = repoMessages.createMessage(user, channel, "message1")
         val message2 = repoMessages.createMessage(user, channel, "message2")
         val messagesDeleted = repoMessages.deleteMessagesByChannel(channel.id)
-        assertEquals(listOf(message1, message2), messagesDeleted)
+        assertTrue(messagesDeleted)
     }
 
     @Test
