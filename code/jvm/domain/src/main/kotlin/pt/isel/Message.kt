@@ -1,13 +1,13 @@
 package pt.isel
 
-import java.time.LocalDateTime
+import kotlinx.datetime.Instant
 
 data class Message(
     val id: Int,
     val sender: User,
     val channel: Channel,
     val content: String,
-    val timestamp: LocalDateTime,
+    val timestamp: Instant,
 ) {
     companion object {
         const val MAX_MESSAGE_LENGTH = 1000

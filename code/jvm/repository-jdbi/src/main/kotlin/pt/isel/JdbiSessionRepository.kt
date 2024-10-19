@@ -2,7 +2,6 @@ package pt.isel
 
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
-import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import org.slf4j.LoggerFactory

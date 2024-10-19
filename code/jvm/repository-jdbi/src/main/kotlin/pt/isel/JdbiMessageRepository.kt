@@ -1,25 +1,12 @@
 package pt.isel
 
+import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
 
 class JdbiMessageRepository(
     private val handle: Handle,
 ) : MessageRepository {
-    override fun findById(id: Int): Message? =
-        handle.createQuery(
-            """
-        SELECT m.*, u.username, u.email, c.name, c.visibility 
-        FROM dbo.MESSAGE m JOIN dbo.USER u ON m.user_id = u.id JOIN dbo.channel c ON m.channel_id = c.id
-        WHERE m.id = :id;
-        """,
-        ).bind("id", id)
-            .map { rs, _ -> mapRowToMessage(rs) }
-            .findFirst()
-            .orElse(
-                null,
-            )
-
     override fun createMessage(
         sender: User,
         channel: Channel,
@@ -43,6 +30,20 @@ class JdbiMessageRepository(
             TODO(),
         )
     }
+
+    override fun findById(id: Int): Message? =
+        handle.createQuery(
+            """
+        SELECT m.*, u.username, u.email, c.name, c.visibility 
+        FROM dbo.MESSAGE m JOIN dbo.USER u ON m.user_id = u.id JOIN dbo.channel c ON m.channel_id = c.id
+        WHERE m.id = :id;
+        """,
+        ).bind("id", id)
+            .map { rs, _ -> mapRowToMessage(rs) }
+            .findFirst()
+            .orElse(
+                null,
+            )
 
     override fun findByChannel(
         channel: Channel,
@@ -116,7 +117,7 @@ class JdbiMessageRepository(
                     creator = user,
                 ),
             content = rs.getString("message"),
-            timestamp = rs.getTimestamp("creationtime").toLocalDateTime(),
+            timestamp = Instant.fromEpochSeconds(rs.getLong("creationtime")),
         )
     }
 }

@@ -5,6 +5,20 @@ import org.jdbi.v3.core.Handle
 class JdbiUserRepository(
     private val handle: Handle,
 ) : UserRepository {
+    override fun createUser(
+        username: String,
+        email: String,
+        password: String,
+    ): User {
+        return handle.createUpdate("INSERT INTO dbo.User (username, email, password) VALUES (:username, :email, :password)")
+            .bind("username", username)
+            .bind("email", email)
+            .bind("password", password)
+            .executeAndReturnGeneratedKeys()
+            .mapTo(User::class.java)
+            .one()
+    }
+
     override fun findById(id: Int): User? {
         return handle.createQuery("SELECT id, email, username FROM dbo.User WHERE id = :id")
             .bind("id", id)
@@ -26,19 +40,7 @@ class JdbiUserRepository(
             .list()
     }
 
-    override fun createUser(
-        username: String,
-        email: String,
-        password: String,
-    ): User {
-        return handle.createUpdate("INSERT INTO dbo.User (username, email, password) VALUES (:username, :email, :password)")
-            .bind("username", username)
-            .bind("email", email)
-            .bind("password", password)
-            .executeAndReturnGeneratedKeys()
-            .mapTo(User::class.java)
-            .one()
-    }
+
 
     override fun updateUsername(
         user: User,
