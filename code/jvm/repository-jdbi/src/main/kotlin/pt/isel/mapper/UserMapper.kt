@@ -6,7 +6,11 @@ import pt.isel.User
 import java.sql.ResultSet
 
 class UserMapper : ColumnMapper<User> {
-    override fun map(rs: ResultSet, columnNumber: Int, ctx: StatementContext): User {
+    override fun map(
+        rs: ResultSet,
+        columnNumber: Int,
+        ctx: StatementContext,
+    ): User {
         return User(
             id = rs.getInt("id"),
             username = rs.getString("username"),

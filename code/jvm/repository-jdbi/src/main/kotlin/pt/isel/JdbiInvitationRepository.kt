@@ -12,19 +12,23 @@ class JdbiInvitationRepository(
         email: String,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): RegisterInvitation {
         val id =
             handle.createUpdate(
                 """
-                INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id)
-                VALUES (:role, :used, :channel_id, :email, :sender)
+                INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id, timestamp)
+                VALUES (:role, :used, :channel_id, :email, :sender, :timestamp)
                 """.trimIndent(),
             )
                 .bind("sender_id", sender.id)
                 .bind("email", email)
                 .bind("channel_id", channel.id)
                 .bind("used", false)
-                .bind("role", role).executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
+                .bind("role", role)
+                .bind("timestamp", timestamp.epochSeconds)
+                .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
+
         return RegisterInvitation(
             id,
             sender,
@@ -32,7 +36,7 @@ class JdbiInvitationRepository(
             channel,
             role,
             false,
-            TODO(),
+            timestamp,
         )
     }
 
@@ -41,12 +45,13 @@ class JdbiInvitationRepository(
         receiver: User,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): ChannelInvitation {
         val id =
             handle.createUpdate(
                 """
-                INSERT INTO dbo.CHANNEL_INVITATION (role_name, used, channel_id, invited_id, inviter_id)
-                VALUES (:role, :used, :channel_id, :receiver, :sender)
+                INSERT INTO dbo.CHANNEL_INVITATION (role_name, used, channel_id, invited_id, inviter_id, timestamp)
+                VALUES (:role, :used, :channel_id, :receiver, :sender, :timestamp)
                 """.trimIndent(),
             )
                 .bind("sender_id", sender.id)
@@ -54,6 +59,7 @@ class JdbiInvitationRepository(
                 .bind("channel_id", channel.id)
                 .bind("used", false)
                 .bind("role", role)
+                .bind("timestamp", timestamp.epochSeconds)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
         return ChannelInvitation(
             id,
@@ -62,7 +68,7 @@ class JdbiInvitationRepository(
             channel,
             role,
             false,
-            TODO(),
+            timestamp,
         )
     }
 
@@ -76,6 +82,7 @@ class JdbiInvitationRepository(
                 ri.channel_id,
                 ri.invited_email,
                 ri.inviter_id,
+                ri.timestamp,
                 inviter.username AS inviter_username,
                 inviter.email AS inviter_email,
                 ch.name AS channel_name,
@@ -106,6 +113,7 @@ class JdbiInvitationRepository(
                 ci.channel_id,
                 ci.inviter_id,
                 ci.invited_id,
+                ci.timestamp,
                 inviter.username AS inviter_username,
                 inviter.email AS inviter_email,
                 invited.username AS invited_username,
@@ -192,6 +200,7 @@ class JdbiInvitationRepository(
                  ci.channel_id,
                  ci.inviter_id,
                  ci.invited_id,
+                 ci.timestamp,
                  inviter.username AS inviter_username,
                  inviter.email AS inviter_email,
                  invited.username AS invited_username,

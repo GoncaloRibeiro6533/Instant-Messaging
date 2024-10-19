@@ -1,7 +1,6 @@
 package pt.isel
 
 import kotlinx.datetime.Instant
-import java.time.LocalDateTime
 
 class ChannelInvitation(
     id: Int,
@@ -16,7 +15,7 @@ class ChannelInvitation(
         require(id >= 0) { "id must be greater than 0" }
         require(role in Role.entries.toTypedArray()) { "Invalid role" }
         require(sender != receiver) { "Sender and receiver must be different" }
-        //require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
+        // require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 
     private fun copy() = ChannelInvitation(id, sender, receiver, channel, role, true, timestamp)

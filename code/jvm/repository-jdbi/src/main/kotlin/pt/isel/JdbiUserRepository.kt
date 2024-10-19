@@ -40,8 +40,6 @@ class JdbiUserRepository(
             .list()
     }
 
-
-
     override fun updateUsername(
         user: User,
         newUsername: String,

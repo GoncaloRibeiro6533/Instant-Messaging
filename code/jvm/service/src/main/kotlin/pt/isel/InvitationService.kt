@@ -1,6 +1,7 @@
 package pt.isel
 
 import jakarta.inject.Named
+import kotlinx.datetime.Clock
 
 sealed class InvitationError {
     data object InvitationNotFound : InvitationError()
@@ -33,7 +34,10 @@ sealed class InvitationError {
 }
 
 @Named
-class InvitationService(private val trxManager: TransactionManager) {
+class InvitationService(
+    private val trxManager: TransactionManager,
+    private val clock: Clock,
+) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<Invitation>> =
         trxManager.run {
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
@@ -69,6 +73,7 @@ class InvitationService(private val trxManager: TransactionManager) {
                     email,
                     channel,
                     role,
+                    clock.now(),
                 )
             return@run success(createdInvitation)
         }
@@ -98,6 +103,7 @@ class InvitationService(private val trxManager: TransactionManager) {
                     receiver,
                     channel,
                     role,
+                    clock.now(),
                 )
 
             return@run success(createdInvitation)

@@ -1,5 +1,6 @@
 package pt.isel.mocks
 
+import kotlinx.datetime.Instant
 import pt.isel.Channel
 import pt.isel.ChannelInvitation
 import pt.isel.Invitation
@@ -7,7 +8,6 @@ import pt.isel.InvitationRepository
 import pt.isel.RegisterInvitation
 import pt.isel.Role
 import pt.isel.User
-import java.time.LocalDateTime
 
 class MockInvitationRepo : InvitationRepository {
     private val channelInvitations = mutableSetOf<ChannelInvitation>()
@@ -21,6 +21,7 @@ class MockInvitationRepo : InvitationRepository {
         email: String,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): RegisterInvitation {
         val invitation =
             RegisterInvitation(
@@ -30,7 +31,7 @@ class MockInvitationRepo : InvitationRepository {
                 channel,
                 role,
                 false,
-                LocalDateTime.now(),
+                timestamp,
             )
         registerInvitations.add(invitation)
         return invitation
@@ -41,6 +42,7 @@ class MockInvitationRepo : InvitationRepository {
         receiver: User,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): ChannelInvitation {
         val invitation =
             ChannelInvitation(
@@ -50,7 +52,7 @@ class MockInvitationRepo : InvitationRepository {
                 channel,
                 role,
                 false,
-                LocalDateTime.now(),
+                timestamp,
             )
         channelInvitations.add(invitation)
         return invitation

@@ -104,7 +104,7 @@ class ChannelController(
     @GetMapping("/{channelId}/members")
     fun getChannelMembers(
         @PathVariable channelId: Int,
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.getChannelMembers(channelId)) {
             is Success -> {
@@ -125,7 +125,7 @@ class ChannelController(
     @GetMapping("/user/{userId}")
     fun getChannelsOfUser(
         @PathVariable userId: Int,
-        user: AuthenticatedUser
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.getChannelsOfUser(userId)) {
             is Success -> {
@@ -193,8 +193,8 @@ class ChannelController(
     @PutMapping("/{channelId}/leave/{userId}")
     fun leaveChannel(
         @PathVariable channelId: Int,
-        @PathVariable userId: Int, //TODO keep parameter, so is possible to kick??
-        user: AuthenticatedUser
+        @PathVariable userId: Int,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.leaveChannel(userId, channelId)) {
             is Success -> {

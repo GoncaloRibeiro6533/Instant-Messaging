@@ -67,7 +67,7 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    //TODO: Implement pagination
+    // TODO: Implement pagination
     fun getChannelMembers(channelId: Int): Either<ChannelError, List<User>> =
         trxManager.run {
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
@@ -76,7 +76,7 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(members)
         }
 
-    //TODO: Implement pagination
+    // TODO: Implement pagination
     fun getChannelsOfUser(userId: Int): Either<ChannelError, List<Channel>> =
         trxManager.run {
             if (userId < 0) return@run failure(ChannelError.NegativeIdentifier)

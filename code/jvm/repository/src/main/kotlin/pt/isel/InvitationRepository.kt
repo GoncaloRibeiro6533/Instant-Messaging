@@ -1,11 +1,14 @@
 package pt.isel
 
+import kotlinx.datetime.Instant
+
 interface InvitationRepository {
     fun createRegisterInvitation(
         sender: User,
         email: String,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): RegisterInvitation
 
     fun createChannelInvitation(
@@ -13,6 +16,7 @@ interface InvitationRepository {
         receiver: User,
         channel: Channel,
         role: Role,
+        timestamp: Instant,
     ): ChannelInvitation
 
     fun findRegisterInvitationById(invitationId: Int): Invitation?

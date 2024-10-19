@@ -73,22 +73,22 @@ class JdbiChannelRepository(
     override fun getChannelsOfUser(user: User): List<Channel> {
         return handle.createQuery(
             """
-                SELECT 
-                    ucr.*, 
-                    u.username, 
-                    u.email,
-                    ch.creator_id, 
-                    ch.name AS name,
-                    ch.visibility,
-                    ch.id
-                FROM 
-                    dbo.USER_CHANNEL_ROLE ucr
-                JOIN 
-                    dbo.USER u ON ucr.user_id = u.id
-                JOIN 
-                    dbo.CHANNEL ch ON ucr.channel_id = ch.id
-                WHERE 
-                    ucr.user_id = :user_id;
+            SELECT 
+                ucr.*, 
+                u.username, 
+                u.email,
+                ch.creator_id, 
+                ch.name AS name,
+                ch.visibility,
+                ch.id
+            FROM 
+                dbo.USER_CHANNEL_ROLE ucr
+            JOIN 
+                dbo.USER u ON ucr.user_id = u.id
+            JOIN 
+                dbo.CHANNEL ch ON ucr.channel_id = ch.id
+            WHERE 
+                ucr.user_id = :user_id;
             """.trimIndent(),
         )
             .bind("user_id", user.id)
