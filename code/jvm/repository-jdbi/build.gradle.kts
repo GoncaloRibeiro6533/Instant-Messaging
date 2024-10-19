@@ -26,6 +26,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=1234")
 }
 kotlin {
     jvmToolchain(21)

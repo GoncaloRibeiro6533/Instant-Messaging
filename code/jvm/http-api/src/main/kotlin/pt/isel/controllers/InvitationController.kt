@@ -19,7 +19,7 @@ import pt.isel.models.invitation.InvitationInputModelRegister
 @RestController
 @RequestMapping("api/invitation")
 class InvitationController(
-    private val invitationService: InvitationService
+    private val invitationService: InvitationService,
 ) {
     @PostMapping("/channel")
     fun createChannelInvitation(

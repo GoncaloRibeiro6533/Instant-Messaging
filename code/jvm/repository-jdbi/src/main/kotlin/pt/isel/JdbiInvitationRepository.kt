@@ -26,7 +26,6 @@ class JdbiInvitationRepository(
             .one()
     }
 
-
     override fun createChannelInvitation(
         sender: User,
         receiver: User,
@@ -147,6 +146,5 @@ class JdbiInvitationRepository(
             .execute()
         handle.createUpdate("DELETE FROM dbo.CHANNEL_INVITATION")
             .execute()
-
     }
 }
