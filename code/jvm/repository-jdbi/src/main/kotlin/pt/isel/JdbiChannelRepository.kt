@@ -120,9 +120,9 @@ class JdbiChannelRepository(
 
     private fun mapRowToChannel(rs: ResultSet): Channel {
         val user = User(
-            rs.getInt("creator_id"),
-            rs.getString("creator_username"),
-            rs.getString("creator_email"),
+            rs.getInt("id"),
+            rs.getString("username"),
+            rs.getString("email"),
         )
         return Channel(
             rs.getInt("id"),
