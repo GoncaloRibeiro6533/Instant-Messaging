@@ -11,9 +11,7 @@ class JdbiChannelRepository(
 ) : ChannelRepository {
     override fun findById(id: Int): Channel? {
         return handle.createQuery("""
-            SELECT * FROM dbo.channel c
-            JOIN dbo.user u ON c.creator_id = u.id
-            WHERE c.id = :id
+            SELECT c.*, u.username, u.email FROM dbo.CHANNEL c JOIN dbo.USER u ON c.creator_id = u.id WHERE c.id = 1;
         """.trimIndent())
             .bind("id", id)
             .map { rs, _ -> mapRowToChannel(rs) }
@@ -27,10 +25,8 @@ class JdbiChannelRepository(
         skip: Int,
     ): List<Channel> {
         return handle.createQuery("""
-            SELECT * FROM dbo.channel c
-            JOIN dbo.user u ON c.creator_id = u.id
-            WHERE c.name LIKE :name || '%' LIMIT :limit OFFSET :skip
-            """.trimIndent())
+            SELECT c.*, u.username, u.email FROM dbo.CHANNEL c 
+            JOIN dbo.USER u ON c.creator_id = u.id WHERE c.name LIKE :name || '%' LIMIT :limit OFFSET :skip;""".trimIndent())
             .bind("name", name)
             .bind("limit", limit)
             .bind("skip", skip)
@@ -58,10 +54,7 @@ class JdbiChannelRepository(
 
     override fun getChannelsOfUser(user: User): List<Channel> {
         return handle.createQuery("""
-            SELECT * FROM dbo.channel c
-            JOIN dbo.user_channel_role ucr ON c.id = ucr.channel_id
-            JOIN dbo.user u ON c.creator_id = u.id
-            WHERE ucr.user_id = :user_id
+            SELECT c.*, u.username, u.email FROM dbo.CHANNEL c JOIN dbo.USER u ON c.creator_id = u.id WHERE c.creator_id = :user_id;
         """.trimIndent())
             .bind("user_id", user.id)
             .map { rs, _ -> mapRowToChannel(rs) }
@@ -120,7 +113,7 @@ class JdbiChannelRepository(
 
     private fun mapRowToChannel(rs: ResultSet): Channel {
         val user = User(
-            rs.getInt("id"),
+            rs.getInt("creator_id"),
             rs.getString("username"),
             rs.getString("email"),
         )
