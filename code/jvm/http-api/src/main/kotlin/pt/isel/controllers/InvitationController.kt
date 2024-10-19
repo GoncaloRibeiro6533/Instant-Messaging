@@ -1,5 +1,6 @@
 package pt.isel.controllers
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -13,6 +14,7 @@ import pt.isel.Failure
 import pt.isel.InvitationError
 import pt.isel.InvitationService
 import pt.isel.Success
+import pt.isel.models.Problem
 import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
 
@@ -21,30 +23,11 @@ import pt.isel.models.invitation.InvitationInputModelRegister
 class InvitationController(
     private val invitationService: InvitationService,
 ) {
-    @PostMapping("/register")
-    fun createRegisterInvitation(
-        @RequestBody invitationInputModelRegister: InvitationInputModelRegister,
-        user: AuthenticatedUser,
-    ): ResponseEntity<Any> {
-        val result =
-            invitationService.createRegisterInvitation(
-                user.user.id,
-                invitationInputModelRegister.email,
-                invitationInputModelRegister.channelId,
-                invitationInputModelRegister.role,
-            )
-        return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
-                handleInvitationError(result.value)
-        }
-    }
-
     @PostMapping("/channel")
     fun createChannelInvitation(
         @RequestBody invitationInputModelChannel: InvitationInputModelChannel,
         user: AuthenticatedUser,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<*> {
         val result =
             invitationInputModelChannel.channelId.let {
                 invitationService.createChannelInvitation(
@@ -56,8 +39,27 @@ class InvitationController(
             }
 
         return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
+            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
+            is Failure ->
+                handleInvitationError(result.value)
+        }
+    }
+
+    @PostMapping("/register")
+    fun createRegisterInvitation(
+        @RequestBody invitationInputModelRegister: InvitationInputModelRegister,
+        user: AuthenticatedUser,
+    ): ResponseEntity<*> {
+        val result =
+            invitationService.createRegisterInvitation(
+                user.user.id,
+                invitationInputModelRegister.email,
+                invitationInputModelRegister.channelId,
+                invitationInputModelRegister.role,
+            )
+        return when (result) {
+            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
+            is Failure ->
                 handleInvitationError(result.value)
         }
     }
@@ -65,28 +67,27 @@ class InvitationController(
     @PostMapping("/accept")
     fun acceptChannelInvitation(
         @RequestParam invitationId: Int,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<*> {
         val result =
             invitationService.acceptChannelInvitation(
                 invitationId,
             )
         return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
+            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Failure ->
                 handleInvitationError(result.value)
         }
     }
 
-    @GetMapping("")
-    fun getInvitations(user: AuthenticatedUser): ResponseEntity<Any> {
+    @GetMapping("user/invitations")
+    fun getInvitations(user: AuthenticatedUser): ResponseEntity<*> {
         val result =
             invitationService.getInvitationsOfUser(
                 user.user.id,
             )
         return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
-                handleInvitationError(result.value)
+            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Failure -> handleInvitationError(result.value)
         }
     }
 
@@ -94,34 +95,34 @@ class InvitationController(
     fun declineInvitation(
         @RequestParam invitationId: Int,
         user: AuthenticatedUser,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<*> {
         val result =
             invitationService.declineChannelInvitation(
                 invitationId,
             )
         return when (result) {
-            is Success<*> -> ResponseEntity.ok(result.value)
-            is Failure<*> ->
+            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.value)
+            is Failure ->
                 handleInvitationError(result.value)
         }
     }
 
-    fun handleInvitationError(error: Any?): ResponseEntity<Any> {
+    fun handleInvitationError(error: InvitationError): ResponseEntity<*> {
         return when (error) {
-            is InvitationError.InvitationNotFound -> ResponseEntity.notFound().build()
-            is InvitationError.InvalidEmail -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.InvalidRole -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.NegativeIdentifier -> ResponseEntity.badRequest().body(error)
-            is InvitationError.InvalidReceiver -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.InvitationExpired -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.Unauthorized -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.UserNotFound -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.SenderDoesntBelongToChannel -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.AlreadyInChannel -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.InvitationAlreadyUsed -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.CantInviteToPublicChannel -> ResponseEntity.unprocessableEntity().body(error)
-            is InvitationError.ChannelNotFound -> ResponseEntity.unprocessableEntity().body(error)
-            else -> ResponseEntity.internalServerError().body("Internal server error")
+            is InvitationError.InvitationNotFound -> Problem.InvitationNotFound.response(HttpStatus.UNAUTHORIZED)
+            is InvitationError.InvalidEmail -> Problem.InvalidEmail.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.InvalidRole -> Problem.InvalidRole.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.InvalidChannel -> Problem.InvalidChannel.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.NegativeIdentifier -> Problem.NegativeIdentifier.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.InvitationExpired -> Problem.InvitationExpired.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.InvalidReceiver -> Problem.InvalidReceiver.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
+            is InvitationError.UserNotFound -> Problem.UserNotFound.response(HttpStatus.NOT_FOUND)
+            is InvitationError.SenderDoesntBelongToChannel -> Problem.SenderDoesntBelongToChannel.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.AlreadyInChannel -> Problem.AlreadyInChannel.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.InvitationAlreadyUsed -> Problem.InvitationAlreadyUsed.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.CantInviteToPublicChannel -> Problem.CantInviteToPublicChannel.response(HttpStatus.BAD_REQUEST)
+            is InvitationError.ChannelNotFound -> Problem.ChannelNotFound.response(HttpStatus.NOT_FOUND)
         }
     }
 }

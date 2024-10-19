@@ -1,6 +1,10 @@
 package pt.isel
 
+import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.mapper.RowMapper
+import org.jdbi.v3.core.statement.StatementContext
+import java.sql.ResultSet
 
 class JdbiChannelRepository(
     private val handle: Handle,
@@ -36,7 +40,7 @@ class JdbiChannelRepository(
             .bind("creator_id", creator.id)
             .bind("visibility", visibility)
             .executeAndReturnGeneratedKeys()
-            .mapTo(Channel::class.java)
+            .map(ChannelMapper(creator))
             .one()
     }
 
@@ -94,5 +98,19 @@ class JdbiChannelRepository(
     override fun clear() {
         handle.createUpdate("DELETE FROM dbo.channel")
             .execute()
+    }
+
+    private class ChannelMapper(private val user: User) : RowMapper<Channel> {
+        override fun map(
+            rs: ResultSet,
+            ctx: StatementContext,
+        ): Channel {
+            return Channel(
+                id = rs.getInt("id"),
+                name = rs.getString("name"),
+                creator = user,
+                visibility = Visibility.valueOf(rs.getString("visibility")),
+            )
+        }
     }
 }

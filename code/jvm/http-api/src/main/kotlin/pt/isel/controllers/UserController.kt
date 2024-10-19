@@ -50,14 +50,14 @@ class UserController(
     @PostMapping("/register/{invitationId}")
     fun register(
         @RequestBody userRegisterInput: UserRegisterInput,
-        @PathVariable invitationId: String,
+        @PathVariable invitationId: Int,
     ): ResponseEntity<*> {
         val result: Either<UserError, User> =
             userService.createUser(
                 userRegisterInput.username.trim(),
                 userRegisterInput.email.trim(),
                 userRegisterInput.password,
-                invitationId.toInt(),
+                invitationId,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
@@ -172,7 +172,6 @@ class UserController(
             is UserError.NegativeSkip -> Problem.NegativeSkip.response(HttpStatus.BAD_REQUEST)
             is UserError.InvitationNotFound -> Problem.InvitationNotFound.response(HttpStatus.BAD_REQUEST)
             is UserError.InvitationAlreadyUsed -> Problem.InvitationAlreadyUsed.response(HttpStatus.CONFLICT)
-            else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
         }
     }
 }
