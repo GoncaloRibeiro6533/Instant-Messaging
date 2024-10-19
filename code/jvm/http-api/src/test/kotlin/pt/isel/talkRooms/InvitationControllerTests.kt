@@ -242,7 +242,7 @@ class InvitationControllerTests {
                 sender,
             ).body as ChannelInvitation
 
-        val result = invitationController.acceptChannelInvitation(channelInvitation.id)
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id,)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 

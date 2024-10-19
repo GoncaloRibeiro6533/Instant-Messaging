@@ -5,7 +5,6 @@ import pt.isel.Channel
 import pt.isel.Message
 import pt.isel.MessageRepository
 import pt.isel.User
-import java.time.LocalDateTime
 
 class MockMessageRepo : MessageRepository {
     private val messages = mutableListOf<Message>()
