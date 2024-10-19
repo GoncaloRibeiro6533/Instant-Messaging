@@ -11,23 +11,26 @@ class JdbiMessageRepository(
         sender: User,
         channel: Channel,
         text: String,
+        creationTime: Instant,
     ): Message {
         val id =
             handle.createUpdate(
                 """
                 INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
-                (now(), :userId, :channelId, :message)
+                (:creationtime, :userId, :channelId, :message)
                 """,
             ).bind("user", sender.id)
                 .bind("channel", channel.id)
                 .bind("text", text)
+                .bind("creationtime", creationTime.epochSeconds)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
+
         return Message(
             id,
             sender,
             channel,
             text,
-            TODO(),
+            creationTime,
         )
     }
 

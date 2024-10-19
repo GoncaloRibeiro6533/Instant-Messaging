@@ -47,7 +47,7 @@ class MessageController(private val messageService: MessageService) {
             messageService.sendMessage(
                 messageInputModel.channelId,
                 user.user.id,
-                messageInputModel.content,
+                messageInputModel.content
             )
 
         return when (result) {

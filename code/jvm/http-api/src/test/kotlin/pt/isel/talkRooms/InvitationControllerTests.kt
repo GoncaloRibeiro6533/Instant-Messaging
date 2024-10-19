@@ -71,7 +71,7 @@ class InvitationControllerTests {
             testClock,
         )
 
-        private fun createInvitationService(trxManager: TransactionManager) = InvitationService(trxManager)
+        private fun createInvitationService(trxManager: TransactionManager) = InvitationService(trxManager, TestClock())
 
         private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
 

@@ -1,5 +1,7 @@
 @file:Suppress("ktlint")
 
+package pt.isel.talkRooms
+
 import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -16,8 +18,6 @@ import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
-import pt.isel.talkRooms.Environment
-import pt.isel.talkRooms.TestClock
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.time.Duration
@@ -72,7 +72,7 @@ class MessageControllerTests {
             testClock,
         )
 
-        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager)
+        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager, TestClock())
 
         private fun createMessageController(trxManager: TransactionManager) = MessageController(createMessageService(trxManager))
 

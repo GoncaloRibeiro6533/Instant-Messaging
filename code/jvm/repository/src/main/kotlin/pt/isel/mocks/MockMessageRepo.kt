@@ -1,5 +1,6 @@
 package pt.isel.mocks
 
+import kotlinx.datetime.Instant
 import pt.isel.Channel
 import pt.isel.Message
 import pt.isel.MessageRepository
@@ -18,8 +19,9 @@ class MockMessageRepo : MessageRepository {
         sender: User,
         channel: Channel,
         text: String,
+        creationTime: Instant,
     ): Message {
-        val message = Message(messages.size + 1, sender, channel, text, LocalDateTime.now())
+        val message = Message(messages.size + 1, sender, channel, text, creationTime)
         messages.add(message)
         return message
     }

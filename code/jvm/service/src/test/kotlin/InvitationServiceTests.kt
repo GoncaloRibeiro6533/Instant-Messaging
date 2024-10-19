@@ -31,6 +31,8 @@ class InvitationServiceTests {
     private lateinit var userService: UserService
     private lateinit var channelService: ChannelService
 
+    private val testClock = TestClock()
+
     private fun createUserService(
         trxManager: TransactionManager,
         testClock: TestClock,
@@ -55,8 +57,8 @@ class InvitationServiceTests {
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
-        invitationService = InvitationService(trxManager, TestClock())
-        userService = createUserService(trxManager, TestClock())
+        invitationService = InvitationService(trxManager, testClock)
+        userService = createUserService(trxManager, testClock)
         channelService = ChannelService(trxManager)
     }
 
