@@ -17,9 +17,11 @@ import pt.isel.Failure
 import pt.isel.Role
 import pt.isel.Success
 import pt.isel.models.Problem
+import pt.isel.models.channel.ChannelList
 import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.user.UserIdentifiers
+import pt.isel.models.user.UserList
 
 @RestController
 @RequestMapping("api/channels")
@@ -46,7 +48,7 @@ class ChannelController(
         }
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("search/{name}")
     fun getChannelByName(
         @PathVariable name: String,
         user: AuthenticatedUser,
@@ -64,7 +66,7 @@ class ChannelController(
                             visibility = it.visibility,
                         )
                     }
-                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+                ResponseEntity.status(HttpStatus.OK).body(ChannelList(outputModel.size, outputModel))
             }
             is Failure ->
                 handleChannelError(result.value)
@@ -102,6 +104,7 @@ class ChannelController(
     @GetMapping("/{channelId}/members")
     fun getChannelMembers(
         @PathVariable channelId: Int,
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
         return when (val result = channelService.getChannelMembers(channelId)) {
             is Success -> {
@@ -112,7 +115,7 @@ class ChannelController(
                             username = it.username,
                         )
                     }
-                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+                ResponseEntity.status(HttpStatus.OK).body(UserList(outputModel, result.value.size))
             }
             is Failure ->
                 handleChannelError(result.value)
@@ -122,6 +125,7 @@ class ChannelController(
     @GetMapping("/user/{userId}")
     fun getChannelsOfUser(
         @PathVariable userId: Int,
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
         return when (val result = channelService.getChannelsOfUser(userId)) {
             is Success -> {
@@ -134,18 +138,19 @@ class ChannelController(
                             visibility = it.visibility,
                         )
                     }
-                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+                ResponseEntity.status(HttpStatus.OK).body(ChannelList(outputModel.size, outputModel))
             }
             is Failure ->
                 handleChannelError(result.value)
         }
     }
 
-    @PutMapping("/{channelId}/members/{userId}")
+    @PutMapping("/{channelId}/add/{userId}/{role}")
     fun addUserToChannel(
         @PathVariable channelId: Int,
         @PathVariable userId: Int,
-        @RequestParam role: Role,
+        @PathVariable role: Role,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.addUserToChannel(userId, channelId, role)) {
             is Success -> {
@@ -163,10 +168,11 @@ class ChannelController(
         }
     }
 
-    @PutMapping("/{channelId}")
+    @PutMapping("/{channelId}/{name}")
     fun updateChannelName(
         @PathVariable channelId: Int,
-        @RequestParam name: String,
+        @PathVariable name: String,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.updateChannelName(channelId, name)) {
             is Success -> {
@@ -187,7 +193,8 @@ class ChannelController(
     @PutMapping("/{channelId}/leave/{userId}")
     fun leaveChannel(
         @PathVariable channelId: Int,
-        @PathVariable userId: Int,
+        @PathVariable userId: Int, //TODO keep parameter, so is possible to kick??
+        user: AuthenticatedUser
     ): ResponseEntity<*> {
         return when (val result = channelService.leaveChannel(userId, channelId)) {
             is Success -> {
