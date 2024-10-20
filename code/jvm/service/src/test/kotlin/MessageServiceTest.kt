@@ -71,7 +71,7 @@ class MessageServiceTest {
                 tokenRollingTtl,
                 maxTokensPerUser = maxTokensPerUser,
             ),
-        )
+        ),
     )
 
     @BeforeEach

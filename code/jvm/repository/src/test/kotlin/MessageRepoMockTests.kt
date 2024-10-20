@@ -13,6 +13,7 @@ import kotlin.test.assertTrue
 class MessageRepoMockTests {
     private var user: User
     private var channel: Channel
+
     @Suppress("unused")
     private val repoUsers =
         MockUserRepository().also {
@@ -23,6 +24,7 @@ class MessageRepoMockTests {
                     "password",
                 )
         }
+
     @Suppress("unused")
     private val repoChannels =
         MockChannelRepository().also {

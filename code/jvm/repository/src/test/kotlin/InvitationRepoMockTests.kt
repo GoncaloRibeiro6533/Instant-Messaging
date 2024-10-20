@@ -18,12 +18,14 @@ class InvitationRepoMockTests {
     private var registerInvitation: RegisterInvitation
     private var channelInvitation: ChannelInvitation
     private var channel: Channel
+
     @Suppress("unused")
     private val repoUsers =
         MockUserRepository().also {
             user = it.createUser("Bob", "bob@mail.com", "password")
             user2 = it.createUser("John", "john@mail.com", "password")
         }
+
     @Suppress("unused")
     private val repoChannels =
         MockChannelRepository().also {

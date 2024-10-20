@@ -138,16 +138,16 @@ class JdbiInvitationRepository(
     }
 
     override fun updateRegisterInvitation(invitation: RegisterInvitation): RegisterInvitation {
-            handle.createUpdate(
-                """
+        handle.createUpdate(
+            """
             UPDATE dbo.REGISTER_INVITATION
             SET used = :used
             WHERE id = :id
             """,
-            )
-                .bind("used", true)
-                .bind("id", invitation.id)
-                .execute()
+        )
+            .bind("used", true)
+            .bind("id", invitation.id)
+            .execute()
         return invitation.markAsUsed()
     }
 

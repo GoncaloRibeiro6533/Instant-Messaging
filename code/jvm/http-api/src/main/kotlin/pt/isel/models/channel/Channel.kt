@@ -10,7 +10,7 @@ data class CreateChannelInputModel(
 data class ChannelOutputModel(
     val id: Int,
     val name: String,
-    val creator: String,
+    val creatorName: String,
     val visibility: Visibility,
 )
 

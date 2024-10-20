@@ -46,7 +46,7 @@ class ChannelController(
                     ChannelOutputModel(
                         id = result.value.id,
                         name = result.value.name,
-                        creator = result.value.creator.username,
+                        creatorName = result.value.creator.username,
                         visibility = result.value.visibility,
                     )
                 ResponseEntity.status(HttpStatus.CREATED).body(outputModel)
@@ -69,7 +69,7 @@ class ChannelController(
                     ChannelOutputModel(
                         id = result.value.id,
                         name = result.value.name,
-                        creator = result.value.creator.username,
+                        creatorName = result.value.creator.username,
                         visibility = result.value.visibility,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
@@ -90,7 +90,7 @@ class ChannelController(
                     ChannelOutputModel(
                         id = result.value.id,
                         name = result.value.name,
-                        creator = result.value.creator.username,
+                        creatorName = result.value.creator.username,
                         visibility = result.value.visibility,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
@@ -114,7 +114,7 @@ class ChannelController(
                         ChannelOutputModel(
                             id = it.id,
                             name = it.name,
-                            creator = it.creator.username,
+                            creatorName = it.creator.username,
                             visibility = it.visibility,
                         )
                     }
@@ -158,7 +158,7 @@ class ChannelController(
                         ChannelOutputModel(
                             id = it.id,
                             name = it.name,
-                            creator = it.creator.username,
+                            creatorName = it.creator.username,
                             visibility = it.visibility,
                         )
                     }
@@ -181,7 +181,7 @@ class ChannelController(
                     ChannelOutputModel(
                         id = result.value.id,
                         name = result.value.name,
-                        creator = result.value.creator.username,
+                        creatorName = result.value.creator.username,
                         visibility = result.value.visibility,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
@@ -203,7 +203,7 @@ class ChannelController(
                     ChannelOutputModel(
                         id = result.value.id,
                         name = result.value.name,
-                        creator = result.value.creator.username,
+                        creatorName = result.value.creator.username,
                         visibility = result.value.visibility,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
