@@ -1,7 +1,6 @@
 package pt.isel.models
 
 import pt.isel.models.channel.ChannelIdentifiers
-import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.user.UserIdentifiers
 import java.time.LocalDateTime
 
@@ -26,8 +25,6 @@ data class MessageInfoOutputModel(
 )
 
 data class MessageHistoryOutputModel(
-    val channelId: Int,
-    val channelName: String,
     val nrOfMessages: Int,
     val channel: ChannelIdentifiers,
     val messages: List<MessageInfoOutputModel>,

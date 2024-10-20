@@ -15,7 +15,6 @@ import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
-import pt.isel.models.invitation.InvitationOutputModelChannel
 import pt.isel.models.invitation.InvitationOutputModelRegister
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
@@ -402,7 +401,6 @@ class InvitationControllerTests {
                 UserLoginCredentialsInput("sender2", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel2 =
             channelController.createChannel(
                 CreateChannelInputModel(
                     "channel2",

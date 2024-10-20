@@ -116,17 +116,18 @@ class MessageController(private val messageService: MessageService) {
                             name = result.value[0].channel.name,
                         ),
                         messages =
-                            result.value.map {
-                                MessageInfoOutputModel(
-                                    msgId = it.id,
-                                    sender = UserIdentifiers(
-                                        id = it.sender.id,
-                                        username = it.sender.username,
-                                    ),
-                                    content = it.content,
-                                    timestamp = it.timestamp,
-                                )
-                            },
+                        result.value.map {
+                            MessageInfoOutputModel(
+                                msgId = it.id,
+                                sender = UserIdentifiers(
+                                    id = it.sender.id,
+                                    username = it.sender.username,
+                                ),
+                                content = it.content,
+                                timestamp = it.timestamp
+                            )
+                        },
+                        nrOfMessages = result.value.size,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
             }
