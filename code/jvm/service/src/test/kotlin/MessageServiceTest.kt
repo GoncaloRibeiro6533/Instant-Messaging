@@ -59,9 +59,9 @@ class MessageServiceTest {
     fun setUp() {
         val trxManager = TransactionManagerInMem()
         channelService = ChannelService(trxManager)
-        messageService = MessageService(trxManager, testClock)
+        messageService = MessageService(trxManager)
         userService = createUserService(trxManager, testClock)
-        invitationService = InvitationService(trxManager, testClock)
+        invitationService = InvitationService(trxManager)
     }
 
     @Test

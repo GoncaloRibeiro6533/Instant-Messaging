@@ -1,13 +1,13 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 data class Message(
     val id: Int,
     val sender: User,
     val channel: Channel,
     val content: String,
-    val timestamp: Instant,
+    val timestamp: LocalDateTime,
 ) {
     companion object {
         const val MAX_MESSAGE_LENGTH = 1000
@@ -19,5 +19,6 @@ data class Message(
         require(content.length <= MAX_MESSAGE_LENGTH) {
             "Content must be less than $MAX_MESSAGE_LENGTH characters"
         }
+        require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 }

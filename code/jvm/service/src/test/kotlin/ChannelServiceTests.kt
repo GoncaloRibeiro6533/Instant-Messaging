@@ -57,7 +57,7 @@ class ChannelServiceTests {
         val trxManager = TransactionManagerInMem()
         channelService = ChannelService(trxManager)
         userService = createUserService(trxManager, testClock)
-        invitationService = InvitationService(trxManager, testClock)
+        invitationService = InvitationService(trxManager)
     }
 
     @Test

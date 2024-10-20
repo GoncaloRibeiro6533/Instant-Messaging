@@ -72,7 +72,7 @@ class UserControllerTests {
     private fun createInvitationService(trxManager: TransactionManager) =
         InvitationService(
             trxManager,
-            TestClock(),
+
         )
 
     @ParameterizedTest

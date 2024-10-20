@@ -71,7 +71,7 @@ class InvitationControllerTests {
             testClock,
         )
 
-        private fun createInvitationService(trxManager: TransactionManager) = InvitationService(trxManager, TestClock())
+        private fun createInvitationService(trxManager: TransactionManager) = InvitationService(trxManager)
 
         private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
 
@@ -240,7 +240,7 @@ class InvitationControllerTests {
                 sender,
             ).body as ChannelInvitation
 
-        val result = invitationController.acceptChannelInvitation(channelInvitation.id,)
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id, receiver)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
