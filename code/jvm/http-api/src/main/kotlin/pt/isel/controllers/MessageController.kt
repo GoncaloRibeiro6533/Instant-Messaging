@@ -102,6 +102,7 @@ class MessageController(private val messageService: MessageService) {
                     MessageHistoryOutputModel(
                         channelId = channelId,
                         channelName = result.value[0].channel.name,
+                        nrOfMessages = result.value.size,
                         messages =
                             result.value.map {
                                 MessageInfoOutputModel(

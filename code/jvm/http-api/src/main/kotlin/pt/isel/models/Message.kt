@@ -28,5 +28,6 @@ data class MessageInfoOutputModel(
 data class MessageHistoryOutputModel(
     val channelId: Int,
     val channelName: String,
+    val nrOfMessages: Int,
     val messages: List<MessageInfoOutputModel>,
 )
