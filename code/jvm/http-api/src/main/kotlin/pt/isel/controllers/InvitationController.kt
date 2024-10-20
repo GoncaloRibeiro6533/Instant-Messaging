@@ -87,7 +87,10 @@ class InvitationController(
                             result.value.sender.id,
                             result.value.sender.username,
                         ),
-                        result.value.receiver.id,
+                        UserIdentifiers(
+                            result.value.receiver.id,
+                            result.value.receiver.username,
+                        ),
                         ChannelOutputModel(
                             result.value.channel.id,
                             result.value.channel.name,
@@ -129,7 +132,7 @@ class InvitationController(
                 invitationId,
             )
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.value)
+            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body("Invitation declined")
             is Failure ->
                 handleInvitationError(result.value)
         }
@@ -150,7 +153,7 @@ class InvitationController(
                             InvitationOutputModelChannel(
                                 it.id,
                                 UserIdentifiers(it.sender.id, it.sender.username),
-                                it.receiver.id,
+                                UserIdentifiers(it.receiver.id, it.receiver.username),
                                 ChannelOutputModel(
                                     it.channel.id,
                                     it.channel.name,

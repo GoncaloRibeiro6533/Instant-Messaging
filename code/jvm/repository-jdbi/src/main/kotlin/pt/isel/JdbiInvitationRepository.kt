@@ -185,7 +185,7 @@ class JdbiInvitationRepository(
             """,
         )
             .bind("id", invitationId)
-            .executeAndReturnGeneratedKeys()
+            .execute()
         return true
     }
 

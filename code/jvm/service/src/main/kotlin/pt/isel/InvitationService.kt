@@ -36,6 +36,7 @@ sealed class InvitationError {
 @Named
 class InvitationService(
     private val trxManager: TransactionManager,
+    private val usersDomain: UsersDomain,
 ) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
@@ -63,6 +64,8 @@ class InvitationService(
             if (senderId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val user = userRepo.findById(senderId) ?: return@run failure(InvitationError.Unauthorized)
             if (email.isBlank()) return@run failure(InvitationError.InvalidEmail)
+            if (!usersDomain.isValidEmail(email)) return@run failure(InvitationError.InvalidEmail)
+            if(userRepo.findByEmail(email) != null) return@run failure(InvitationError.AlreadyInChannel)
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val channel =
                 channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
@@ -122,7 +125,7 @@ class InvitationService(
 
     fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Boolean> =
         trxManager.run {
-            invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
+            invitationRepo.findChannelInvitationById(invitationId) ?:  return@run failure(InvitationError.InvitationNotFound)
             val declined = invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(declined)
         }
