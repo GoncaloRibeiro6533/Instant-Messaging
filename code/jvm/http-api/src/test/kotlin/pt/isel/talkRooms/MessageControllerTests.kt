@@ -12,6 +12,7 @@ import pt.isel.*
 import pt.isel.controllers.ChannelController
 import pt.isel.controllers.MessageController
 import pt.isel.controllers.UserController
+import pt.isel.models.MessageHistoryOutputModel
 import pt.isel.models.MessageInputModel
 import pt.isel.models.MessageOutputModel
 import pt.isel.models.channel.ChannelOutputModel
@@ -115,7 +116,7 @@ class MessageControllerTests {
                 userLoggedIn,
             )
 
-        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(HttpStatus.CREATED, result.statusCode)
         assertEquals("Hello, World!", (result.body as MessageOutputModel).content)
     }
 
@@ -225,7 +226,7 @@ class MessageControllerTests {
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(5, (result.body as List<*>).size)
+        assertEquals(5, (result.body as MessageHistoryOutputModel).nrOfMessages)
     }
 
     @ParameterizedTest
@@ -292,12 +293,12 @@ class MessageControllerTests {
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(3, (result.body as List<*>).size)
+        assertEquals(3, (result.body as MessageHistoryOutputModel).nrOfMessages)
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `when getting a message history with invalid channel id, then a bad request is returned`(trxManager: TransactionManager) {
+    fun `when getting a message history with invalid channel id, then a NOT_FOUND is returned`(trxManager: TransactionManager) {
         val messageController = createMessageController(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager)
@@ -318,13 +319,13 @@ class MessageControllerTests {
 
         val result =
             messageController.getMsgHistory(
-                1,
+                1653,
                 10,
                 0,
                 userLoggedIn,
             )
 
-        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
     }
 
     @ParameterizedTest
@@ -372,7 +373,7 @@ class MessageControllerTests {
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val messageInputModel = MessageInputModel(1, "Hello, World!")
+        val messageInputModel = MessageInputModel(165231, "Hello, World!")
 
         val result =
             messageController.sendMessage(
@@ -380,7 +381,7 @@ class MessageControllerTests {
                 userLoggedIn,
             )
 
-        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
     }
 
     @ParameterizedTest

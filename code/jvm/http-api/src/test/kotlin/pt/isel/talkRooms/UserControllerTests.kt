@@ -9,9 +9,13 @@ import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.*
+import pt.isel.controllers.ChannelController
 import pt.isel.controllers.InvitationController
 import pt.isel.controllers.UserController
+import pt.isel.models.channel.ChannelOutputModel
+import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.invitation.InvitationInputModelRegister
+import pt.isel.models.invitation.InvitationOutputModelRegister
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
@@ -69,11 +73,27 @@ class UserControllerTests {
         testClock,
     )
 
-    private fun createInvitationService(trxManager: TransactionManager) =
-        InvitationService(
-            trxManager,
+    private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
+    private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
 
+    private fun createInvitationService(
+        trxManager: TransactionManager,
+        tokenTtl: Duration = 30.days,
+        tokenRollingTtl: Duration = 30.minutes,
+        maxTokensPerUser: Int = 3,
+    ) = InvitationService(
+        trxManager,
+        UsersDomain(
+            BCryptPasswordEncoder(),
+            Sha256TokenEncoder(),
+            UsersDomainConfig(
+                tokenSizeInBytes = 256 / 8,
+                tokenTtl = tokenTtl,
+                tokenRollingTtl,
+                maxTokensPerUser = maxTokensPerUser,
+            ),
         )
+    )
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -144,31 +164,45 @@ class UserControllerTests {
     @MethodSource("transactionManagers")
     fun `register user with invitation then login`(trxManager: TransactionManager) {
         val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        val channelController = createChannelController(trxManager)
         controllerUser.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
         )
             .let { resp ->
                 assertEquals(HttpStatus.CREATED, resp.statusCode)
             }
+        val login = controllerUser.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad"),
+        ).body as AuthenticatedUser
+        val channelToRegister =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                login,
+            ).body as ChannelOutputModel
         val invitation =
             InvitationController(createInvitationService(trxManager)).createRegisterInvitation(
                 InvitationInputModelRegister(
-                    "bob@mail.com",
-                    1,
+                    "receiver@test.com",
+                    channelToRegister.id,
                     Role.READ_ONLY,
                 ),
-                user =
-                    controllerUser.login(
-                        UserLoginCredentialsInput("admin", "Admin_123dsad"),
-                    ).body as AuthenticatedUser,
-            ).body as Invitation
+                user = login,
+            ).body as InvitationOutputModelRegister
         val newUser =
-            UserController(createUserService(trxManager, TestClock())).register(
-                UserRegisterInput("bob", "bob@mail.com", "Bob_123dsad"),
+            controllerUser.register(
+                UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
                 invitation.id,
-            ).let {
-                assertEquals(HttpStatus.CREATED, it.statusCode)
-                it.body as User
-            }
+            )
+        assertEquals(HttpStatus.CREATED, newUser.statusCode)
+
+        val receiver =
+            controllerUser.login(
+                UserLoginCredentialsInput("receiver", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+        assertEquals("receiver", receiver.user.username)
+        assertEquals("receiver@test.com", receiver.user.email)
     }
 }

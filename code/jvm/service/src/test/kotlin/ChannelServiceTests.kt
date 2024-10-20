@@ -68,7 +68,7 @@ class ChannelServiceTests {
                 tokenRollingTtl,
                 maxTokensPerUser = maxTokensPerUser,
             ),
-        )
+        ),
     )
 
     @BeforeEach

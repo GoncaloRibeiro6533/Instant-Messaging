@@ -69,7 +69,7 @@ class UserServiceTests {
                 tokenRollingTtl,
                 maxTokensPerUser = maxTokensPerUser,
             ),
-        )
+        ),
     )
 
     @BeforeEach
