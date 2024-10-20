@@ -7,7 +7,7 @@ info:
 servers:
   - url: http://localhost:8080/api
 tags:
-  - name: User
+  - name: Users
   - name: Channels
   - name: Messages
   - name: Invitations
@@ -222,6 +222,8 @@ paths:
 
   /invitation/register:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - Invitations
       summary: Create a new register invitation
@@ -246,6 +248,8 @@ paths:
 
   /invitation/channel:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - Invitations
       summary: Create a new channel invitation
@@ -271,10 +275,10 @@ paths:
 
   /invitation/accept/{invitationId}:
     put:
-      tags:
-        - Invitations
       security:
         - bearerAuth: [ ]
+      tags:
+        - Invitations
       summary: accept invitation
       parameters:
         - name: invitationId
@@ -299,10 +303,10 @@ paths:
 
   /invitation/decline/{invitationId}:
     put:
-      tags:
-        - Invitations
       security:
         - bearerAuth: [ ]
+      tags:
+        - Invitations
       summary: Decline
       parameters:
         - name: invitationId
@@ -322,6 +326,8 @@ paths:
 
   /invitation/user/invitations:
     get:
+      security:
+        - bearerAuth: [ ]
       tags:
         - Invitations
       summary: Get user invitations
@@ -338,6 +344,8 @@ paths:
 
   /channels:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - Channels
       summary: Create a channel
