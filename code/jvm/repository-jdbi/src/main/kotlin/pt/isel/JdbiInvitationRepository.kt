@@ -288,7 +288,7 @@ class JdbiInvitationRepository(
                 creator = channelCreator,
             )
         return RegisterInvitation(
-            id = rs.getInt("id"),
+            id = rs.getInt("invitation_id"),
             sender = userSender,
             email = rs.getString("invited_email"),
             channel = channel,
