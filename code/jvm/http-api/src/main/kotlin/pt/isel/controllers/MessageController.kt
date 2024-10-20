@@ -16,6 +16,8 @@ import pt.isel.MessageError
 import pt.isel.MessageService
 import pt.isel.Success
 import pt.isel.models.*
+import pt.isel.models.channel.ChannelIdentifiers
+import pt.isel.models.user.UserIdentifiers
 
 @RestController
 @RequestMapping("api/messages")
@@ -37,17 +39,22 @@ class MessageController(private val messageService: MessageService) {
                 val outputModel =
                     MessageOutputModel(
                         msgId = result.value.id,
-                        senderId = result.value.sender.id,
-                        senderName = result.value.sender.username,
-                        channelId = result.value.channel.id,
-                        channelName = result.value.channel.name,
+                        sender = UserIdentifiers(
+                            id = result.value.sender.id,
+                            username = result.value.sender.username,
+                        ),
+                        channel = ChannelIdentifiers(
+                            id = result.value.channel.id,
+                            name = result.value.channel.name,
+                        ),
                         content = result.value.content,
                         timestamp = result.value.timestamp,
                     )
                 ResponseEntity.status(HttpStatus.CREATED).body(outputModel)
             }
-            is Failure ->
+            is Failure -> {
                 handleMessageError(result.value)
+            }
         }
     }
 
@@ -67,10 +74,14 @@ class MessageController(private val messageService: MessageService) {
                 val outputModel =
                     MessageOutputModel(
                         msgId = result.value.id,
-                        senderId = result.value.sender.id,
-                        senderName = result.value.sender.username,
-                        channelId = result.value.channel.id,
-                        channelName = result.value.channel.name,
+                        sender = UserIdentifiers(
+                            id = result.value.sender.id,
+                            username = result.value.sender.username,
+                        ),
+                        channel = ChannelIdentifiers(
+                            id = result.value.channel.id,
+                            name = result.value.channel.name,
+                        ),
                         content = result.value.content,
                         timestamp = result.value.timestamp,
                     )
@@ -100,14 +111,18 @@ class MessageController(private val messageService: MessageService) {
             is Success -> {
                 val outputModel =
                     MessageHistoryOutputModel(
-                        channelId = channelId,
-                        channelName = result.value[0].channel.name,
+                        channel = ChannelIdentifiers(
+                            id = result.value[0].channel.id,
+                            name = result.value[0].channel.name,
+                        ),
                         messages =
                             result.value.map {
                                 MessageInfoOutputModel(
                                     msgId = it.id,
-                                    senderId = it.sender.id,
-                                    senderName = it.sender.username,
+                                    sender = UserIdentifiers(
+                                        id = it.sender.id,
+                                        username = it.sender.username,
+                                    ),
                                     content = it.content,
                                     timestamp = it.timestamp,
                                 )

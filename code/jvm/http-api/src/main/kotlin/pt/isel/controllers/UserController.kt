@@ -74,7 +74,7 @@ class UserController(
                 userLoginInput.username.trim(),
                 userLoginInput.password,
             )
-        return when (result) {
+        return when (result) { //TODO
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
                 handleUserError(result.value)
@@ -113,7 +113,9 @@ class UserController(
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result: Either<UserError, User> = userService.getUserById(id)) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success -> ResponseEntity.status(HttpStatus.OK).body(
+                UserIdentifiers(result.value.id, result.value.username)
+            )
             is Failure ->
                 handleUserError(result.value)
         }
