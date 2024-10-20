@@ -70,7 +70,7 @@ class InvitationServiceTests {
                 tokenRollingTtl,
                 maxTokensPerUser = maxTokensPerUser,
             ),
-        )
+        ),
     )
 
     @BeforeEach

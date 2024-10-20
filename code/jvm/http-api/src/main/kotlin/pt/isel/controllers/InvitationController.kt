@@ -51,7 +51,10 @@ class InvitationController(
                         ChannelOutputModel(
                             result.value.channel.id,
                             result.value.channel.name,
-                            result.value.channel.creator.username,
+                            UserIdentifiers(
+                                result.value.channel.creator.id,
+                                result.value.channel.creator.username,
+                            ),
                             result.value.channel.visibility,
                         ),
                         result.value.role,
@@ -94,7 +97,10 @@ class InvitationController(
                         ChannelOutputModel(
                             result.value.channel.id,
                             result.value.channel.name,
-                            result.value.channel.creator.username,
+                            UserIdentifiers(
+                                result.value.channel.creator.id,
+                                result.value.channel.creator.username,
+                            ),
                             result.value.channel.visibility,
                         ),
                         result.value.role,
@@ -132,7 +138,7 @@ class InvitationController(
                 invitationId,
             )
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body("Invitation declined")
+            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.value)
             is Failure ->
                 handleInvitationError(result.value)
         }
@@ -157,7 +163,7 @@ class InvitationController(
                                 ChannelOutputModel(
                                     it.channel.id,
                                     it.channel.name,
-                                    it.channel.creator.username,
+                                    UserIdentifiers(it.channel.creator.id, it.channel.creator.username),
                                     it.channel.visibility,
                                 ),
                                 it.role,
