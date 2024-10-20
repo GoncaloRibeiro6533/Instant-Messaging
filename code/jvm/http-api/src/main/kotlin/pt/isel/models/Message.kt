@@ -8,9 +8,25 @@ data class MessageInputModel(
 )
 
 data class MessageOutputModel(
-    val id: Int,
+    val msgId: Int,
+    val senderId: Int,
+    val senderName: String,
     val channelId: Int,
-    val userId: Int,
+    val channelName: String,
     val content: String,
     val timestamp: LocalDateTime,
+)
+
+data class MessageInfoOutputModel(
+    val msgId: Int,
+    val senderId: Int,
+    val senderName: String,
+    val content: String,
+    val timestamp: LocalDateTime,
+)
+
+data class MessageHistoryOutputModel(
+    val channelId: Int,
+    val channelName: String,
+    val messages: List<MessageInfoOutputModel>,
 )

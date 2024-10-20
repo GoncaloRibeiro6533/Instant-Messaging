@@ -14,12 +14,42 @@ import pt.isel.Failure
 import pt.isel.MessageError
 import pt.isel.MessageService
 import pt.isel.Success
-import pt.isel.models.MessageInputModel
-import pt.isel.models.Problem
+import pt.isel.models.*
 
 @RestController
 @RequestMapping("api/messages")
 class MessageController(private val messageService: MessageService) {
+    @PostMapping
+    fun sendMessage(
+        @RequestBody messageInputModel: MessageInputModel,
+        user: AuthenticatedUser,
+    ): ResponseEntity<*> {
+        val result =
+            messageService.sendMessage(
+                messageInputModel.channelId,
+                user.user.id,
+                messageInputModel.content
+            )
+
+        return when (result) {
+            is Success -> {
+                val outputModel =
+                    MessageOutputModel(
+                        msgId = result.value.id,
+                        senderId = result.value.sender.id,
+                        senderName = result.value.sender.username,
+                        channelId = result.value.channel.id,
+                        channelName = result.value.channel.name,
+                        content = result.value.content,
+                        timestamp = result.value.timestamp,
+                    )
+                ResponseEntity.status(HttpStatus.CREATED).body(outputModel)
+            }
+            is Failure ->
+                handleMessageError(result.value)
+        }
+    }
+
     @GetMapping("/{id}")
     fun getMessageById(
         @PathVariable id: Int,
@@ -32,36 +62,29 @@ class MessageController(private val messageService: MessageService) {
             )
 
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success -> {
+                val outputModel =
+                    MessageOutputModel(
+                        msgId = result.value.id,
+                        senderId = result.value.sender.id,
+                        senderName = result.value.sender.username,
+                        channelId = result.value.channel.id,
+                        channelName = result.value.channel.name,
+                        content = result.value.content,
+                        timestamp = result.value.timestamp,
+                    )
+                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+            }
             is Failure ->
                 handleMessageError(result.value)
         }
     }
 
-    @PostMapping
-    fun sendMessage(
-        @RequestBody messageInputModel: MessageInputModel,
-        user: AuthenticatedUser,
-    ): ResponseEntity<*> {
-        val result =
-            messageService.sendMessage(
-                messageInputModel.channelId,
-                user.user.id,
-                messageInputModel.content,
-            )
-
-        return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
-            is Failure ->
-                handleMessageError(result.value)
-        }
-    }
-
-    @GetMapping("/{channelId}")
+    @GetMapping("/history/{channelId}")
     fun getMsgHistory(
         @PathVariable channelId: Int,
-        @RequestParam limit: Int,
-        @RequestParam skip: Int,
+        @RequestParam(required = false, defaultValue = "10") limit: Int,
+        @RequestParam(required = false, defaultValue = "0") skip: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result =
@@ -73,7 +96,24 @@ class MessageController(private val messageService: MessageService) {
             )
 
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success -> {
+                val outputModel =
+                    MessageHistoryOutputModel(
+                        channelId = channelId,
+                        channelName = result.value[0].channel.name,
+                        messages = result.value.map {
+                            MessageInfoOutputModel(
+                                msgId = it.id,
+                                senderId = it.sender.id,
+                                senderName = it.sender.username,
+                                content = it.content,
+                                timestamp = it.timestamp,
+                            )
+                        },
+
+                    )
+                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+            }
             is Failure ->
                 handleMessageError(result.value)
         }

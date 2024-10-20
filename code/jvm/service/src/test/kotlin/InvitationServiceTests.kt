@@ -31,6 +31,8 @@ class InvitationServiceTests {
     private lateinit var userService: UserService
     private lateinit var channelService: ChannelService
 
+    private val testClock = TestClock()
+
     private fun createUserService(
         trxManager: TransactionManager,
         testClock: TestClock,
@@ -56,7 +58,7 @@ class InvitationServiceTests {
     fun setUp() {
         val trxManager = TransactionManagerInMem()
         invitationService = InvitationService(trxManager)
-        userService = createUserService(trxManager, TestClock())
+        userService = createUserService(trxManager, testClock)
         channelService = ChannelService(trxManager)
     }
 
@@ -645,7 +647,7 @@ class InvitationServiceTests {
             )
         assertIs<Success<ChannelInvitation>>(result)
         val declined = invitationService.declineChannelInvitation(result.value.id)
-        assertIs<Success<Unit>>(declined)
+        assertIs<Success<Boolean>>(declined)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
         assertIs<Success<List<Channel>>>(channelsOfUser2)
         assertEquals(1, channelsOfUser2.value.size)

@@ -21,6 +21,7 @@ class MockInvitationRepo : InvitationRepository {
         email: String,
         channel: Channel,
         role: Role,
+        timestamp: LocalDateTime,
     ): RegisterInvitation {
         val invitation =
             RegisterInvitation(
@@ -30,7 +31,7 @@ class MockInvitationRepo : InvitationRepository {
                 channel,
                 role,
                 false,
-                LocalDateTime.now(),
+                timestamp,
             )
         registerInvitations.add(invitation)
         return invitation
@@ -41,6 +42,7 @@ class MockInvitationRepo : InvitationRepository {
         receiver: User,
         channel: Channel,
         role: Role,
+        timestamp: LocalDateTime,
     ): ChannelInvitation {
         val invitation =
             ChannelInvitation(
@@ -50,7 +52,7 @@ class MockInvitationRepo : InvitationRepository {
                 channel,
                 role,
                 false,
-                LocalDateTime.now(),
+                timestamp,
             )
         channelInvitations.add(invitation)
         return invitation
@@ -64,7 +66,7 @@ class MockInvitationRepo : InvitationRepository {
         return channelInvitations.firstOrNull { it.id == invitationId }
     }
 
-    override fun updateRegisterInvitation(invitation: Invitation): Invitation {
+    override fun updateRegisterInvitation(invitation: RegisterInvitation): RegisterInvitation {
         val invite = registerInvitations.first { it.id == invitation.id }
         val invitationEdited = invite.markAsUsed()
         registerInvitations.remove(invite)
@@ -72,7 +74,7 @@ class MockInvitationRepo : InvitationRepository {
         return invitationEdited
     }
 
-    override fun updateChannelInvitation(invitation: Invitation): Invitation {
+    override fun updateChannelInvitation(invitation: ChannelInvitation): ChannelInvitation {
         val invite = channelInvitations.first { it.id == invitation.id }
         val invitationEdited = invite.markAsUsed()
         channelInvitations.remove(invite)
@@ -80,16 +82,16 @@ class MockInvitationRepo : InvitationRepository {
         return invitationEdited
     }
 
-    override fun deleteChannelInvitationById(invitationId: Int): Invitation {
+    override fun deleteChannelInvitationById(invitationId: Int): Boolean {
         val invitation = channelInvitations.first { it.id == invitationId }
         channelInvitations.remove(invitation)
-        return invitation
+        return true
     }
 
-    override fun deleteRegisterInvitationById(invitationId: Int): Invitation {
+    override fun deleteRegisterInvitationById(invitationId: Int): Boolean {
         val invitation = registerInvitations.first { it.id == invitationId }
         registerInvitations.remove(invitation)
-        return invitation
+        return true
     }
 
     override fun getInvitationsOfUser(user: User): List<Invitation> {

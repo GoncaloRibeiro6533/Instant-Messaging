@@ -1,12 +1,40 @@
 package pt.isel
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
+import java.time.LocalDateTime
 
 class JdbiMessageRepository(
     private val handle: Handle,
 ) : MessageRepository {
+    override fun createMessage(
+        sender: User,
+        channel: Channel,
+        text: String,
+        creationTime: LocalDateTime,
+    ): Message {
+        val id =
+            handle.createUpdate(
+                """
+                INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
+                (:creationtime, :user_id, :channel_id, :message)
+                """,
+            ).bind("user_id", sender.id)
+                .bind("channel_id", channel.id)
+                .bind("message", text)
+                .bind("creationtime", creationTime)
+                .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
+
+        return Message(
+            id,
+            sender,
+            channel,
+            text,
+            creationTime,
+        )
+    }
+
     override fun findById(id: Int): Message? =
         handle.createQuery(
             """
@@ -15,34 +43,11 @@ class JdbiMessageRepository(
         WHERE m.id = :id;
         """,
         ).bind("id", id)
-            .map{ rs, _ -> mapRowToMessage(rs) }
+            .map { rs, _ -> mapRowToMessage(rs) }
             .findFirst()
             .orElse(
                 null,
             )
-
-    override fun createMessage(
-        sender: User,
-        channel: Channel,
-        text: String,
-    ): Message {
-                val id = handle.createUpdate(
-                    """
-                INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
-                (now(), :userId, :channelId, :message)
-                """,
-                ).bind("user", sender.id)
-                    .bind("channel", channel.id)
-                    .bind("text", text)
-                    .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
-        return Message(
-                    id,
-                    sender,
-                    channel,
-                    text,
-                    TODO()
-                )
-    }
 
     override fun findByChannel(
         channel: Channel,
@@ -58,21 +63,19 @@ class JdbiMessageRepository(
         ).bind("channelId", channel.id)
             .bind("limit", limit)
             .bind("skip", skip)
-            .map{ rs, _ -> mapRowToMessage(rs) }
+            .map { rs, _ -> mapRowToMessage(rs) }
             .list()
     }
 
-    override fun deleteMessageById(id: Int): Message? {
-        val message = findById(id)
+    override fun deleteMessageById(message: Message): Message {
         handle.createUpdate(
             """
             DELETE FROM dbo.message WHERE id = :id
             """,
-        ).bind("id", id)
+        ).bind("id", message.id)
             .executeAndReturnGeneratedKeys()
         return message
     }
-
 
     override fun deleteMessagesByChannel(channelId: Int): Boolean {
         handle.createUpdate(
@@ -89,7 +92,7 @@ class JdbiMessageRepository(
             """
             SELECT * FROM dbo.message
             """,
-        ).map{ rs, _ -> mapRowToMessage(rs) }
+        ).map { rs, _ -> mapRowToMessage(rs) }
             .list()
 
     override fun clear() {
@@ -101,22 +104,24 @@ class JdbiMessageRepository(
     }
 
     private fun mapRowToMessage(rs: ResultSet): Message {
-        val user = User(
-            rs.getInt("user_id"),
-            rs.getString("username"),
-            rs.getString("email"),
-        )
+        val user =
+            User(
+                rs.getInt("user_id"),
+                rs.getString("username"),
+                rs.getString("email"),
+            )
         return Message(
             id = rs.getInt("id"),
             sender = user,
-            channel = Channel(
-                id = rs.getInt("channel_id"),
-                name = rs.getString("channel_name"),
-                visibility = Visibility.valueOf(rs.getString("visibility")),
-                creator = user
+            channel =
+                Channel(
+                    id = rs.getInt("channel_id"),
+                    name = rs.getString("name"),
+                    visibility = Visibility.valueOf(rs.getString("visibility")),
+                    creator = user,
                 ),
             content = rs.getString("message"),
-            timestamp = rs.getTimestamp("creationtime").toLocalDateTime()
+            timestamp = rs.getTimestamp("creationtime").toLocalDateTime(),
         )
     }
 }

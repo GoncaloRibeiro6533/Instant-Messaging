@@ -1,5 +1,6 @@
-package pt.isel.talkRooms
+@file:Suppress("ktlint")
 
+package pt.isel.talkRooms
 
 import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.params.ParameterizedTest
@@ -7,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import pt.isel.*
 import pt.isel.controllers.InvitationController
 import pt.isel.controllers.UserController
 import pt.isel.models.invitation.InvitationInputModelRegister
@@ -17,7 +19,6 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
-import pt.isel.*
 
 class UserControllerTests {
     companion object {
@@ -71,6 +72,7 @@ class UserControllerTests {
     private fun createInvitationService(trxManager: TransactionManager) =
         InvitationService(
             trxManager,
+
         )
 
     @ParameterizedTest

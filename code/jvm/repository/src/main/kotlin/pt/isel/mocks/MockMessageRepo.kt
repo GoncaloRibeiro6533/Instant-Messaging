@@ -18,8 +18,9 @@ class MockMessageRepo : MessageRepository {
         sender: User,
         channel: Channel,
         text: String,
+        creationTime: LocalDateTime,
     ): Message {
-        val message = Message(messages.size + 1, sender, channel, text, LocalDateTime.now())
+        val message = Message(messages.size + 1, sender, channel, text, creationTime)
         messages.add(message)
         return message
     }

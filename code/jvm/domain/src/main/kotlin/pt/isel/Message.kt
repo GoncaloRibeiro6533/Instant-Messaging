@@ -19,5 +19,6 @@ data class Message(
         require(content.length <= MAX_MESSAGE_LENGTH) {
             "Content must be less than $MAX_MESSAGE_LENGTH characters"
         }
+        require(timestamp <= LocalDateTime.now()) { "Invalid timestamp" }
     }
 }

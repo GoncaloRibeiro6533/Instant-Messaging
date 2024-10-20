@@ -2,19 +2,13 @@ package pt.isel.mapper
 
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
-import pt.isel.User
+import pt.isel.Visibility
 import java.sql.ResultSet
 
-class UserMapper : ColumnMapper<User> {
+class VisibilityMapper : ColumnMapper<Visibility> {
     override fun map(
         rs: ResultSet,
         columnNumber: Int,
         ctx: StatementContext,
-    ): User {
-        return User(
-            id = rs.getInt("id"),
-            username = rs.getString("username"),
-            email = rs.getString("email"),
-        )
-    }
+    ): Visibility = Visibility.valueOf(rs.getString(columnNumber))
 }

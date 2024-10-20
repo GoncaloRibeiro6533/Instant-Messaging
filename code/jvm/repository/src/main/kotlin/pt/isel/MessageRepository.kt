@@ -1,13 +1,16 @@
 package pt.isel
 
-interface MessageRepository {
-    fun findById(id: Int): Message?
+import java.time.LocalDateTime
 
+interface MessageRepository {
     fun createMessage(
         sender: User,
         channel: Channel,
         text: String,
+        creationTime: LocalDateTime,
     ): Message
+
+    fun findById(id: Int): Message?
 
     fun findByChannel(
         channel: Channel,

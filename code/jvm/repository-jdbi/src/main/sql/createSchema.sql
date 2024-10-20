@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS dbo.USER(
 	password VARCHAR(255) NOT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS dbo.TOKEN(
 	token VARCHAR(256) UNIQUE NOT NULL,
 	user_id int NOT NULL,
@@ -31,6 +30,9 @@ CREATE TABLE IF NOT EXISTS dbo.ROLE(
 	name VARCHAR(60)  PRIMARY KEY NOT NULL CHECK ( name in ('READ_ONLY', 'READ_WRITE')),
 	description VARCHAR(500) NOT NULL
 );
+
+INSERT INTO dbo.ROLE(name, description) VALUES ('READ_ONLY', 'Can only read messages');
+INSERT INTO dbo.ROLE(name, description) VALUES ('READ_WRITE', 'Can read and write messages');
 
 
 CREATE TABLE IF NOT EXISTS dbo.CHANNEL(
@@ -48,6 +50,7 @@ CREATE TABLE IF NOT EXISTS dbo.CHANNEL_INVITATION(
 	channel_id int NOT NULL,
 	invited_id int NOT NULL,
 	inviter_id int NOT NULL,
+    timestamp timestamp not null,
 	CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES dbo.CHANNEL(id) ON DELETE CASCADE,
 	CONSTRAINT fk_inviter FOREIGN KEY(inviter_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
 	CONSTRAINT fk_invited FOREIGN KEY(invited_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
@@ -61,6 +64,7 @@ CREATE TABLE IF NOT EXISTS dbo.REGISTER_INVITATION(
 	channel_id int,
 	invited_email VARCHAR(255) NOT NULL,
 	inviter_id int NOT NULL,
+    timestamp timestamp not null,
 	CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES dbo.CHANNEL(id) ON DELETE CASCADE,
 	CONSTRAINT fk_user FOREIGN KEY(inviter_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
 	CONSTRAINT fk_role FOREIGN KEY(role_name) REFERENCES dbo.ROLE(name) ON DELETE CASCADE
@@ -70,7 +74,7 @@ CREATE TABLE IF NOT EXISTS dbo.REGISTER_INVITATION(
 
 CREATE TABLE IF NOT EXISTS dbo.MESSAGE(
 	id SERIAL PRIMARY KEY,
-	creationTime TIMESTAMP NOT NULL,
+	creationTime timestamp NOT NULL,
 	user_id int NOT NULL,
 	channel_id int NOT NULL,
 	message VARCHAR(2064) NOT NULL,

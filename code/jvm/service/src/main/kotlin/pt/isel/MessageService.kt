@@ -1,6 +1,7 @@
 package pt.isel
 
 import jakarta.inject.Named
+import java.time.LocalDateTime
 
 sealed class MessageError {
     data object MessageNotFound : MessageError()
@@ -35,9 +36,7 @@ class MessageService(private val trxManager: TransactionManager) {
         trxManager.run {
             userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (id < 0) return@run failure(MessageError.NegativeIdentifier)
-
             val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
-
             if (!channelRepo.getChannelMembers(msg.channel).contains(userId)) return@run failure(MessageError.UserNotInChannel)
             return@run success(msg)
         }
@@ -49,16 +48,13 @@ class MessageService(private val trxManager: TransactionManager) {
     ): Either<MessageError, Message> =
         trxManager.run {
             val user = userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
-
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (text.isBlank()) return@run failure(MessageError.InvalidText)
             if (userId < 0) return@run failure(MessageError.InvalidUserId)
-
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
-
-            return@run success(messageRepo.createMessage(user, channel, text))
+            return@run success(messageRepo.createMessage(user, channel, text, LocalDateTime.now()))
         }
 
     fun getMsgHistory(
@@ -71,24 +67,8 @@ class MessageService(private val trxManager: TransactionManager) {
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (limit < 0) return@run failure(MessageError.InvalidLimit)
             if (skip < 0) return@run failure(MessageError.InvalidSkip)
-
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             if (!channelRepo.getChannelMembers(channel).contains(userId)) return@run failure(MessageError.UserNotInChannel)
-
             return@run success(messageRepo.findByChannel(channel, limit, skip))
         }
-
-    fun deleteMessage(
-        id: Int,
-        userId: Int,
-    ): Either<MessageError, Message?> =
-        trxManager.run {
-            if (id < 0) return@run failure(MessageError.NegativeIdentifier)
-
-            val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
-            if (msg.sender.id != userId) return@run failure(MessageError.Unauthorized)
-
-            return@run success(messageRepo.deleteMessageById(id))
-        }
-
 }

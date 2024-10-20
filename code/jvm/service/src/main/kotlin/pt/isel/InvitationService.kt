@@ -1,6 +1,7 @@
 package pt.isel
 
 import jakarta.inject.Named
+import java.time.LocalDateTime
 
 sealed class InvitationError {
     data object InvitationNotFound : InvitationError()
@@ -33,7 +34,9 @@ sealed class InvitationError {
 }
 
 @Named
-class InvitationService(private val trxManager: TransactionManager) {
+class InvitationService(
+    private val trxManager: TransactionManager,
+) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<Invitation>> =
         trxManager.run {
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
@@ -69,6 +72,7 @@ class InvitationService(private val trxManager: TransactionManager) {
                     email,
                     channel,
                     role,
+                    LocalDateTime.now(),
                 )
             return@run success(createdInvitation)
         }
@@ -98,6 +102,7 @@ class InvitationService(private val trxManager: TransactionManager) {
                     receiver,
                     channel,
                     role,
+                    LocalDateTime.now(),
                 )
 
             return@run success(createdInvitation)
@@ -117,7 +122,7 @@ class InvitationService(private val trxManager: TransactionManager) {
             return@run success(channel)
         }
 
-    fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Invitation> =
+    fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Boolean> =
         trxManager.run {
             invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
             val declined = invitationRepo.deleteChannelInvitationById(invitationId)
