@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS dbo.CHANNEL_INVITATION(
 	channel_id int NOT NULL,
 	invited_id int NOT NULL,
 	inviter_id int NOT NULL,
-    timestamp bigint not null,
+    timestamp timestamp not null,
 	CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES dbo.CHANNEL(id) ON DELETE CASCADE,
 	CONSTRAINT fk_inviter FOREIGN KEY(inviter_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
 	CONSTRAINT fk_invited FOREIGN KEY(invited_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS dbo.REGISTER_INVITATION(
 	channel_id int,
 	invited_email VARCHAR(255) NOT NULL,
 	inviter_id int NOT NULL,
-    timestamp bigint not null,
+    timestamp timestamp not null,
 	CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES dbo.CHANNEL(id) ON DELETE CASCADE,
 	CONSTRAINT fk_user FOREIGN KEY(inviter_id) REFERENCES dbo.USER(id) ON DELETE CASCADE,
 	CONSTRAINT fk_role FOREIGN KEY(role_name) REFERENCES dbo.ROLE(name) ON DELETE CASCADE

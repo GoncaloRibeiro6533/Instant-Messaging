@@ -3,6 +3,7 @@ package pt.isel
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
+import java.time.LocalDateTime
 
 class JdbiMessageRepository(
     private val handle: Handle,
@@ -11,18 +12,18 @@ class JdbiMessageRepository(
         sender: User,
         channel: Channel,
         text: String,
-        creationTime: Instant,
+        creationTime: LocalDateTime,
     ): Message {
         val id =
             handle.createUpdate(
                 """
                 INSERT INTO dbo.message(creationtime, user_id, channel_id, message) values 
-                (:creationtime, :userId, :channelId, :message)
+                (:creationtime, :user_id, :channel_id, :message)
                 """,
-            ).bind("user", sender.id)
-                .bind("channel", channel.id)
-                .bind("text", text)
-                .bind("creationtime", creationTime.epochSeconds)
+            ).bind("user_id", sender.id)
+                .bind("channel_id", channel.id)
+                .bind("message", text)
+                .bind("creationtime", creationTime)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
 
         return Message(
@@ -120,7 +121,7 @@ class JdbiMessageRepository(
                     creator = user,
                 ),
             content = rs.getString("message"),
-            timestamp = Instant.fromEpochSeconds(rs.getLong("creationtime")),
+            timestamp = rs.getTimestamp("creationtime").toLocalDateTime(),
         )
     }
 }

@@ -72,7 +72,7 @@ class MessageControllerTests {
             testClock,
         )
 
-        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager, TestClock())
+        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager)
 
         private fun createMessageController(trxManager: TransactionManager) = MessageController(createMessageService(trxManager))
 

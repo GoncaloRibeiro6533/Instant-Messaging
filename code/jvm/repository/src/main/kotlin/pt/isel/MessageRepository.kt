@@ -1,6 +1,6 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 interface MessageRepository {
     fun findById(id: Int): Message?
@@ -9,7 +9,7 @@ interface MessageRepository {
         sender: User,
         channel: Channel,
         text: String,
-        creationTime: Instant,
+        creationTime: LocalDateTime,
     ): Message
 
     fun findByChannel(

@@ -1,7 +1,7 @@
 package pt.isel
 
 import jakarta.inject.Named
-import kotlinx.datetime.Clock
+import java.time.LocalDateTime
 
 sealed class MessageError {
     data object MessageNotFound : MessageError()
@@ -28,7 +28,7 @@ sealed class MessageError {
 }
 
 @Named
-class MessageService(private val trxManager: TransactionManager, private val clock: Clock) {
+class MessageService(private val trxManager: TransactionManager) {
     fun findMessageById(
         id: Int,
         userId: Int,
@@ -54,7 +54,7 @@ class MessageService(private val trxManager: TransactionManager, private val clo
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(userId)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.createMessage(user, channel, text, clock.now()))
+            return@run success(messageRepo.createMessage(user, channel, text, LocalDateTime.now()))
         }
 
     fun getMsgHistory(

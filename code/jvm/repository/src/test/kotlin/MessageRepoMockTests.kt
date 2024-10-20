@@ -7,6 +7,7 @@ import pt.isel.Visibility
 import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockMessageRepo
 import pt.isel.mocks.MockUserRepository
+import java.time.LocalDateTime
 import kotlin.test.assertTrue
 
 class MessageRepoMockTests {
@@ -30,7 +31,7 @@ class MessageRepoMockTests {
 
     @Test
     fun `Test create message`() {
-        val message = repoMessages.createMessage(user, channel, "message", TestClock().now())
+        val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
         assertEquals("message", message.content)
         assertEquals(user.id, message.sender.id)
         assertEquals(channel.id, message.channel.id)
@@ -38,7 +39,7 @@ class MessageRepoMockTests {
 
     @Test
     fun `Test find message by id`() {
-        val message = repoMessages.createMessage(user, channel, "message", TestClock().now())
+        val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
         val messageFound = repoMessages.findById(message.id)
         assertEquals(message, messageFound)
     }
@@ -51,30 +52,30 @@ class MessageRepoMockTests {
 
     @Test
     fun `Test find messages by channel`() {
-        val message1 = repoMessages.createMessage(user, channel, "message1", TestClock().now())
-        val message2 = repoMessages.createMessage(user, channel, "message2", TestClock().now())
+        val message1 = repoMessages.createMessage(user, channel, "message1", LocalDateTime.now())
+        val message2 = repoMessages.createMessage(user, channel, "message2", LocalDateTime.now())
         val messages = repoMessages.findByChannel(channel, 2, 0)
         assertEquals(listOf(message1, message2), messages)
     }
 
     @Test
     fun `Test delete message by id`() {
-        val message = repoMessages.createMessage(user, channel, "message", TestClock().now())
+        val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
         val messageDeleted = repoMessages.deleteMessageById(message)
         assertEquals(message, messageDeleted)
     }
 
     @Test
     fun `Test delete message by id with one message`() {
-        val message = repoMessages.createMessage(user, channel, "message", TestClock().now())
+        val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
         val messageDeleted = repoMessages.deleteMessageById(message)
         assertEquals(message, messageDeleted)
     }
 
     @Test
     fun `Test delete messages by channel`() {
-        val message1 = repoMessages.createMessage(user, channel, "message1", TestClock().now())
-        val message2 = repoMessages.createMessage(user, channel, "message2", TestClock().now())
+        val message1 = repoMessages.createMessage(user, channel, "message1", LocalDateTime.now())
+        val message2 = repoMessages.createMessage(user, channel, "message2", LocalDateTime.now())
         val messagesDeleted: Boolean = repoMessages.deleteMessagesByChannel(channel.id)
         assertTrue(messagesDeleted)
     }
