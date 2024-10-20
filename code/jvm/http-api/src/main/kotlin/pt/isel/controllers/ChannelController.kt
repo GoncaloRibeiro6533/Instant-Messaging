@@ -28,9 +28,61 @@ import pt.isel.models.user.UserList
 class ChannelController(
     private val channelService: ChannelService,
 ) {
+    @PostMapping
+    fun createChannel(
+        @RequestBody request: CreateChannelInputModel,
+        user: AuthenticatedUser,
+    ): ResponseEntity<*> {
+        return when (
+            val result =
+                channelService.createChannel(
+                    name = request.name,
+                    creatorId = user.user.id,
+                    visibility = request.visibility,
+                )
+        ) {
+            is Success -> {
+                val outputModel =
+                    ChannelOutputModel(
+                        id = result.value.id,
+                        name = result.value.name,
+                        creator = result.value.creator.username,
+                        visibility = result.value.visibility,
+                    )
+                ResponseEntity.status(HttpStatus.CREATED).body(outputModel)
+            }
+            is Failure ->
+                handleChannelError(result.value)
+        }
+    }
+
+    @PutMapping("/{channelId}/add/{userId}/{role}")
+    fun addUserToChannel(
+        @PathVariable channelId: Int,
+        @PathVariable userId: Int,
+        @PathVariable role: Role,
+        user: AuthenticatedUser,
+    ): ResponseEntity<*> {
+        return when (val result = channelService.addUserToChannel(userId, channelId, role)) {
+            is Success -> {
+                val outputModel =
+                    ChannelOutputModel(
+                        id = result.value.id,
+                        name = result.value.name,
+                        creator = result.value.creator.username,
+                        visibility = result.value.visibility,
+                    )
+                ResponseEntity.status(HttpStatus.OK).body(outputModel)
+            }
+            is Failure ->
+                handleChannelError(result.value)
+        }
+    }
+
     @GetMapping("/{id}")
     fun getChannelById(
         @PathVariable id: Int,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         return when (val result = channelService.getChannelById(id)) {
             is Success -> {
@@ -67,34 +119,6 @@ class ChannelController(
                         )
                     }
                 ResponseEntity.status(HttpStatus.OK).body(ChannelList(outputModel.size, outputModel))
-            }
-            is Failure ->
-                handleChannelError(result.value)
-        }
-    }
-
-    @PostMapping
-    fun createChannel(
-        @RequestBody request: CreateChannelInputModel,
-        user: AuthenticatedUser,
-    ): ResponseEntity<*> {
-        return when (
-            val result =
-                channelService.createChannel(
-                    name = request.name,
-                    creatorId = user.user.id,
-                    visibility = request.visibility,
-                )
-        ) {
-            is Success -> {
-                val outputModel =
-                    ChannelOutputModel(
-                        id = result.value.id,
-                        name = result.value.name,
-                        creator = result.value.creator.username,
-                        visibility = result.value.visibility,
-                    )
-                ResponseEntity.status(HttpStatus.CREATED).body(outputModel)
             }
             is Failure ->
                 handleChannelError(result.value)
@@ -139,29 +163,6 @@ class ChannelController(
                         )
                     }
                 ResponseEntity.status(HttpStatus.OK).body(ChannelList(outputModel.size, outputModel))
-            }
-            is Failure ->
-                handleChannelError(result.value)
-        }
-    }
-
-    @PutMapping("/{channelId}/add/{userId}/{role}")
-    fun addUserToChannel(
-        @PathVariable channelId: Int,
-        @PathVariable userId: Int,
-        @PathVariable role: Role,
-        user: AuthenticatedUser,
-    ): ResponseEntity<*> {
-        return when (val result = channelService.addUserToChannel(userId, channelId, role)) {
-            is Success -> {
-                val outputModel =
-                    ChannelOutputModel(
-                        id = result.value.id,
-                        name = result.value.name,
-                        creator = result.value.creator.username,
-                        visibility = result.value.visibility,
-                    )
-                ResponseEntity.status(HttpStatus.OK).body(outputModel)
             }
             is Failure ->
                 handleChannelError(result.value)

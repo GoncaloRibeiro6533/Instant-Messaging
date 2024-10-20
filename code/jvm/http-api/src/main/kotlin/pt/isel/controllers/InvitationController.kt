@@ -89,6 +89,7 @@ class InvitationController(
     @PostMapping("/accept")
     fun acceptChannelInvitation(
         @RequestParam invitationId: Int,
+        user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result =
             invitationService.acceptChannelInvitation(
