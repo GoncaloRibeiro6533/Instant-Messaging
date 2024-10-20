@@ -10,23 +10,6 @@ import java.sql.ResultSet
 class JdbiSessionRepository(
     private val handle: Handle,
 ) : SessionRepository {
-    override fun findByToken(token: String): Token? {
-        return handle.createQuery(
-            "SELECT * FROM dbo.token WHERE token = :token",
-        ).bind("token", token)
-            .map(TokenMapper())
-            .findFirst()
-            .orElse(null)
-    }
-
-    override fun findByUserId(userId: Int): List<Token> {
-        return handle.createQuery(
-            "SELECT * FROM dbo.token WHERE user_id = :userId",
-        ).bind("userId", userId)
-            .mapTo(Token::class.java)
-            .list()
-    }
-
     override fun createSession(
         userId: Int,
         token: Token,
@@ -60,6 +43,23 @@ class JdbiSessionRepository(
             .bind("last_used_at", token.lastUsedAt.epochSeconds)
             .executeAndReturnGeneratedKeys()
             .map(TokenMapper()).one()
+    }
+
+    override fun findByToken(token: String): Token? {
+        return handle.createQuery(
+            "SELECT * FROM dbo.token WHERE token = :token",
+        ).bind("token", token)
+            .map(TokenMapper())
+            .findFirst()
+            .orElse(null)
+    }
+
+    override fun findByUserId(userId: Int): List<Token> {
+        return handle.createQuery(
+            "SELECT * FROM dbo.token WHERE user_id = :userId",
+        ).bind("userId", userId)
+            .mapTo(Token::class.java)
+            .list()
     }
 
     override fun getSessionHistory(

@@ -26,28 +26,6 @@ import pt.isel.models.user.UserIdentifiers
 class InvitationController(
     private val invitationService: InvitationService,
 ) {
-    @PostMapping("/channel")
-    fun createChannelInvitation(
-        @RequestBody invitationInputModelChannel: InvitationInputModelChannel,
-        user: AuthenticatedUser,
-    ): ResponseEntity<*> {
-        val result =
-            invitationInputModelChannel.channelId.let {
-                invitationService.createChannelInvitation(
-                    user.user.id,
-                    invitationInputModelChannel.receiverId,
-                    invitationInputModelChannel.channelId,
-                    invitationInputModelChannel.role,
-                )
-            }
-
-        return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
-            is Failure ->
-                handleInvitationError(result.value)
-        }
-    }
-
     @PostMapping("/register")
     fun createRegisterInvitation(
         @RequestBody invitationInputModelRegister: InvitationInputModelRegister,
@@ -86,6 +64,28 @@ class InvitationController(
         }
     }
 
+    @PostMapping("/channel")
+    fun createChannelInvitation(
+        @RequestBody invitationInputModelChannel: InvitationInputModelChannel,
+        user: AuthenticatedUser,
+    ): ResponseEntity<*> {
+        val result =
+            invitationInputModelChannel.channelId.let {
+                invitationService.createChannelInvitation(
+                    user.user.id,
+                    invitationInputModelChannel.receiverId,
+                    invitationInputModelChannel.channelId,
+                    invitationInputModelChannel.role,
+                )
+            }
+
+        return when (result) {
+            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
+            is Failure ->
+                handleInvitationError(result.value)
+        }
+    }
+
     @PostMapping("/accept")
     fun acceptChannelInvitation(
         @RequestParam invitationId: Int,
@@ -102,18 +102,6 @@ class InvitationController(
         }
     }
 
-    @GetMapping("user/invitations")
-    fun getInvitations(user: AuthenticatedUser): ResponseEntity<*> {
-        val result =
-            invitationService.getInvitationsOfUser(
-                user.user.id,
-            )
-        return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
-            is Failure -> handleInvitationError(result.value)
-        }
-    }
-
     @PutMapping("/decline")
     fun declineInvitation(
         @RequestParam invitationId: Int,
@@ -127,6 +115,18 @@ class InvitationController(
             is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.value)
             is Failure ->
                 handleInvitationError(result.value)
+        }
+    }
+
+    @GetMapping("user/invitations")
+    fun getInvitations(user: AuthenticatedUser): ResponseEntity<*> {
+        val result =
+            invitationService.getInvitationsOfUser(
+                user.user.id,
+            )
+        return when (result) {
+            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Failure -> handleInvitationError(result.value)
         }
     }
 

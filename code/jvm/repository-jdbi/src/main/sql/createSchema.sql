@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS dbo.REGISTER_INVITATION(
 
 CREATE TABLE IF NOT EXISTS dbo.MESSAGE(
 	id SERIAL PRIMARY KEY,
-	creationTime bigint NOT NULL,
+	creationTime timestamp NOT NULL,
 	user_id int NOT NULL,
 	channel_id int NOT NULL,
 	message VARCHAR(2064) NOT NULL,

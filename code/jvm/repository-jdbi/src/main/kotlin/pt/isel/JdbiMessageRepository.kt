@@ -116,7 +116,7 @@ class JdbiMessageRepository(
             channel =
                 Channel(
                     id = rs.getInt("channel_id"),
-                    name = rs.getString("channel_name"),
+                    name = rs.getString("name"),
                     visibility = Visibility.valueOf(rs.getString("visibility")),
                     creator = user,
                 ),
