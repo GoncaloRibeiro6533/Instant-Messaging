@@ -178,7 +178,6 @@ class InvitationControllerTests {
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    "receiver@test.com",
                     channel.id,
                     Role.READ_WRITE,
                 ),
@@ -235,7 +234,6 @@ class InvitationControllerTests {
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    "receiver@test.com",
                     channel.id,
                     Role.READ_WRITE,
                 ),
@@ -293,7 +291,6 @@ class InvitationControllerTests {
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    "receiver@test.com",
                     channel.id,
                     Role.READ_WRITE,
                 ),
@@ -353,7 +350,6 @@ class InvitationControllerTests {
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    "receiver@gmail.com",
                     channel.id,
                     Role.READ_WRITE,
                 ),
@@ -393,7 +389,6 @@ class InvitationControllerTests {
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    "receiver@test.com",
                     channel2.id,
                     Role.READ_WRITE,
                 ),

@@ -1,8 +1,8 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
+import java.time.LocalDateTime
 
 class JdbiInvitationRepository(
     private val handle: Handle,
@@ -12,13 +12,13 @@ class JdbiInvitationRepository(
         email: String,
         channel: Channel,
         role: Role,
-        timestamp: Instant,
+        timestamp: LocalDateTime,
     ): RegisterInvitation {
         val id =
             handle.createUpdate(
                 """
                 INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id, timestamp)
-                VALUES (:role, :used, :channel_id, :email, :sender, :timestamp)
+                VALUES (:role, :used, :channel_id, :email, :sender_id, :timestamp)
                 """.trimIndent(),
             )
                 .bind("sender_id", sender.id)
@@ -26,7 +26,7 @@ class JdbiInvitationRepository(
                 .bind("channel_id", channel.id)
                 .bind("used", false)
                 .bind("role", role)
-                .bind("timestamp", timestamp.epochSeconds)
+                .bind("timestamp", timestamp)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
 
         return RegisterInvitation(
@@ -45,7 +45,7 @@ class JdbiInvitationRepository(
         receiver: User,
         channel: Channel,
         role: Role,
-        timestamp: Instant,
+        timestamp: LocalDateTime,
     ): ChannelInvitation {
         val id =
             handle.createUpdate(
@@ -59,7 +59,7 @@ class JdbiInvitationRepository(
                 .bind("channel_id", channel.id)
                 .bind("used", false)
                 .bind("role", role)
-                .bind("timestamp", timestamp.epochSeconds)
+                .bind("timestamp", timestamp)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
         return ChannelInvitation(
             id,
@@ -263,7 +263,7 @@ class JdbiInvitationRepository(
             channel = channel,
             role = Role.valueOf(rs.getString("role_name")),
             isUsed = rs.getBoolean("used"),
-            timestamp = Instant.fromEpochSeconds(rs.getLong("timestamp")),
+            timestamp = rs.getTimestamp("timestamp").toLocalDateTime(),
         )
     }
 
@@ -294,7 +294,7 @@ class JdbiInvitationRepository(
             channel = channel,
             role = Role.valueOf(rs.getString("role_name")),
             isUsed = rs.getBoolean("used"),
-            timestamp = Instant.fromEpochSeconds(rs.getLong("timestamp")),
+            timestamp = rs.getTimestamp("timestamp").toLocalDateTime(),
         )
     }
 }

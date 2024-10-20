@@ -15,8 +15,11 @@ import pt.isel.InvitationError
 import pt.isel.InvitationService
 import pt.isel.Success
 import pt.isel.models.Problem
+import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
+import pt.isel.models.invitation.InvitationOutputModelRegister
+import pt.isel.models.user.UserIdentifiers
 
 @RestController
 @RequestMapping("api/invitation")
@@ -57,8 +60,27 @@ class InvitationController(
                 invitationInputModelRegister.channelId,
                 invitationInputModelRegister.role,
             )
+
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
+            is Success ->
+                ResponseEntity.status(HttpStatus.CREATED).body(
+                    InvitationOutputModelRegister(
+                        result.value.id,
+                        UserIdentifiers(
+                            result.value.sender.id,
+                            result.value.sender.username,
+                        ),
+                        result.value.email,
+                        ChannelOutputModel(
+                            result.value.channel.id,
+                            result.value.channel.name,
+                            result.value.channel.creator.username,
+                            result.value.channel.visibility,
+                        ),
+                        result.value.role,
+                        result.value.timestamp,
+                    ),
+                )
             is Failure ->
                 handleInvitationError(result.value)
         }

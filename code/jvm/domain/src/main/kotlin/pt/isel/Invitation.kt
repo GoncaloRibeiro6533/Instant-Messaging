@@ -1,12 +1,12 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 sealed class Invitation(
     val id: Int,
     val sender: User,
     val isUsed: Boolean,
-    val timestamp: Instant,
+    val timestamp: LocalDateTime,
 ) {
     abstract fun markAsUsed(): Invitation
 }

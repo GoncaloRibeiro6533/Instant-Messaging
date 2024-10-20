@@ -1,6 +1,6 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 class RegisterInvitation(
     id: Int,
@@ -9,7 +9,7 @@ class RegisterInvitation(
     val channel: Channel,
     val role: Role,
     isUsed: Boolean = false,
-    timestamp: Instant,
+    timestamp: LocalDateTime,
 ) : Invitation(id, sender, isUsed, timestamp) {
     init {
         require(id >= 0) { "id must be greater than 0" }

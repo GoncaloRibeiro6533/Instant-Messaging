@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 
 data class InvitationInputModelChannel(
     val receiverId: Int,
-    val email: String,
     val channelId: Int,
     val role: Role,
 )

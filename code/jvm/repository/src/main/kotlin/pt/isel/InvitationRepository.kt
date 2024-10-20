@@ -1,6 +1,6 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 interface InvitationRepository {
     fun createRegisterInvitation(
@@ -8,7 +8,7 @@ interface InvitationRepository {
         email: String,
         channel: Channel,
         role: Role,
-        timestamp: Instant,
+        timestamp: LocalDateTime,
     ): RegisterInvitation
 
     fun createChannelInvitation(
@@ -16,7 +16,7 @@ interface InvitationRepository {
         receiver: User,
         channel: Channel,
         role: Role,
-        timestamp: Instant,
+        timestamp: LocalDateTime,
     ): ChannelInvitation
 
     fun findRegisterInvitationById(invitationId: Int): Invitation?
