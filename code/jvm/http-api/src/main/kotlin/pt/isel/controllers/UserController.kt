@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -140,10 +139,7 @@ class UserController(
     }
 
     @PostMapping("/delete")
-    fun deleteUser(
-        user: AuthenticatedUser,
-        @RequestHeader("Authorization") token: String,
-    ): ResponseEntity<*> {
+    fun deleteUser(user: AuthenticatedUser): ResponseEntity<*> {
         return when (val result: Either<UserError, Unit> = userService.deleteUser(user.user.id)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
             is Failure ->

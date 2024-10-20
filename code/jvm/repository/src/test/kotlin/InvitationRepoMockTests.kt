@@ -18,11 +18,13 @@ class InvitationRepoMockTests {
     private var registerInvitation: RegisterInvitation
     private var channelInvitation: ChannelInvitation
     private var channel: Channel
+    @Suppress("unused")
     private val repoUsers =
         MockUserRepository().also {
             user = it.createUser("Bob", "bob@mail.com", "password")
             user2 = it.createUser("John", "john@mail.com", "password")
         }
+    @Suppress("unused")
     private val repoChannels =
         MockChannelRepository().also {
             channel = it.createChannel("channel", user, Visibility.PUBLIC)
@@ -67,7 +69,7 @@ class InvitationRepoMockTests {
 
     @Test
     fun `Test update register invitation`() {
-        val updatedInvitation = repoInvitations.updateRegisterInvitation(registerInvitation) as RegisterInvitation
+        val updatedInvitation = repoInvitations.updateRegisterInvitation(registerInvitation)
         assertTrue(updatedInvitation.isUsed)
         assertEquals(registerInvitation.id, updatedInvitation.id)
         assertEquals(registerInvitation.sender, updatedInvitation.sender)
@@ -77,7 +79,7 @@ class InvitationRepoMockTests {
 
     @Test
     fun `Test update channel invitation`() {
-        val updatedInvitation = repoInvitations.updateChannelInvitation(channelInvitation) as ChannelInvitation
+        val updatedInvitation = repoInvitations.updateChannelInvitation(channelInvitation)
         assertEquals(channelInvitation.id, updatedInvitation.id)
         assertTrue(updatedInvitation.isUsed)
     }

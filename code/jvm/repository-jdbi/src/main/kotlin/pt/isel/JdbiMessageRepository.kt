@@ -1,6 +1,5 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import java.sql.ResultSet
 import java.time.LocalDateTime

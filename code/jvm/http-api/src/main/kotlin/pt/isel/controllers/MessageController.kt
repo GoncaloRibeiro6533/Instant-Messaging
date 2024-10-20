@@ -1,3 +1,4 @@
+@file:Suppress("ktlint")
 package pt.isel.controllers
 
 import org.springframework.http.HttpStatus
@@ -28,7 +29,7 @@ class MessageController(private val messageService: MessageService) {
             messageService.sendMessage(
                 messageInputModel.channelId,
                 user.user.id,
-                messageInputModel.content
+                messageInputModel.content,
             )
 
         return when (result) {
@@ -101,16 +102,16 @@ class MessageController(private val messageService: MessageService) {
                     MessageHistoryOutputModel(
                         channelId = channelId,
                         channelName = result.value[0].channel.name,
-                        messages = result.value.map {
-                            MessageInfoOutputModel(
-                                msgId = it.id,
-                                senderId = it.sender.id,
-                                senderName = it.sender.username,
-                                content = it.content,
-                                timestamp = it.timestamp,
-                            )
-                        },
-
+                        messages =
+                            result.value.map {
+                                MessageInfoOutputModel(
+                                    msgId = it.id,
+                                    senderId = it.sender.id,
+                                    senderName = it.sender.username,
+                                    content = it.content,
+                                    timestamp = it.timestamp,
+                                )
+                            },
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
             }

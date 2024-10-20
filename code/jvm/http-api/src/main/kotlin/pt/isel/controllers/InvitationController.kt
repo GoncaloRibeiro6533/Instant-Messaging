@@ -1,13 +1,14 @@
+@file:Suppress("ktlint")
 package pt.isel.controllers
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import pt.isel.AuthenticatedUser
 import pt.isel.Failure
@@ -16,9 +17,7 @@ import pt.isel.InvitationService
 import pt.isel.Success
 import pt.isel.models.Problem
 import pt.isel.models.channel.ChannelOutputModel
-import pt.isel.models.invitation.InvitationInputModelChannel
-import pt.isel.models.invitation.InvitationInputModelRegister
-import pt.isel.models.invitation.InvitationOutputModelRegister
+import pt.isel.models.invitation.*
 import pt.isel.models.user.UserIdentifiers
 
 @RestController
@@ -80,15 +79,33 @@ class InvitationController(
             }
 
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
+            is Success ->
+                ResponseEntity.status(HttpStatus.CREATED).body(
+                    InvitationOutputModelChannel(
+                        result.value.id,
+                        UserIdentifiers(
+                            result.value.sender.id,
+                            result.value.sender.username,
+                        ),
+                        result.value.receiver.id,
+                        ChannelOutputModel(
+                            result.value.channel.id,
+                            result.value.channel.name,
+                            result.value.channel.creator.username,
+                            result.value.channel.visibility,
+                        ),
+                        result.value.role,
+                        result.value.timestamp,
+                    ),
+                )
             is Failure ->
                 handleInvitationError(result.value)
         }
     }
 
-    @PostMapping("/accept")
+    @PutMapping("/accept/{invitationId}")
     fun acceptChannelInvitation(
-        @RequestParam invitationId: Int,
+        @PathVariable invitationId: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result =
@@ -102,9 +119,9 @@ class InvitationController(
         }
     }
 
-    @PutMapping("/decline")
+    @PutMapping("/decline/{invitationId}")
     fun declineInvitation(
-        @RequestParam invitationId: Int,
+        @PathVariable invitationId: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
         val result =
@@ -125,7 +142,27 @@ class InvitationController(
                 user.user.id,
             )
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success ->
+                ResponseEntity.status(HttpStatus.OK).body(
+                    InvitationsList(
+                        result.value.size,
+                        result.value.map {
+                            InvitationOutputModelChannel(
+                                it.id,
+                                UserIdentifiers(it.sender.id, it.sender.username),
+                                it.receiver.id,
+                                ChannelOutputModel(
+                                    it.channel.id,
+                                    it.channel.name,
+                                    it.channel.creator.username,
+                                    it.channel.visibility,
+                                ),
+                                it.role,
+                                it.timestamp,
+                            )
+                        },
+                    ),
+                )
             is Failure -> handleInvitationError(result.value)
         }
     }

@@ -37,7 +37,7 @@ sealed class InvitationError {
 class InvitationService(
     private val trxManager: TransactionManager,
 ) {
-    fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<Invitation>> =
+    fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val user = userRepo.findById(userId) ?: return@run failure(InvitationError.UserNotFound)
@@ -45,7 +45,7 @@ class InvitationService(
             return@run success(invitations)
         }
 
-    fun getRegisterInvitationById(invitationId: Int): Either<InvitationError, Invitation> =
+    fun getRegisterInvitationById(invitationId: Int): Either<InvitationError, RegisterInvitation> =
         trxManager.run {
             val invitation =
                 invitationRepo.findRegisterInvitationById(invitationId)
@@ -111,10 +111,8 @@ class InvitationService(
     fun acceptChannelInvitation(invitationId: Int): Either<InvitationError, Channel> =
         trxManager.run {
             val invitation: ChannelInvitation =
-                (
-                    invitationRepo.findChannelInvitationById(invitationId)
-                        ?: return@run failure(InvitationError.InvitationNotFound)
-                ) as ChannelInvitation
+                invitationRepo.findChannelInvitationById(invitationId)
+                    ?: return@run failure(InvitationError.InvitationNotFound)
             if (invitation.isUsed) return@run failure(InvitationError.InvitationAlreadyUsed)
             val channel =
                 channelRepo.addUserToChannel(invitation.receiver, invitation.channel, invitation.role)

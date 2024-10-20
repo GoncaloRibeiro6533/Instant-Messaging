@@ -2,7 +2,6 @@ package pt.isel.mocks
 
 import pt.isel.Channel
 import pt.isel.ChannelInvitation
-import pt.isel.Invitation
 import pt.isel.InvitationRepository
 import pt.isel.RegisterInvitation
 import pt.isel.Role
@@ -58,11 +57,11 @@ class MockInvitationRepo : InvitationRepository {
         return invitation
     }
 
-    override fun findRegisterInvitationById(invitationId: Int): Invitation? {
+    override fun findRegisterInvitationById(invitationId: Int): RegisterInvitation? {
         return registerInvitations.firstOrNull { it.id == invitationId }
     }
 
-    override fun findChannelInvitationById(invitationId: Int): Invitation? {
+    override fun findChannelInvitationById(invitationId: Int): ChannelInvitation? {
         return channelInvitations.firstOrNull { it.id == invitationId }
     }
 
@@ -94,7 +93,7 @@ class MockInvitationRepo : InvitationRepository {
         return true
     }
 
-    override fun getInvitationsOfUser(user: User): List<Invitation> {
+    override fun getInvitationsOfUser(user: User): List<ChannelInvitation> {
         return channelInvitations.filter { it.receiver.id == user.id }
     }
 

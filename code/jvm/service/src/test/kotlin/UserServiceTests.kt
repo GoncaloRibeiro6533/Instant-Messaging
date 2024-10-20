@@ -57,7 +57,7 @@ class UserServiceTests {
     fun setUp() {
         val trxManager = TransactionManagerInMem()
         userService = createUserService(trxManager, testClock)
-        invitationService = InvitationService(trxManager, testClock)
+        invitationService = InvitationService(trxManager)
         channelService = ChannelService(trxManager)
     }
 

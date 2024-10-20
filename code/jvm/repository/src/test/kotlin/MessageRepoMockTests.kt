@@ -13,6 +13,7 @@ import kotlin.test.assertTrue
 class MessageRepoMockTests {
     private var user: User
     private var channel: Channel
+    @Suppress("unused")
     private val repoUsers =
         MockUserRepository().also {
             user =
@@ -22,6 +23,7 @@ class MessageRepoMockTests {
                     "password",
                 )
         }
+    @Suppress("unused")
     private val repoChannels =
         MockChannelRepository().also {
             channel = it.createChannel("channel", user, Visibility.PUBLIC)
@@ -74,8 +76,8 @@ class MessageRepoMockTests {
 
     @Test
     fun `Test delete messages by channel`() {
-        val message1 = repoMessages.createMessage(user, channel, "message1", LocalDateTime.now())
-        val message2 = repoMessages.createMessage(user, channel, "message2", LocalDateTime.now())
+        repoMessages.createMessage(user, channel, "message1", LocalDateTime.now())
+        repoMessages.createMessage(user, channel, "message2", LocalDateTime.now())
         val messagesDeleted: Boolean = repoMessages.deleteMessagesByChannel(channel.id)
         assertTrue(messagesDeleted)
     }
