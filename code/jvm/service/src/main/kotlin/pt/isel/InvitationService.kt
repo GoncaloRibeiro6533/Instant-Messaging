@@ -36,8 +36,9 @@ sealed class InvitationError {
 @Named
 class InvitationService(
     private val trxManager: TransactionManager,
+    private val usersDomain: UsersDomain,
 ) {
-    fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<Invitation>> =
+    fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val user = userRepo.findById(userId) ?: return@run failure(InvitationError.UserNotFound)
@@ -45,7 +46,7 @@ class InvitationService(
             return@run success(invitations)
         }
 
-    fun getRegisterInvitationById(invitationId: Int): Either<InvitationError, Invitation> =
+    fun getRegisterInvitationById(invitationId: Int): Either<InvitationError, RegisterInvitation> =
         trxManager.run {
             val invitation =
                 invitationRepo.findRegisterInvitationById(invitationId)
@@ -63,6 +64,8 @@ class InvitationService(
             if (senderId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val user = userRepo.findById(senderId) ?: return@run failure(InvitationError.Unauthorized)
             if (email.isBlank()) return@run failure(InvitationError.InvalidEmail)
+            if (!usersDomain.isValidEmail(email)) return@run failure(InvitationError.InvalidEmail)
+            if(userRepo.findByEmail(email) != null) return@run failure(InvitationError.AlreadyInChannel)
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val channel =
                 channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
@@ -111,10 +114,8 @@ class InvitationService(
     fun acceptChannelInvitation(invitationId: Int): Either<InvitationError, Channel> =
         trxManager.run {
             val invitation: ChannelInvitation =
-                (
-                    invitationRepo.findChannelInvitationById(invitationId)
-                        ?: return@run failure(InvitationError.InvitationNotFound)
-                ) as ChannelInvitation
+                invitationRepo.findChannelInvitationById(invitationId)
+                    ?: return@run failure(InvitationError.InvitationNotFound)
             if (invitation.isUsed) return@run failure(InvitationError.InvitationAlreadyUsed)
             val channel =
                 channelRepo.addUserToChannel(invitation.receiver, invitation.channel, invitation.role)
@@ -124,7 +125,7 @@ class InvitationService(
 
     fun declineChannelInvitation(invitationId: Int): Either<InvitationError, Boolean> =
         trxManager.run {
-            invitationRepo.findChannelInvitationById(invitationId) ?: failure(InvitationError.InvitationNotFound)
+            invitationRepo.findChannelInvitationById(invitationId) ?:  return@run failure(InvitationError.InvitationNotFound)
             val declined = invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(declined)
         }

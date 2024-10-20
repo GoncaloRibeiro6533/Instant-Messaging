@@ -51,7 +51,7 @@ class JdbiInvitationRepository(
             handle.createUpdate(
                 """
                 INSERT INTO dbo.CHANNEL_INVITATION (role_name, used, channel_id, invited_id, inviter_id, timestamp)
-                VALUES (:role, :used, :channel_id, :receiver, :sender, :timestamp)
+                VALUES (:role, :used, :channel_id, :receiver_id, :sender_id, :timestamp)
                 """.trimIndent(),
             )
                 .bind("sender_id", sender.id)
@@ -72,11 +72,11 @@ class JdbiInvitationRepository(
         )
     }
 
-    override fun findRegisterInvitationById(invitationId: Int): Invitation? {
+    override fun findRegisterInvitationById(invitationId: Int): RegisterInvitation? {
         return handle.createQuery(
             """
             SELECT 
-                ri.id AS invitation_id,
+                ri.id,
                 ri.role_name,
                 ri.used,
                 ri.channel_id,
@@ -103,11 +103,11 @@ class JdbiInvitationRepository(
             .orElse(null)
     }
 
-    override fun findChannelInvitationById(invitationId: Int): Invitation? {
+    override fun findChannelInvitationById(invitationId: Int): ChannelInvitation? {
         return handle.createQuery(
             """    
             SELECT 
-                ci.id AS invitation_id,
+                ci.id,
                 ci.role_name,
                 ci.used,
                 ci.channel_id,
@@ -128,7 +128,7 @@ class JdbiInvitationRepository(
             JOIN dbo.USER invited ON invited.id = ci.invited_id
             JOIN dbo.CHANNEL ch ON ch.id = ci.channel_id
             JOIN dbo.USER creator ON creator.id = ch.creator_id
-            WHERE ci.id = :id 
+            WHERE ci.id = :id; 
             """.trimIndent(),
         )
             .bind("id", invitationId)
@@ -138,7 +138,6 @@ class JdbiInvitationRepository(
     }
 
     override fun updateRegisterInvitation(invitation: RegisterInvitation): RegisterInvitation {
-        val key =
             handle.createUpdate(
                 """
             UPDATE dbo.REGISTER_INVITATION
@@ -146,9 +145,9 @@ class JdbiInvitationRepository(
             WHERE id = :id
             """,
             )
-                .bind("used", invitation.isUsed)
+                .bind("used", true)
                 .bind("id", invitation.id)
-                .executeAndReturnGeneratedKeys()
+                .execute()
         return invitation.markAsUsed()
     }
 
@@ -160,9 +159,9 @@ class JdbiInvitationRepository(
             WHERE id = :id
             """,
         )
-            .bind("used", invitation.isUsed)
+            .bind("used", true)
             .bind("id", invitation.id)
-            .executeAndReturnGeneratedKeys()
+            .execute()
         return invitation.markAsUsed()
     }
 
@@ -186,15 +185,15 @@ class JdbiInvitationRepository(
             """,
         )
             .bind("id", invitationId)
-            .executeAndReturnGeneratedKeys()
+            .execute()
         return true
     }
 
-    override fun getInvitationsOfUser(user: User): List<Invitation> {
+    override fun getInvitationsOfUser(user: User): List<ChannelInvitation> {
         return handle.createQuery(
             """
             SELECT 
-                 ci.id AS invitation_id,
+                 ci.id,
                  ci.role_name,
                  ci.used,
                  ci.channel_id,
@@ -215,11 +214,11 @@ class JdbiInvitationRepository(
              JOIN dbo.USER invited ON invited.id = ci.invited_id
              JOIN dbo.CHANNEL ch ON ch.id = ci.channel_id
              JOIN dbo.USER creator ON creator.id = ch.creator_id
-             WHERE ci.invited_id = :user_id 
+             WHERE ci.invited_id = :user_id AND ci.used = FALSE;
             """.trimIndent(),
         )
             .bind("user_id", user.id)
-            .mapTo(ChannelInvitation::class.java)
+            .map { rs, _ -> mapRowToChannelInvitation(rs) }
             .list()
     }
 
@@ -288,7 +287,7 @@ class JdbiInvitationRepository(
                 creator = channelCreator,
             )
         return RegisterInvitation(
-            id = rs.getInt("invitation_id"),
+            id = rs.getInt("id"),
             sender = userSender,
             email = rs.getString("invited_email"),
             channel = channel,

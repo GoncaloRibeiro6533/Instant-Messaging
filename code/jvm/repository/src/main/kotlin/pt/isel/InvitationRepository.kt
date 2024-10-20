@@ -19,9 +19,9 @@ interface InvitationRepository {
         timestamp: LocalDateTime,
     ): ChannelInvitation
 
-    fun findRegisterInvitationById(invitationId: Int): Invitation?
+    fun findRegisterInvitationById(invitationId: Int): RegisterInvitation?
 
-    fun findChannelInvitationById(invitationId: Int): Invitation?
+    fun findChannelInvitationById(invitationId: Int): ChannelInvitation?
 
     fun updateRegisterInvitation(invitation: RegisterInvitation): RegisterInvitation
 
@@ -31,7 +31,7 @@ interface InvitationRepository {
 
     fun deleteChannelInvitationById(invitationId: Int): Boolean
 
-    fun getInvitationsOfUser(user: User): List<Invitation>
+    fun getInvitationsOfUser(user: User): List<ChannelInvitation>
 
-    fun clear(): Unit
+    fun clear()
 }

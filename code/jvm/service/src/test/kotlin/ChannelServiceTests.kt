@@ -52,12 +52,31 @@ class ChannelServiceTests {
         testClock,
     )
 
+    private fun createInvitationService(
+        trxManager: TransactionManager,
+        tokenTtl: Duration = 30.days,
+        tokenRollingTtl: Duration = 30.minutes,
+        maxTokensPerUser: Int = 3,
+    ) = InvitationService(
+        trxManager,
+        UsersDomain(
+            BCryptPasswordEncoder(),
+            Sha256TokenEncoder(),
+            UsersDomainConfig(
+                tokenSizeInBytes = 256 / 8,
+                tokenTtl = tokenTtl,
+                tokenRollingTtl,
+                maxTokensPerUser = maxTokensPerUser,
+            ),
+        )
+    )
+
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
         channelService = ChannelService(trxManager)
         userService = createUserService(trxManager, testClock)
-        invitationService = InvitationService(trxManager)
+        invitationService = createInvitationService(trxManager)
     }
 
     @Test

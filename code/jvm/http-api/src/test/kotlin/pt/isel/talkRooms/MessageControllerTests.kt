@@ -153,7 +153,7 @@ class MessageControllerTests {
 
         val result =
             messageController.getMessageById(
-                message.id,
+                message.msgId,
                 userLoggedIn,
             )
 
@@ -225,7 +225,7 @@ class MessageControllerTests {
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(5, (result.body as List<MessageOutputModel>).size)
+        assertEquals(5, (result.body as List<*>).size)
     }
 
     @ParameterizedTest
@@ -292,7 +292,7 @@ class MessageControllerTests {
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(3, (result.body as List<MessageOutputModel>).size)
+        assertEquals(3, (result.body as List<*>).size)
     }
 
     @ParameterizedTest

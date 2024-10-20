@@ -14,7 +14,7 @@ data class InvitationInputModelChannel(
 data class InvitationOutputModelChannel(
     val id: Int,
     val sender: UserIdentifiers,
-    val receiverId: Int,
+    val receiver: UserIdentifiers,
     val channel: ChannelOutputModel,
     val role: Role,
     val timestamp: LocalDateTime,

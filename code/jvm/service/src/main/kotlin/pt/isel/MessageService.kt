@@ -59,8 +59,8 @@ class MessageService(private val trxManager: TransactionManager) {
 
     fun getMsgHistory(
         channelId: Int,
-        limit: Int,
-        skip: Int,
+        limit: Int = 10,
+        skip: Int = 0,
         userId: Int,
     ): Either<MessageError, List<Message>> =
         trxManager.run {
