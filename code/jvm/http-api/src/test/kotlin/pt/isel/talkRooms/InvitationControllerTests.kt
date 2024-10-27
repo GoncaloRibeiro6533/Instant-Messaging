@@ -308,7 +308,7 @@ class InvitationControllerTests {
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager)
 
-        val adminUser = userController.registerFirstUser(
+        userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
         ).body as? User ?: throw AssertionError("User registration failed")
 
