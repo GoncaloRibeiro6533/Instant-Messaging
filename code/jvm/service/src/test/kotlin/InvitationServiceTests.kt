@@ -230,7 +230,7 @@ class InvitationServiceTests {
             )
         assertIs<Success<ChannelInvitation>>(channelInvitation)
         val result =
-            invitationService.acceptChannelInvitation(channelInvitation.value.id)
+            invitationService.acceptChannelInvitation(channelInvitation.value.id, user2.value.id)
         assertIs<Success<ChannelInvitation>>(result)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
         assertIs<Success<List<Channel>>>(channelsOfUser2)
@@ -270,8 +270,8 @@ class InvitationServiceTests {
                 Role.READ_WRITE,
             )
         assertIs<Success<ChannelInvitation>>(invitation)
-        invitationService.acceptChannelInvitation(invitation.value.id)
-        val result = invitationService.acceptChannelInvitation(invitation.value.id)
+        invitationService.acceptChannelInvitation(invitation.value.id, user2.value.id)
+        val result = invitationService.acceptChannelInvitation(invitation.value.id, user2.value.id)
         assertIs<Failure<InvitationError>>(result)
         assertEquals(InvitationError.InvitationAlreadyUsed, result.value)
     }
@@ -627,7 +627,7 @@ class InvitationServiceTests {
         assertIs<Success<AuthenticatedUser>>(logged2)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PRIVATE)
         assertIs<Success<Channel>>(channel)
-        val result = invitationService.acceptChannelInvitation(165465)
+        val result = invitationService.acceptChannelInvitation(165465, user2.value.id)
         assertIs<Failure<InvitationError>>(result)
         assertEquals(InvitationError.InvitationNotFound, result.value)
     }
@@ -665,7 +665,7 @@ class InvitationServiceTests {
                 Role.READ_WRITE,
             )
         assertIs<Success<ChannelInvitation>>(result)
-        val declined = invitationService.declineChannelInvitation(result.value.id)
+        val declined = invitationService.declineChannelInvitation(result.value.id, user2.value.id)
         assertIs<Success<Boolean>>(declined)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
         assertIs<Success<List<Channel>>>(channelsOfUser2)
