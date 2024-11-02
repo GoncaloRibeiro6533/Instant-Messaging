@@ -65,14 +65,14 @@ class MessageRepoMockTests {
     @Test
     fun `Test delete message by id`() {
         val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
-        val messageDeleted = repoMessages.deleteMessageById(message)
+        val messageDeleted = repoMessages.deleteMessageById(message.id)
         assertEquals(message, messageDeleted)
     }
 
     @Test
     fun `Test delete message by id with one message`() {
         val message = repoMessages.createMessage(user, channel, "message", LocalDateTime.now())
-        val messageDeleted = repoMessages.deleteMessageById(message)
+        val messageDeleted = repoMessages.deleteMessageById(message.id)
         assertEquals(message, messageDeleted)
     }
 

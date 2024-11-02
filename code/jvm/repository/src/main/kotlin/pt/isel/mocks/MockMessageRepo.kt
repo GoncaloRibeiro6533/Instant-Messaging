@@ -43,8 +43,7 @@ class MockMessageRepo : MessageRepository {
 
     override fun deleteMessagesByChannel(channelId: Int): Boolean {
         val messagesToDelete = messages.filter { it.channel.id == channelId }
-        messages.removeAll(messagesToDelete)
-        return true
+        return messages.removeAll(messagesToDelete)
     }
 
     override fun clear() {

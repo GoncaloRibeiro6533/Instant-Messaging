@@ -66,12 +66,13 @@ class JdbiMessageRepository(
             .list()
     }
 
-    override fun deleteMessageById(message: Message): Message {
+    override fun deleteMessageById(id: Int): Message? {
+        val message = findById(id)
         handle.createUpdate(
             """
             DELETE FROM dbo.message WHERE id = :id
             """,
-        ).bind("id", message.id)
+        ).bind("id", id)
             .executeAndReturnGeneratedKeys()
         return message
     }
@@ -89,8 +90,12 @@ class JdbiMessageRepository(
     override fun findAll(): List<Message> =
         handle.createQuery(
             """
-            SELECT * FROM dbo.message
-            """,
+            SELECT m.*, u.username, u.email, c.name, c.visibility
+            FROM dbo.MESSAGE m
+            JOIN dbo.USER u ON m.user_id = u.id
+            JOIN dbo.channel c ON m.channel_id = c.id
+            
+        """
         ).map { rs, _ -> mapRowToMessage(rs) }
             .list()
 
