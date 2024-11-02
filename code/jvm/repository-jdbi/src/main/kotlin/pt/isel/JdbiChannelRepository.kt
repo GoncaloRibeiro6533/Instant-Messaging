@@ -11,18 +11,21 @@ class JdbiChannelRepository(
         creator: User,
         visibility: Visibility,
     ): Channel {
-        val id =
-            handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
-                .bind("name", name)
-                .bind("creator_id", creator.id)
-                .bind("visibility", visibility)
-                .executeAndReturnGeneratedKeys()
-        return Channel(
-            id.mapTo(Int::class.java).one(),
-            name,
-            creator,
-            visibility,
-        )
+        val id = handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
+            .bind("name", name)
+            .bind("creator_id", creator.id)
+            .bind("visibility", visibility)
+            .executeAndReturnGeneratedKeys()
+            .mapTo(Int::class.java)
+            .one()
+
+        handle.createUpdate("INSERT INTO dbo.user_channel_role (user_id, channel_id, role_name) VALUES (:user_id, :channel_id, :role)")
+            .bind("user_id", creator.id)
+            .bind("channel_id", id)
+            .bind("role", Role.READ_WRITE)
+            .execute()
+
+        return Channel(id, name, creator, visibility)
     }
 
     override fun addUserToChannel(
@@ -118,11 +121,24 @@ class JdbiChannelRepository(
         user: User,
         channel: Channel,
     ): Channel {
-        return handle.createUpdate("DELETE FROM dbo.user_channel_role WHERE user_id = :user_id AND channel_id = :channel_id")
+        val userInChannel =
+            handle.createQuery("SELECT COUNT(*) FROM dbo.user_channel_role WHERE user_id = :user_id AND channel_id = :channel_id")
+                .bind("user_id", user.id)
+                .bind("channel_id", channel.id)
+                .mapTo(Int::class.java)
+                .one()
+
+        if (userInChannel == 0) {
+            throw Exception("User is not in the channel")
+        }
+
+        handle.createUpdate("DELETE FROM dbo.user_channel_role WHERE user_id = :user_id AND channel_id = :channel_id")
             .bind("user_id", user.id)
             .bind("channel_id", channel.id)
             .execute()
-            .let { channel }
+
+        return channel
+
     }
 
     override fun clear() {
