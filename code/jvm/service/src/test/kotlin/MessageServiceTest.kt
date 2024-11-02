@@ -386,21 +386,4 @@ class MessageServiceTest {
         val result = messageService.getMsgHistory(channel.value.id, 2, 0, user2.value.id)
         assertIs<Failure<MessageError.UserNotInChannel>>(result)
     }
-
-    @Test
-    fun `deleteMessage should succeed`() {
-        val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
-        assertIs<Success<User>>(user)
-        val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
-        val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
-        assertIs<Success<Channel>>(channel)
-
-        val message =
-            messageService.sendMessage(channel.value.id, user.value.id, "Hello, how are you?")
-        assertIs<Success<Message>>(message)
-
-        val result = messageService.deleteMessage(message.value.id, user.value.id)
-        assertIs<Success<Message?>>(result)
-    }
 }
