@@ -20,6 +20,9 @@ sealed class ChannelError {
     data object InvalidSkip : ChannelError()
 
     data object InvalidLimit : ChannelError()
+
+    data object Unauthorized : ChannelError()
+
 }
 
 @Named
@@ -86,29 +89,35 @@ class ChannelService(private val trxManager: TransactionManager) {
         }
 
     fun addUserToChannel(
-        userId: Int,
+        userToAdd: Int,
         channelId: Int,
         role: Role,
+        userAdding: Int
     ): Either<ChannelError, Channel> =
         trxManager.run {
-            if (userId < 0 || channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
-            val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
+            if (userToAdd < 0 || channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
+            val userToAddInfo = userRepo.findById(userToAdd) ?: return@run failure(ChannelError.UserNotFound)
+            val userAdding = userRepo.findById(userAdding) ?: return@run failure(ChannelError.UserNotFound)
             val channel =
                 channelRepo.findById(channelId)
                     ?: return@run failure(ChannelError.ChannelNotFound)
-            if (channelRepo.getChannelMembers(channel).contains(userId)) {
+            if(!channelRepo.getChannelMembers(channel).contains(userAdding.id)) return@run failure(ChannelError.Unauthorized)
+            if (channelRepo.getChannelMembers(channel).contains(userToAdd)) {
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
-            return@run success(channelRepo.addUserToChannel(user, channel, role))
+            return@run success(channelRepo.addUserToChannel(userToAddInfo, channel, role))
         }
 
     fun updateChannelName(
         channelId: Int,
         name: String,
+        userId: Int
     ): Either<ChannelError, Channel> =
         trxManager.run {
+            userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
+            if(!channelRepo.getChannelMembers(channel).contains(userId)) return@run failure(ChannelError.Unauthorized)
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
             return@run success(channelRepo.updateChannelName(channel, name))

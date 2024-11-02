@@ -67,7 +67,7 @@ class ChannelController(
         @PathVariable role: Role,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.addUserToChannel(userId, channelId, role)) {
+        return when (val result = channelService.addUserToChannel(userId, channelId, role, user.user.id)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(
@@ -195,7 +195,7 @@ class ChannelController(
         @PathVariable name: String,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.updateChannelName(channelId, name)) {
+        return when (val result = channelService.updateChannelName(channelId, name, user.user.id)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(
@@ -252,6 +252,7 @@ class ChannelController(
             is ChannelError.InvalidSkip -> Problem.NegativeSkip.response(HttpStatus.BAD_REQUEST)
             is ChannelError.InvalidLimit -> Problem.NegativeLimit.response(HttpStatus.BAD_REQUEST)
             is ChannelError.InvalidVisibility -> Problem.InvalidVisibility.response(HttpStatus.BAD_REQUEST)
+            is ChannelError.Unauthorized -> Problem.Unauthorized.response(HttpStatus.UNAUTHORIZED)
         }
     }
 }

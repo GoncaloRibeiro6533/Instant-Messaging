@@ -119,7 +119,7 @@ class InvitationController(
     ): ResponseEntity<*> {
         val result =
             invitationService.acceptChannelInvitation(
-                invitationId,
+                invitationId, user.user.id,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
@@ -135,10 +135,10 @@ class InvitationController(
     ): ResponseEntity<*> {
         val result =
             invitationService.declineChannelInvitation(
-                invitationId,
+                invitationId, user.user.id,
             )
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.value)
+            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
             is Failure ->
                 handleInvitationError(result.value)
         }

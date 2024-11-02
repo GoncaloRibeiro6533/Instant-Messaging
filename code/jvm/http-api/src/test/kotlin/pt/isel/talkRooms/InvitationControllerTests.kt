@@ -15,6 +15,7 @@ import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
+import pt.isel.models.invitation.InvitationOutputModelChannel
 import pt.isel.models.invitation.InvitationOutputModelRegister
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
@@ -91,13 +92,16 @@ class InvitationControllerTests {
             )
         )
 
-        private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
+        private fun createInvitationController(trxManager: TransactionManager) =
+            InvitationController(createInvitationService(trxManager))
 
-        private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
+        private fun createChannelController(trxManager: TransactionManager) =
+            ChannelController(createChannelService(trxManager))
 
         private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
 
-        private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
+        private fun createUserController(trxManager: TransactionManager) =
+            UserController(createUserService(trxManager, TestClock()))
     }
 
     @ParameterizedTest
@@ -204,7 +208,99 @@ class InvitationControllerTests {
 
         assertEquals(HttpStatus.CREATED, channelInvitation.statusCode)
     }
-/*
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `when creating an invitation with an invalid email then it should return an error`(trxManager: TransactionManager) {
+        val invitationController = createInvitationController(trxManager)
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
+        ).body as User
+
+        val sender =
+            userController.login(
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        val channel = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PUBLIC,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val result = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "invalidEmail",
+                channel.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        )
+
+        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `when creating an invitation with an email that already exists then it should return an error`(trxManager: TransactionManager) {
+        val invitationController = createInvitationController(trxManager)
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
+        ).body as User
+
+        val sender =
+            userController.login(
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        val channel = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PUBLIC,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val regInvitation = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "receiver@test.com",
+                channel.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelRegister
+
+        userController.register(
+            UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
+            regInvitation.id,
+        ).body as User
+
+        val receiver = userController.login(
+            UserLoginCredentialsInput("receiver", "Admin_123dsad"),
+        ).body as AuthenticatedUser
+
+        val result = invitationController.createChannelInvitation(
+            InvitationInputModelChannel(
+                receiver.user.id,
+                channel.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        )
+
+        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+    }
+
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when accepting a channel invitation then it should return the invitation`(trxManager: TransactionManager) {
@@ -213,15 +309,159 @@ class InvitationControllerTests {
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin3", "admin3@test.com", "Admin_123dsad"),
+            UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
+        ).body as? User ?: throw AssertionError("User registration failed")
+
+        val sender = userController.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad"),
+        ).body as? AuthenticatedUser ?: throw AssertionError("User login failed")
+
+        val channelForRegister = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as? ChannelOutputModel ?: throw AssertionError("Channel creation failed")
+
+        val registerInvitation = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "receiver@test.com",
+                channelForRegister.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as? InvitationOutputModelRegister ?: throw AssertionError("Register invitation creation failed")
+
+        userController.register(
+            UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
+            registerInvitation.id,
+        )
+
+        val channelForInviting = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel2",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as? ChannelOutputModel ?: throw AssertionError("Channel creation failed")
+
+        val receiver = userController.login(
+            UserLoginCredentialsInput("receiver", "Admin_123dsad"),
+        ).body as? AuthenticatedUser ?: throw AssertionError("Receiver login failed")
+
+        val channelInvitation = invitationController.createChannelInvitation(
+            InvitationInputModelChannel(
+                receiver.user.id,
+                channelForInviting.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as? InvitationOutputModelChannel ?: throw AssertionError("Channel invitation creation failed")
+
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id, receiver)
+        assertEquals(HttpStatus.OK, result.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `when accepting another person's channel invitation it should return an error`(trxManager: TransactionManager) {
+        val invitationController = createInvitationController(trxManager)
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
         ).body as User
 
         val sender =
             userController.login(
-                UserLoginCredentialsInput("admin3", "Admin_123dsad"),
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel =
+        val channelForRegister = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val registerInvitation1 = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "receiver1@test.com",
+                channelForRegister.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelRegister
+
+        val registerInvitation2 = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "wr@test.com",
+                channelForRegister.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelRegister
+
+        userController.register(
+            UserRegisterInput("receiver1", "receiver1@test.com", "Admin_123dsad"),
+            registerInvitation1.id,
+        ).body as User
+
+        val receiver1 = userController.login(
+            UserLoginCredentialsInput("receiver1", "Admin_123dsad"),
+        ).body as AuthenticatedUser
+
+        userController.register(
+            UserRegisterInput("wrongReceiver", "wr@test.com", "Admin_123dsad"),
+            registerInvitation2.id,
+        ).body as User
+
+        val wrongReceiver = userController.login(
+            UserLoginCredentialsInput("wrongReceiver", "Admin_123dsad"),
+        ).body as AuthenticatedUser
+
+        val channelForInviting = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel2",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val channelInvitation = invitationController.createChannelInvitation(
+            InvitationInputModelChannel(
+                receiver1.user.id,
+                channelForInviting.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelChannel
+
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id, wrongReceiver)
+        assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `decline invitation`(trxManager: TransactionManager) {
+        val invitationController = createInvitationController(trxManager)
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
+        ).body as User
+
+        val sender =
+            userController.login(
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        val channelForRegister =
             channelController.createChannel(
                 CreateChannelInputModel(
                     "channel1",
@@ -233,52 +473,124 @@ class InvitationControllerTests {
         val registerInvitation =
             invitationController.createRegisterInvitation(
                 InvitationInputModelRegister(
-                    "receiver1@test.com",
-                    channel.id,
+                    "receiver@test.com",
+                    channelForRegister.id,
                     Role.READ_WRITE,
                 ),
                 sender,
             ).body as InvitationOutputModelRegister
 
         userController.register(
-            UserRegisterInput("receiver1", "receiver1@test.com", "Admin_123dsad"),
+            UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
             registerInvitation.id,
         )
 
         val receiver =
-            userController.login(UserLoginCredentialsInput("receiver1", "Admin_123dsad")).body as AuthenticatedUser
+            userController.login(UserLoginCredentialsInput("receiver", "Admin_123dsad")).body as AuthenticatedUser
+
+        val channelForInviting =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel2",
+                    Visibility.PRIVATE,
+                ),
+                sender,
+            ).body as ChannelOutputModel
 
         val channelInvitation =
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
                     receiver.user.id,
-                    channel.id,
+                    channelForInviting.id,
                     Role.READ_WRITE,
                 ),
                 sender,
             ).body as InvitationOutputModelChannel
 
-        val result = invitationController.acceptChannelInvitation(channelInvitation.id, receiver)
+
+        val result = invitationController.declineInvitation(channelInvitation.id, receiver)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
- */
-    /*
-
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `decline invitation`(trxManager: TransactionManager) {
+    fun `when declining someone else's invitation, it should return unauthorized`(trxManager: TransactionManager) {
         val invitationController = createInvitationController(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager)
 
         userController.registerFirstUser(
-            UserRegisterInput("admin4", "admin4@test.com", "Admin_123dsad"),
+            UserRegisterInput("admin", "admin@tes.com", "Admin_123dsad"),
         ).body as User
 
         val sender =
             userController.login(
-                UserLoginCredentialsInput("admin4", "Admin_123dsad"),
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+
+        val channelForRegister = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val registerInvitation = invitationController.createRegisterInvitation(
+            InvitationInputModelRegister(
+                "receiver1@test.com",
+                channelForRegister.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelRegister
+
+        userController.register(
+            UserRegisterInput("receiver1", "receiver1@test.com", "Admin_123dsad"),
+            registerInvitation.id,
+        ).body as User
+
+        val receiver1 = userController.login(
+            UserLoginCredentialsInput("receiver1", "Admin_123dsad"),
+        ).body as AuthenticatedUser
+
+        val channelForInviting = channelController.createChannel(
+            CreateChannelInputModel(
+                "channel2",
+                Visibility.PRIVATE,
+            ),
+            sender,
+        ).body as ChannelOutputModel
+
+        val channelInvitation = invitationController.createChannelInvitation(
+            InvitationInputModelChannel(
+                receiver1.user.id,
+                channelForInviting.id,
+                Role.READ_WRITE,
+            ),
+            sender,
+        ).body as InvitationOutputModelChannel
+
+        val result = invitationController.declineInvitation(channelInvitation.id, sender)
+        assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `when getting a list of invitations then it should return the list`(trxManager: TransactionManager) {
+        val invitationController = createInvitationController(trxManager)
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin", "admin@tes.com", "Admin_123dsad"),
+        ).body as User
+
+        val sender =
+            userController.login(
+                UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
         val channel =
@@ -301,90 +613,19 @@ class InvitationControllerTests {
             ).body as InvitationOutputModelRegister
 
         userController.register(
-            UserRegisterInput("receiver2", "receiver2@test.com", "Admin_123dsad"),
-            registerInvitation.id,
-        )
-
-        val receiver =
-            userController.login(UserLoginCredentialsInput("receiver2", "Admin_123dsad")).body as AuthenticatedUser
-
-        val channelInvitation =
-            invitationController.createChannelInvitation(
-                InvitationInputModelChannel(
-                    receiver.user.id,
-                    channel.id,
-                    Role.READ_WRITE,
-                ),
-                sender,
-            ).body as InvitationOutputModelChannel
-
-        val result = invitationController.declineInvitation(channelInvitation.id, receiver)
-        assertEquals(HttpStatus.OK, result.statusCode)
-    }
-
-     */
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `when getting a list of invitations then it should return the list`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
-        val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
-
-        userController.registerFirstUser(
-            UserRegisterInput("admin56", "admin56@tes.com", "Admin_123dsad"),
-        ).body as User
-
-        val sender =
-            userController.login(
-                UserLoginCredentialsInput("admin56", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-
-        val channel =
-            channelController.createChannel(
-                CreateChannelInputModel(
-                    "channel1",
-                    Visibility.PRIVATE,
-                ),
-                sender,
-            ).body as ChannelOutputModel
-
-        val registerInvitation =
-            invitationController.createRegisterInvitation(
-                InvitationInputModelRegister(
-                    "receiver56@test.com",
-                    channel.id,
-                    Role.READ_WRITE,
-                ),
-                sender,
-            ).body as InvitationOutputModelRegister
-
-        userController.register(
-            UserRegisterInput("receiver56", "receiver56@test.com", "Admin_123dsad"),
+            UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
             registerInvitation.id,
         )
 
         val receiver =
             userController.login(
-                UserLoginCredentialsInput("receiver56", "Admin_123dsad"),
+                UserLoginCredentialsInput("receiver", "Admin_123dsad"),
             ).body as AuthenticatedUser
-/*
-        val channelInvitation1 =
-            invitationController.createChannelInvitation(
-                InvitationInputModelChannel(
-                    receiver.user.id,
-                    channel.id,
-                    Role.READ_WRITE,
-                ),
-                sender,
-            ).body as ChannelInvitation
-
- */
 
         val registerInvitation2 =
             invitationController.createRegisterInvitation(
                 InvitationInputModelRegister(
-                    "sender2@test.com",
+                    "sender@test.com",
                     channel.id,
                     Role.READ_WRITE,
                 ),
@@ -392,35 +633,23 @@ class InvitationControllerTests {
             ).body as InvitationOutputModelRegister
 
         userController.register(
-            UserRegisterInput("sender2", "sender2@test.com", "Admin_123dsad"),
+            UserRegisterInput("sender", "sender@test.com", "Admin_123dsad"),
             registerInvitation2.id,
         )
 
         val sender2 =
             userController.login(
-                UserLoginCredentialsInput("sender2", "Admin_123dsad"),
+                UserLoginCredentialsInput("sender", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-            channelController.createChannel(
-                CreateChannelInputModel(
-                    "channel2",
-                    Visibility.PUBLIC,
-                ),
-                sender2,
-            ).body as ChannelOutputModel
-/*
-        val channelInvitation2 =
-            invitationController.createChannelInvitation(
-                InvitationInputModelChannel(
-                    receiver.user.id,
-                    channel2.id,
-                    Role.READ_WRITE,
-                ),
-                sender2,
-            ).body as ChannelInvitation
+        channelController.createChannel(
+            CreateChannelInputModel(
+                "channel2",
+                Visibility.PUBLIC,
+            ),
+            sender2,
+        ).body as ChannelOutputModel
 
-
- */
         val result = invitationController.getInvitations(receiver)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
