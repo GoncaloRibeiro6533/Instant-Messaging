@@ -19,6 +19,27 @@ class JdbiUserRepository(
             .one()
     }
 
+    override fun updateUsername(
+        user: User,
+        newUsername: String,
+    ): User {
+        if(findById(user.id) == null) return user
+        handle.createUpdate(
+            """
+            UPDATE dbo.User set username = :newUsername WHERE id = :id
+            """.trimIndent(),
+        ).bind("newUsername", newUsername)
+            .bind("id", user.id)
+            .execute()
+        return user.copy(username = newUsername)
+    }
+
+    override fun findAll(): List<User> {
+        return handle.createQuery("SELECT * FROM dbo.User")
+            .mapTo(User::class.java)
+            .list()
+    }
+
     override fun findById(id: Int): User? {
         return handle.createQuery("SELECT id, email, username FROM dbo.User WHERE id = :id")
             .bind("id", id)
@@ -40,20 +61,6 @@ class JdbiUserRepository(
             .list()
     }
 
-    override fun updateUsername(
-        user: User,
-        newUsername: String,
-    ): User {
-        handle.createUpdate(
-            """
-            UPDATE dbo.User set username = :newUsername WHERE id = :id
-            """.trimIndent(),
-        ).bind("newUsername", newUsername)
-            .bind("id", user.id)
-            .execute()
-        return user.copy(username = newUsername)
-    }
-
     override fun findByUsernameAndPassword(
         username: String,
         password: String,
@@ -64,23 +71,6 @@ class JdbiUserRepository(
             .mapTo(User::class.java)
             .findFirst()
             .orElse(null)
-    }
-
-    override fun delete(id: Int) {
-        handle.createUpdate("DELETE FROM dbo.User WHERE id = :id")
-            .bind("id", id)
-            .execute()
-    }
-
-    override fun clear() {
-        handle.createUpdate("DELETE FROM dbo.User")
-            .execute()
-    }
-
-    override fun findAll(): List<User> {
-        return handle.createQuery("SELECT * FROM dbo.User")
-            .mapTo(User::class.java)
-            .list()
     }
 
     override fun findByEmail(email: String): User? {
@@ -95,6 +85,18 @@ class JdbiUserRepository(
         return handle.createQuery("SELECT password FROM dbo.User WHERE id = :id")
             .bind("id", user.id)
             .mapTo(String::class.java)
-            .one()
+            .findOne()
+            .orElse("")
+    }
+
+    override fun delete(id: Int) {
+        handle.createUpdate("DELETE FROM dbo.User WHERE id = :id")
+            .bind("id", id)
+            .execute()
+    }
+
+    override fun clear() {
+        handle.createUpdate("DELETE FROM dbo.User")
+            .execute()
     }
 }
