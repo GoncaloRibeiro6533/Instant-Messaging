@@ -66,7 +66,6 @@ class ChannelService(private val trxManager: TransactionManager) {
                 return@run failure(ChannelError.ChannelNameAlreadyExists)
             }
             val channel = channelRepo.createChannel(name, user, visibility)
-            channelRepo.addUserToChannel(user, channel, Role.READ_WRITE)
             return@run success(channel)
         }
 

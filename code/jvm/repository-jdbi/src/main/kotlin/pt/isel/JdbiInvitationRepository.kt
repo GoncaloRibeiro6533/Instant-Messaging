@@ -166,19 +166,19 @@ class JdbiInvitationRepository(
     }
 
     override fun deleteRegisterInvitationById(invitationId: Int): Boolean {
-        handle.createUpdate(
+        val rowsAffected = handle.createUpdate(
             """
-            DELETE FROM dbo.REGISTER_INVITATION
-            WHERE id = :id
-            """,
+        DELETE FROM dbo.REGISTER_INVITATION
+        WHERE id = :id
+        """
         )
             .bind("id", invitationId)
-            .executeAndReturnGeneratedKeys()
-        return true
+            .execute()
+        return rowsAffected > 0
     }
 
     override fun deleteChannelInvitationById(invitationId: Int): Boolean {
-        handle.createUpdate(
+       val affectedRows = handle.createUpdate(
             """
             DELETE FROM dbo.CHANNEL_INVITATION
             WHERE id = :id
@@ -186,7 +186,7 @@ class JdbiInvitationRepository(
         )
             .bind("id", invitationId)
             .execute()
-        return true
+        return affectedRows > 0
     }
 
     override fun getInvitationsOfUser(user: User): List<ChannelInvitation> {

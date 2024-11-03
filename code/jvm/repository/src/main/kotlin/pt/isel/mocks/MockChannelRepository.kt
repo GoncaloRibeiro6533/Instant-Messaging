@@ -34,6 +34,7 @@ class MockChannelRepository : ChannelRepository {
     ): Channel {
         val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
+        usersInChannel.add(channel.id to UserRole(creator.id, Role.READ_WRITE))
         return channel
     }
 
