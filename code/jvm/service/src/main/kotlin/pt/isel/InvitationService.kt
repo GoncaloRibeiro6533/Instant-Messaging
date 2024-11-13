@@ -80,6 +80,7 @@ class InvitationService(
             return@run success(createdInvitation)
         }
 
+
     fun createChannelInvitation(
         senderId: Int,
         receiverId: Int,
@@ -96,9 +97,9 @@ class InvitationService(
             val channel = channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
             if (authenticatedUser == receiver) return@run failure(InvitationError.InvalidReceiver)
             if (channel.visibility == Visibility.PUBLIC) return@run failure(InvitationError.CantInviteToPublicChannel)
-            val channelMembers = channelRepo.getChannelMembers(channel).map { userRepo.findById(it) }
-            if (channelMembers.none { it == authenticatedUser }) return@run failure(InvitationError.SenderDoesntBelongToChannel)
-            if (channelMembers.any { it == receiver }) return@run failure(InvitationError.AlreadyInChannel)
+            val channelMembers = channelRepo.getChannelMembers(channel)
+            if (channelMembers.none { it.key == authenticatedUser }) return@run failure(InvitationError.SenderDoesntBelongToChannel)
+            if (channelMembers.any { it.key == receiver }) return@run failure(InvitationError.AlreadyInChannel)
             val createdInvitation =
                 invitationRepo.createChannelInvitation(
                     authenticatedUser,

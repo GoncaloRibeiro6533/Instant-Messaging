@@ -89,13 +89,10 @@ class UserService(
                 return@run failure(UserError.UsernameAlreadyExists)
             }
             if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
-
             val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
             val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
-
             invitation = invitation.markAsUsed()
             invitationRepo.updateRegisterInvitation(invitation)
-
             channelRepo.addUserToChannel(user, invitation.channel, invitation.role)
             return@run success(user)
         }
@@ -114,10 +111,8 @@ class UserService(
             val repoPassword = userRepo.findPasswordOfUser(user)
             val passwordValidationInfo = PasswordValidationInfo(repoPassword)
             if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
-                if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
                     return@run failure(UserError.NoMatchingPassword)
                 }
-            }
             val now = clock.now()
             val newToken =
                 Token(
@@ -183,6 +178,6 @@ class UserService(
     fun getUserByToken(token: String): User? =
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run null
-            return@run userRepo.findById(session.userId)
+            return@run userRepo.findById(session.userId) //TODO token does not expire, do that
         }
 }

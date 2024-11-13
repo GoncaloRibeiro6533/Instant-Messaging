@@ -94,6 +94,4 @@ sealed class Problem(
     data object ChannelNotFound : Problem(URI("$PROBLEM_URI_PATH/channel-not-found"))
 
     data object InvitationNotFound : Problem(URI("$PROBLEM_URI_PATH/invitation-not-found"))
-
-    data object InvitationAlreadUsed : Problem(URI("$PROBLEM_URI_PATH/invitation-already-used"))
 }

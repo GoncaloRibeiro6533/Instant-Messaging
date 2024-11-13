@@ -15,9 +15,10 @@ interface ChannelRepository {
         visibility: Visibility,
     ): Channel
 
+    // TODO add role
     fun getChannelsOfUser(user: User): List<Channel>
 
-    fun getChannelMembers(channel: Channel): List<Int>
+    fun getChannelMembers(channel: Channel): Map<User, Role>
 
     fun addUserToChannel(
         user: User,

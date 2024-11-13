@@ -95,7 +95,7 @@ class JdbiMessageRepository(
             JOIN dbo.USER u ON m.user_id = u.id
             JOIN dbo.channel c ON m.channel_id = c.id
             
-        """
+        """,
         ).map { rs, _ -> mapRowToMessage(rs) }
             .list()
 

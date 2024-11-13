@@ -5,6 +5,7 @@ import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockUserRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class ChannelRepoMockTests {
     private var user: User
@@ -45,7 +46,8 @@ class ChannelRepoMockTests {
         repoChannels.addUserToChannel(user, channel1, Role.READ_WRITE)
         repoChannels.addUserToChannel(user1, channel1, Role.READ_WRITE)
         val members = repoChannels.getChannelMembers(channel1)
-        assertEquals(listOf(user.id, user1.id), members)
+        assertEquals(2, members.size)
+        assertEquals(mapOf(user to Role.READ_WRITE, user1 to Role.READ_WRITE), members)
     }
 
     @Test
@@ -66,9 +68,10 @@ class ChannelRepoMockTests {
     fun `Test add user to channel`() {
         val channel = repoChannels.createChannel("channel6", user, Visibility.PUBLIC)
         repoChannels.addUserToChannel(user, channel, Role.READ_WRITE)
-        val members = repoChannels.getChannelMembers(channel)
+        val members: Map<User, Role> = repoChannels.getChannelMembers(channel)
         assertEquals(1, members.size)
-        assertEquals(listOf(user.id), members)
+        assertNotNull(members[user])
+        assertEquals(Role.READ_WRITE, members[user])
     }
 
     @Test

@@ -23,7 +23,7 @@ class JdbiUserRepository(
         user: User,
         newUsername: String,
     ): User {
-        if(findById(user.id) == null) return user
+        if (findById(user.id) == null) return user
         handle.createUpdate(
             """
             UPDATE dbo.User set username = :newUsername WHERE id = :id

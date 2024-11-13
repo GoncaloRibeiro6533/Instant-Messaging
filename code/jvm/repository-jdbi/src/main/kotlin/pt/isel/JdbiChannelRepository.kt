@@ -11,13 +11,14 @@ class JdbiChannelRepository(
         creator: User,
         visibility: Visibility,
     ): Channel {
-        val id = handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
-            .bind("name", name)
-            .bind("creator_id", creator.id)
-            .bind("visibility", visibility)
-            .executeAndReturnGeneratedKeys()
-            .mapTo(Int::class.java)
-            .one()
+        val id =
+            handle.createUpdate("INSERT INTO dbo.channel (name, creator_id, visibility) VALUES (:name, :creator_id, :visibility)")
+                .bind("name", name)
+                .bind("creator_id", creator.id)
+                .bind("visibility", visibility)
+                .executeAndReturnGeneratedKeys()
+                .mapTo(Int::class.java)
+                .one()
 
         handle.createUpdate("INSERT INTO dbo.user_channel_role (user_id, channel_id, role_name) VALUES (:user_id, :channel_id, :role)")
             .bind("user_id", creator.id)
@@ -73,6 +74,7 @@ class JdbiChannelRepository(
             .list()
     }
 
+    // TODO add role
     override fun getChannelsOfUser(user: User): List<Channel> {
         return handle.createQuery(
             """
@@ -99,11 +101,23 @@ class JdbiChannelRepository(
             .list()
     }
 
-    override fun getChannelMembers(channel: Channel): List<Int> {
-        return handle.createQuery("SELECT user_id FROM dbo.user_channel_role WHERE channel_id = :channel_id")
-            .bind("channel_id", channel.id)
-            .mapTo(Int::class.java)
+    override fun getChannelMembers(channel: Channel): Map<User, Role> {
+        return handle.createQuery(
+            """
+            SELECT 
+                ur.user_id AS user_id,
+                ur.channel_id AS channel_id,
+                ur.role_name AS ROLE,
+                u.username AS user_username,
+                u.email AS user_email
+            FROM dbo.user_channel_role ur 
+            JOIN dbo.USER u ON u.id = user_id
+            WHERE ur.channel_id = :channel_id;
+            """.trimIndent(),
+        ).bind("channel_id", channel.id)
+            .map { rs, _ -> mapRowToUserRoleEntry(rs) }
             .list()
+            .toMap()
     }
 
     override fun updateChannelName(
@@ -138,7 +152,6 @@ class JdbiChannelRepository(
             .execute()
 
         return channel
-
     }
 
     override fun clear() {
@@ -159,5 +172,15 @@ class JdbiChannelRepository(
             user,
             Visibility.valueOf(rs.getString("visibility")),
         )
+    }
+
+    private fun mapRowToUserRoleEntry(rs: ResultSet): Pair<User, Role> {
+        val user =
+            User(
+                rs.getInt("user_id"),
+                rs.getString("user_username"),
+                rs.getString("user_email"),
+            )
+        return user to Role.valueOf(rs.getString("role"))
     }
 }

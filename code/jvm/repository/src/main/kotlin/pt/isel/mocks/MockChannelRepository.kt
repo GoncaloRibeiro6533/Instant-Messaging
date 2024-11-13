@@ -8,12 +8,12 @@ import pt.isel.Visibility
 
 class MockChannelRepository : ChannelRepository {
     private data class UserRole(
-        val userId: Int,
+        val user: User,
         val role: Role,
     )
 
     private val channels = mutableListOf<Channel>()
-    private val usersInChannel = mutableSetOf<Pair<Int, UserRole>>() // <ChannelId,Pair<UserId,Role>>
+    private val usersInChannel = mutableSetOf<Pair<Channel, UserRole>>() // <ChannelId,Pair<UserId,Role>>
     private var currentId = 0
 
     override fun findById(id: Int) = channels.firstOrNull { it.id == id }
@@ -34,33 +34,24 @@ class MockChannelRepository : ChannelRepository {
     ): Channel {
         val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
-        usersInChannel.add(channel.id to UserRole(creator.id, Role.READ_WRITE))
+        usersInChannel.add(channel to UserRole(creator, Role.READ_WRITE))
         return channel
     }
 
     override fun getChannelsOfUser(user: User): List<Channel> {
-        // Filtrar todos os channelIds nos quais o userId está presente
-        val userChannelIds =
+        val userChannels: List<Channel> =
             usersInChannel
-                .filter { it.second.userId == user.id } // it.second.first é o userId
-                .map { it.first } // it.first é o channelId
-
-        // Procurar os canais correspondentes a esses channelIds
-        val userChannels = channels.filter { it.id in userChannelIds }
-
-        // Retornar a lista de canais ou null se o user não tiver canais
-        return userChannels.ifEmpty { emptyList() }
+                .filter { it.second.user.id == user.id }
+                .map { it.first }
+        return userChannels
     }
 
-    override fun getChannelMembers(channel: Channel): List<Int> {
-        // Filtrar os userIds dos membros do canal usando usersInChannel
-        val userIdsInChannel =
+    override fun getChannelMembers(channel: Channel): Map<User, Role> {
+        val users =
             usersInChannel
-                .filter { it.first == channel.id } // Filtra os pares que têm o mesmo channelId
-                .map { it.second.userId } // Mapeia para userId (it.second.first)
-
-        // Retornar a lista de usuários ou null se não houver membros
-        return userIdsInChannel.ifEmpty { emptyList() }
+                .filter { it.first.id == channel.id }.map { it.second }
+        val usersMap = users.associate { it.user to it.role }
+        return usersMap
     }
 
     override fun addUserToChannel(
@@ -68,7 +59,7 @@ class MockChannelRepository : ChannelRepository {
         channel: Channel,
         role: Role,
     ): Channel {
-        usersInChannel.add(channel.id to UserRole(user.id, role))
+        usersInChannel.add(channel to UserRole(user, role))
         return channel
     }
 
@@ -85,7 +76,9 @@ class MockChannelRepository : ChannelRepository {
         user: User,
         channel: Channel,
     ): Channel {
-        usersInChannel.remove(channel.id to UserRole(user.id, Role.READ_WRITE))
+        val user: Pair<Channel, UserRole> =
+            usersInChannel.first { it.first.id == channel.id && it.second.user.id == user.id }
+        usersInChannel.remove(user)
         return channel
     }
 
