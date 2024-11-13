@@ -89,4 +89,13 @@ class ChannelRepoMockTests {
         val members = repoChannels.getChannelMembers(channel)
         assertEquals(0, members.size)
     }
+
+    @Test
+    fun `Test clear`() {
+        val channel = repoChannels.createChannel("channel9", user, Visibility.PUBLIC)
+        repoChannels.addUserToChannel(user, channel, Role.READ_WRITE)
+        repoChannels.clear()
+        val channels = repoChannels.getChannelsOfUser(user)
+        assertEquals(0, channels.size)
+    }
 }

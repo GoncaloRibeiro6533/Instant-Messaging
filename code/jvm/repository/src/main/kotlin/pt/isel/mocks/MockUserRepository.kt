@@ -69,4 +69,6 @@ class MockUserRepository : UserRepository {
 
     // TODO remove double bang
     override fun findPasswordOfUser(user: User): String = passwordsHash[user.id]!!
+
+    override fun findUserMatchesUsername(username: String): User? = users.firstOrNull { it.username == username }
 }

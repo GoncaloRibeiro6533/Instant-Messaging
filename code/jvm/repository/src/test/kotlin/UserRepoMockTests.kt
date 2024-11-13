@@ -2,7 +2,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import pt.isel.User
-import pt.isel.mocks.MockChannelRepository
 import pt.isel.mocks.MockUserRepository
 
 class UserRepoMockTests {
@@ -11,7 +10,6 @@ class UserRepoMockTests {
         MockUserRepository().also {
             user = it.createUser("Bob", "bob@mail.com", "password")
         }
-    private val repoChannels = MockChannelRepository()
 
     @Test
     fun `Test create user`() {
@@ -85,5 +83,35 @@ class UserRepoMockTests {
     fun `Test find user by username and password with wrong password`() {
         val user = repoUsers.findByUsernameAndPassword("Bob", "password2")
         assertEquals(null, user)
+    }
+
+    @Test
+    fun `Test find user by username and password with wrong username`() {
+        val user = repoUsers.findByUsernameAndPassword("Bob2", "password")
+        assertEquals(null, user)
+    }
+
+    @Test
+    fun `find user by password with no user matching`() {
+        val user = repoUsers.findByUsernameAndPassword("Bob2", "password2")
+        assertEquals(null, user)
+    }
+
+    @Test
+    fun `Test find user by username with no user matching`() {
+        val users = repoUsers.findByUsername("Bob2", 1, 0)
+        assertEquals(emptyList<User>(), users)
+    }
+
+    @Test
+    fun `Test find user by username with  user matching`() {
+        val userMatched = repoUsers.findUserMatchesUsername("Bob")
+        assertEquals(user, userMatched)
+    }
+
+    @Test
+    fun `find password of user`() {
+        val password = repoUsers.findPasswordOfUser(user)
+        assertEquals("password", password)
     }
 }

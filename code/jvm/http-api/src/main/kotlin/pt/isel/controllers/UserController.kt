@@ -81,6 +81,7 @@ class UserController(
         }
     }
 
+    // TODO receive a token to logout a specific session, verify in service if the session is from requester
     @PostMapping("/logout")
     fun logout(user: AuthenticatedUser): ResponseEntity<*> {
         return when (val result: Either<UserError, Boolean> = userService.logoutUser(user.token)) {

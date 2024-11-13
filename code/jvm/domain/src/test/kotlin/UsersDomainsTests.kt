@@ -1,12 +1,16 @@
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.Sha256TokenEncoder
+import pt.isel.Token
 import pt.isel.UsersDomain
 import pt.isel.UsersDomainConfig
 import kotlin.time.Duration.Companion.hours
 
 class UsersDomainsTests {
+    private val clock = Clock.System
     private val usersDomainConfig =
         UsersDomainConfig(
             tokenSizeInBytes = 256 / 8,
@@ -96,5 +100,37 @@ class UsersDomainsTests {
         val validationInfo = usersDomain.createPasswordValidationInformation(password)
         val result = usersDomain.validatePassword(password, validationInfo)
         assertTrue(result)
+    }
+
+    @Test
+    fun `token expiration should be calculated`() {
+        val token =
+            Token(
+                tokenEncoder.createValidationInformation("token"),
+                userId = 0,
+                createdAt = Instant.DISTANT_PAST,
+                lastUsedAt = Instant.DISTANT_PAST,
+            )
+        val result = usersDomain.getTokenExpiration(token)
+        assertTrue(result > token.createdAt)
+    }
+
+    @Test
+    fun `token should be time valid`() {
+        val token =
+            Token(
+                tokenEncoder.createValidationInformation("token"),
+                userId = 0,
+                createdAt = Clock.System.now(),
+                lastUsedAt = Clock.System.now() + 1.hours,
+            )
+        val result = usersDomain.isTokenTimeValid(clock, token)
+        assertTrue(result)
+    }
+
+    @Test
+    fun `canBeToken fails for invalid token`() {
+        val result = usersDomain.canBeToken("invalidToken")
+        assertTrue(!result)
     }
 }

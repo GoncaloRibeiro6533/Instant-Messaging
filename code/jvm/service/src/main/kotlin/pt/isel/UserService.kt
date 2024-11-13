@@ -75,7 +75,7 @@ class UserService(
         trxManager.run {
             if (inviteId < 0) return@run failure(UserError.NegativeIdentifier)
             var invitation =
-                (invitationRepo.findRegisterInvitationById(inviteId) as? RegisterInvitation)
+                invitationRepo.findRegisterInvitationById(inviteId)
                     ?: return@run failure(UserError.InvitationNotFound)
             if (invitation.isUsed) return@run failure(UserError.InvitationAlreadyUsed)
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
@@ -85,9 +85,8 @@ class UserService(
             if (userRepo.findByEmail(email) != null) return@run failure(UserError.EmailAlreadyInUse)
             if (email != invitation.email) return@run failure(UserError.EmailDoesNotMatchInvite)
             if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
-            if (userRepo.findByUsername(username, 1, 0).isNotEmpty()) {
-                return@run failure(UserError.UsernameAlreadyExists)
-            }
+            val matches = userRepo.findUserMatchesUsername(username.trim())
+            if (matches != null) return@run failure(UserError.UsernameAlreadyExists)
             if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
             val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
             val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
@@ -105,14 +104,12 @@ class UserService(
             if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             val user =
-                userRepo.findByUsername(username, 1, 0).firstOrNull {
-                    it.username == username
-                } ?: return@run failure(UserError.NoMatchingUsername)
+                userRepo.findUserMatchesUsername(username.trim()) ?: return@run failure(UserError.NoMatchingUsername)
             val repoPassword = userRepo.findPasswordOfUser(user)
             val passwordValidationInfo = PasswordValidationInfo(repoPassword)
             if (!usersDomain.validatePassword(password, passwordValidationInfo)) {
-                    return@run failure(UserError.NoMatchingPassword)
-                }
+                return@run failure(UserError.NoMatchingPassword)
+            }
             val now = clock.now()
             val newToken =
                 Token(
@@ -161,9 +158,8 @@ class UserService(
             val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
             if (newUsername.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
-            if (userRepo.findByUsername(newUsername, 1, 0).isNotEmpty()) {
-                return@run failure(UserError.UsernameAlreadyExists)
-            }
+            val matches = userRepo.findUserMatchesUsername(newUsername.trim())
+            if (matches != null) return@run failure(UserError.UsernameAlreadyExists)
             val userEdited = userRepo.updateUsername(user, newUsername)
             return@run success(userEdited)
         }
@@ -178,6 +174,10 @@ class UserService(
     fun getUserByToken(token: String): User? =
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run null
-            return@run userRepo.findById(session.userId) //TODO token does not expire, do that
+            if (!usersDomain.isTokenTimeValid(clock, session)) {
+                sessionRepo.deleteSession(token)
+                return@run null
+            }
+            return@run userRepo.findById(session.userId)
         }
 }

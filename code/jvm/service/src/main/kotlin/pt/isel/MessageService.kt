@@ -34,7 +34,7 @@ class MessageService(private val trxManager: TransactionManager) {
         userId: Int,
     ): Either<MessageError, Message> =
         trxManager.run {
-            val user= userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
+            val user = userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
             if (id < 0) return@run failure(MessageError.NegativeIdentifier)
             val msg = messageRepo.findById(id) ?: return@run failure(MessageError.MessageNotFound)
             if (!channelRepo.getChannelMembers(msg.channel).containsKey(user)) return@run failure(MessageError.UserNotInChannel)

@@ -4,7 +4,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.postgresql.ds.PGSimpleDataSource
-import pt.isel.*
+import pt.isel.Channel
+import pt.isel.JdbiChannelRepository
+import pt.isel.JdbiInvitationRepository
+import pt.isel.JdbiMessageRepository
+import pt.isel.JdbiUserRepository
+import pt.isel.User
+import pt.isel.Visibility
+import pt.isel.configureWithAppRequirements
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
@@ -55,14 +62,13 @@ class JbdiMessageRepositoryTest {
                     User(-1, "username", "invalid@invalid.com"),
                     channel,
                     "text",
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
 
             val messages = JdbiMessageRepository(handle).findByChannel(channel, 5, 0)
             assertEquals(0, messages.size)
         }
-
     }
 
     @Test
@@ -75,7 +81,7 @@ class JbdiMessageRepositoryTest {
                     user,
                     Channel(-1, "channel1", user, Visibility.PUBLIC),
                     "text",
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
 
@@ -83,8 +89,8 @@ class JbdiMessageRepositoryTest {
                 JdbiMessageRepository(handle).findByChannel(Channel(99, "channel99", user, Visibility.PUBLIC), 5, 0)
             assertEquals(0, messages.size)
         }
-
     }
+
     @Test
     fun `should find a message by its id`() {
         runWithHandle { handle ->
@@ -101,7 +107,6 @@ class JbdiMessageRepositoryTest {
             assertEquals(message.timestamp.withNano(0), foundMessage.timestamp.withNano(0))
         }
     }
-
 
     @Test
     fun `when getting a message history, then the message history is returned`() {
@@ -145,7 +150,6 @@ class JbdiMessageRepositoryTest {
             val messageHistory = JdbiMessageRepository(handle).findByChannel(channel, 5, 0)
 
             assertEquals(5, messageHistory.size)
-
         }
     }
 
@@ -163,7 +167,6 @@ class JbdiMessageRepositoryTest {
                 JdbiMessageRepository(handle).findByChannel(Channel(99, "channel99", user, Visibility.PUBLIC), 5, 0)
 
             assertEquals(0, messageHistory.size)
-
         }
     }
 
@@ -205,7 +208,6 @@ class JbdiMessageRepositoryTest {
 
             val messageHistory = JdbiMessageRepository(handle).findByChannel(channel, 5, 0)
             assertEquals(5, messageHistory.size)
-
         }
     }
 
@@ -238,10 +240,6 @@ class JbdiMessageRepositoryTest {
 
             val messageHistory = JdbiMessageRepository(handle).findAll()
             assertEquals(10, messageHistory.size)
-
         }
     }
 }
-
-
-

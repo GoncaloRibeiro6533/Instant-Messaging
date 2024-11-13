@@ -1,10 +1,21 @@
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import org.postgresql.ds.PGSimpleDataSource
-import pt.isel.*
+import pt.isel.Channel
+import pt.isel.JdbiChannelRepository
+import pt.isel.JdbiInvitationRepository
+import pt.isel.JdbiMessageRepository
+import pt.isel.JdbiUserRepository
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
+import pt.isel.configureWithAppRequirements
 import java.time.LocalDateTime
 import kotlin.test.Test
 
@@ -38,13 +49,14 @@ class JdbiInvitationRepositoryTests {
             val receiver = JdbiUserRepository(handle).createUser("receiver", "receiver@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createChannelInvitation(
-                sender,
-                receiver,
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createChannelInvitation(
+                    sender,
+                    receiver,
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
             assertEquals(invitation.sender, sender)
             assertEquals(invitation.receiver, receiver)
             assertEquals(invitation.channel, channel)
@@ -65,7 +77,7 @@ class JdbiInvitationRepositoryTests {
                     receiver,
                     channel,
                     Role.READ_WRITE,
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
         }
@@ -83,7 +95,7 @@ class JdbiInvitationRepositoryTests {
                     receiver,
                     Channel(99, "channel", sender, Visibility.PUBLIC),
                     Role.READ_WRITE,
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
         }
@@ -101,7 +113,7 @@ class JdbiInvitationRepositoryTests {
                     receiver,
                     channel,
                     Role.READ_WRITE,
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
         }
@@ -119,7 +131,7 @@ class JdbiInvitationRepositoryTests {
                     User(99, "receiver", "receiver@test.com"),
                     channel,
                     Role.READ_WRITE,
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
                 )
             }
         }
@@ -132,13 +144,14 @@ class JdbiInvitationRepositoryTests {
             val receiver = JdbiUserRepository(handle).createUser("receiver", "receiver@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createChannelInvitation(
-                sender,
-                receiver,
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createChannelInvitation(
+                    sender,
+                    receiver,
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
 
             val foundChannelInvitation = JdbiInvitationRepository(handle).findChannelInvitationById(invitation.id)
             assertEquals(foundChannelInvitation!!.sender, sender)
@@ -163,13 +176,14 @@ class JdbiInvitationRepositoryTests {
             val receiver = JdbiUserRepository(handle).createUser("receiver", "receiver@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createChannelInvitation(
-                sender,
-                receiver,
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createChannelInvitation(
+                    sender,
+                    receiver,
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
 
             val foundInvitation = JdbiInvitationRepository(handle).findChannelInvitationById(invitation.id)
             assertEquals(foundInvitation!!.sender, sender)
@@ -195,13 +209,14 @@ class JdbiInvitationRepositoryTests {
 
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createChannelInvitation(
-                sender,
-                receiver,
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createChannelInvitation(
+                    sender,
+                    receiver,
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
 
             invitation.markAsUsed()
 
@@ -210,7 +225,6 @@ class JdbiInvitationRepositoryTests {
         }
     }
 
-
     @Test
     fun `delete register invitation by id should succeed`() {
         runWithHandle { handle ->
@@ -218,13 +232,14 @@ class JdbiInvitationRepositoryTests {
             JdbiUserRepository(handle).createUser("receiver", "receiver@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createRegisterInvitation(
-                sender,
-                "receiver@test.com",
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createRegisterInvitation(
+                    sender,
+                    "receiver@test.com",
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
 
             val deleted = JdbiInvitationRepository(handle).deleteRegisterInvitationById(invitation.id)
             assertTrue(deleted)
@@ -250,13 +265,14 @@ class JdbiInvitationRepositoryTests {
             val receiver = JdbiUserRepository(handle).createUser("receiver", "receiver@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel", sender, Visibility.PUBLIC)
 
-            val invitation = JdbiInvitationRepository(handle).createChannelInvitation(
-                sender,
-                receiver,
-                channel,
-                Role.READ_WRITE,
-                LocalDateTime.now()
-            )
+            val invitation =
+                JdbiInvitationRepository(handle).createChannelInvitation(
+                    sender,
+                    receiver,
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                )
 
             val deleted = JdbiInvitationRepository(handle).deleteChannelInvitationById(invitation.id)
             assertTrue(deleted)
@@ -287,7 +303,7 @@ class JdbiInvitationRepositoryTests {
                 receiver,
                 channel,
                 Role.READ_WRITE,
-                LocalDateTime.now()
+                LocalDateTime.now(),
             )
 
             JdbiInvitationRepository(handle).createChannelInvitation(
@@ -295,13 +311,11 @@ class JdbiInvitationRepositoryTests {
                 receiver,
                 channel,
                 Role.READ_WRITE,
-                LocalDateTime.now()
+                LocalDateTime.now(),
             )
 
             val invitations = JdbiInvitationRepository(handle).getInvitationsOfUser(receiver)
             assertEquals(invitations.size, 2)
         }
     }
-    }
-
-
+}

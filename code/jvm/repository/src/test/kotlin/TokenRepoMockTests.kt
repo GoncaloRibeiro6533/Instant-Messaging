@@ -41,7 +41,6 @@ class TokenRepoMockTests {
 
     private val repoSessions = MockSessionRepository()
 
-    private val clock = kotlinx.datetime.Clock
     private val token = Token(TokenValidationInfo("token"), user.id, Clock.System.now(), Clock.System.now())
 
     @Test
@@ -78,5 +77,19 @@ class TokenRepoMockTests {
         repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
         val sessions = repoSessions.findByUserId(user.id)
         assertEquals(2, sessions.size)
+    }
+
+    @Test
+    fun `Test clear`() {
+        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
+        repoSessions.clear()
+        val sessions = repoSessions.findByUserId(user.id)
+        assertEquals(0, sessions.size)
+    }
+
+    @Test
+    fun `Delete non existing session`() {
+        val isDeleted = repoSessions.deleteSession("token")
+        assertEquals(false, isDeleted)
     }
 }

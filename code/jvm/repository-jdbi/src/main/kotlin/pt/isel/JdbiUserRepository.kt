@@ -99,4 +99,12 @@ class JdbiUserRepository(
         handle.createUpdate("DELETE FROM dbo.User")
             .execute()
     }
+
+    override fun findUserMatchesUsername(username: String): User? {
+        return handle.createQuery("SELECT * FROM dbo.User WHERE username = :username")
+            .bind("username", username)
+            .mapTo(User::class.java)
+            .findFirst()
+            .orElse(null)
+    }
 }

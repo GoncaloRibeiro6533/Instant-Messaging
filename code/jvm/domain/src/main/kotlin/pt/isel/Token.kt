@@ -9,9 +9,7 @@ data class Token(
     val lastUsedAt: Instant,
 ) {
     init {
-        // require(token.isNotBlank()) { "Token must not be blank" }
-        // require(expiration.isAfter(LocalDateTime.now())) { "Expiration must be in the future" }
+        require(userId >= 0) { "Invalid user id" }
+        require(token.validationInfo.isNotEmpty()) { "Invalid token validation info" }
     }
-
-    // fun expired(): Boolean = expiration.isBefore(LocalDateTime.now())
 }

@@ -4,7 +4,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import org.postgresql.ds.PGSimpleDataSource
-import pt.isel.*
+import pt.isel.JdbiChannelRepository
+import pt.isel.JdbiInvitationRepository
+import pt.isel.JdbiMessageRepository
+import pt.isel.JdbiUserRepository
+import pt.isel.User
+import pt.isel.configureWithAppRequirements
 import kotlin.test.Test
 import kotlin.test.assertContains
 
@@ -130,7 +135,6 @@ class JdbiUserRepositoryTests {
             JdbiUserRepository(handle).createUser("username2", "user2@test.com", "password")
             val users = JdbiUserRepository(handle).findByUsername("username", 1, 0)
             assertEquals(users.size, 1)
-
         }
     }
 
@@ -180,7 +184,7 @@ class JdbiUserRepositoryTests {
     }
 
     @Test
-    fun `find by email should succeed`(){
+    fun `find by email should succeed`() {
         runWithHandle { handle ->
             val user = JdbiUserRepository(handle).createUser("username", "user@test.com", "password")
             val foundUser = JdbiUserRepository(handle).findByEmail("user@test.com")
@@ -233,5 +237,4 @@ class JdbiUserRepositoryTests {
             assertEquals(JdbiUserRepository(handle).findAll().size, 0)
         }
     }
-
 }

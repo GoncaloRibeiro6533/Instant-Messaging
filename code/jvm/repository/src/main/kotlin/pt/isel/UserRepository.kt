@@ -35,4 +35,6 @@ interface UserRepository {
     fun findByEmail(email: String): User?
 
     fun findPasswordOfUser(user: User): String
+
+    fun findUserMatchesUsername(username: String): User?
 }

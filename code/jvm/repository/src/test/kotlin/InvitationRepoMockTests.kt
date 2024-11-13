@@ -105,4 +105,11 @@ class InvitationRepoMockTests {
         assertTrue(deletedInvitation)
         assertEquals(null, repoInvitations.findChannelInvitationById(channelInvitation.id))
     }
+
+    @Test
+    fun `Test clear`() {
+        repoInvitations.clear()
+        assertEquals(0, repoInvitations.getInvitationsOfUser(user).size)
+        assertEquals(0, repoInvitations.getInvitationsOfUser(user2).size)
+    }
 }

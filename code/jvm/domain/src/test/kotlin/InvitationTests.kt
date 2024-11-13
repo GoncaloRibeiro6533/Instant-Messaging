@@ -67,4 +67,82 @@ class InvitationTests {
             RegisterInvitation(1, user, user.email, channel, role, false, LocalDateTime.now())
         }
     }
+
+    @Test
+    fun `Channel Invitation starts as not used`() {
+        val invitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, LocalDateTime.now())
+        assertEquals(false, invitation.isUsed)
+    }
+
+    @Test
+    fun `Register Invitation starts as not used`() {
+        val invitation =
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+            )
+        assertEquals(false, invitation.isUsed)
+    }
+
+    @Test
+    fun `Channel Invitation is marked as used`() {
+        val invitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, LocalDateTime.now())
+        val markedInvitation = invitation.markAsUsed()
+        assertEquals(true, markedInvitation.isUsed)
+    }
+
+    @Test
+    fun `Register Invitation is marked as used`() {
+        val invitation =
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+            )
+        val markedInvitation = invitation.markAsUsed()
+        assertEquals(true, markedInvitation.isUsed)
+    }
+
+    @Test
+    fun `Channel Invitation is equal to another`() {
+        val time = LocalDateTime.now()
+        val invitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, time)
+        val otherInvitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, time)
+        assertEquals(invitation, otherInvitation)
+    }
+
+    @Test
+    fun `Register Invitation is equal to another`() {
+        val time = LocalDateTime.now()
+        val invitation =
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                time,
+            )
+        val otherInvitation =
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                time,
+            )
+        assertEquals(invitation, otherInvitation)
+    }
 }

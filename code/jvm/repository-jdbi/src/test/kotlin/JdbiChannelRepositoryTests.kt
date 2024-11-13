@@ -6,7 +6,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.postgresql.ds.PGSimpleDataSource
-import pt.isel.*
+import pt.isel.Channel
+import pt.isel.JdbiChannelRepository
+import pt.isel.JdbiInvitationRepository
+import pt.isel.JdbiMessageRepository
+import pt.isel.JdbiUserRepository
+import pt.isel.Role
+import pt.isel.User
+import pt.isel.Visibility
+import pt.isel.configureWithAppRequirements
 import kotlin.test.assertContains
 
 class JdbiChannelRepositoryTests {
@@ -52,7 +60,7 @@ class JdbiChannelRepositoryTests {
                 JdbiChannelRepository(handle).createChannel(
                     "channel1",
                     User(-1, "username", "user@test.com"),
-                    Visibility.PUBLIC
+                    Visibility.PUBLIC,
                 )
             }
         }
@@ -68,7 +76,7 @@ class JdbiChannelRepositoryTests {
             JdbiChannelRepository(handle).addUserToChannel(user, channel, Role.READ_WRITE)
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)
-            assertTrue(channelMembers.contains(user.id))
+            assertTrue(channelMembers.containsKey(user))
         }
     }
 
@@ -81,7 +89,7 @@ class JdbiChannelRepositoryTests {
                 JdbiChannelRepository(handle).addUserToChannel(
                     User(-1, "username", "user@test.com"),
                     Channel(-1, "channel1", admin, Visibility.PUBLIC),
-                    Role.READ_WRITE
+                    Role.READ_WRITE,
                 )
             }
         }
@@ -194,9 +202,9 @@ class JdbiChannelRepositoryTests {
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)
             assertEquals(3, channelMembers.size)
-            assertContains(channelMembers, admin.id)
-            assertContains(channelMembers, user.id)
-            assertContains(channelMembers, user2.id)
+            assertContains(channelMembers, admin)
+            assertContains(channelMembers, user)
+            assertContains(channelMembers, user2)
         }
     }
 
@@ -219,10 +227,9 @@ class JdbiChannelRepositoryTests {
             assertThrows<Exception> {
                 JdbiChannelRepository(handle).updateChannelName(
                     Channel(-1, "channel1", admin, Visibility.PUBLIC),
-                    "channel2"
+                    "channel2",
                 )
             }
-
         }
     }
 
@@ -238,8 +245,8 @@ class JdbiChannelRepositoryTests {
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)
             assertEquals(1, channelMembers.size)
-            assertContains(channelMembers, admin.id)
-            assertTrue(!channelMembers.contains(user.id))
+            assertContains(channelMembers.keys, admin)
+            assertTrue(!channelMembers.containsKey(user))
         }
     }
 

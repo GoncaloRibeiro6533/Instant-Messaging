@@ -1,3 +1,5 @@
+@file:Suppress("ktlint")
+
 package pt.isel.talkRooms
 
 import org.jdbi.v3.core.Jdbi
@@ -26,7 +28,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
-class ChannelControllerTests{
+class ChannelControllerTests {
     companion object {
         private val jdbi =
             Jdbi
@@ -90,19 +92,16 @@ class ChannelControllerTests{
                     tokenRollingTtl,
                     maxTokensPerUser = maxTokensPerUser,
                 ),
-            )
+            ),
         )
 
-        private fun createInvitationController(trxManager: TransactionManager) =
-            InvitationController(createInvitationService(trxManager))
+        private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
 
-        private fun createChannelController(trxManager: TransactionManager) =
-            ChannelController(createChannelService(trxManager))
+        private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
 
         private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
 
-        private fun createUserController(trxManager: TransactionManager) =
-            UserController(createUserService(trxManager, TestClock()))
+        private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
     }
 
     @ParameterizedTest
@@ -148,13 +147,14 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            channelCreator,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                channelCreator,
+            ).body as ChannelOutputModel
 
         val result = channelController.getChannelById(channel.id, channelCreator)
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -203,26 +203,30 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            channelCreator,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                channelCreator,
+            ).body as ChannelOutputModel
 
-        val member1RegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "member1@test.com",
-                channel.id,
-                Role.READ_WRITE,
-            ),
-            channelCreator,
-        ).body as InvitationOutputModelRegister
+        val member1RegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "member1@test.com",
+                    channel.id,
+                    Role.READ_WRITE,
+                ),
+                channelCreator,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "member1", "member1@test.com", "Member_123dsad"
+                "member1",
+                "member1@test.com",
+                "Member_123dsad",
             ),
             member1RegisterInvitation.id,
         ).body as User
@@ -236,7 +240,7 @@ class ChannelControllerTests{
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `get channel members of non existing channel should return error`(trxManager: TransactionManager){
+    fun `get channel members of non existing channel should return error`(trxManager: TransactionManager) {
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager)
 
@@ -269,13 +273,14 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel1 = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            user1,
-        ).body as ChannelOutputModel
+        val channel1 =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                user1,
+            ).body as ChannelOutputModel
 
         channelController.createChannel(
             CreateChannelInputModel(
@@ -285,42 +290,48 @@ class ChannelControllerTests{
             user1,
         ).body as ChannelOutputModel
 
-        val member1RegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "user2@test.com",
-                channel1.id,
-                Role.READ_WRITE,
-            ),
-            user1,
-        ).body as InvitationOutputModelRegister
+        val member1RegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "user2@test.com",
+                    channel1.id,
+                    Role.READ_WRITE,
+                ),
+                user1,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "user2", "user2@test.com", "User_123dsad"
+                "user2",
+                "user2@test.com",
+                "User_123dsad",
             ),
             member1RegisterInvitation.id,
         ).body as User
 
-        val user2 = userController.login(
-            UserLoginCredentialsInput("user2", "User_123dsad"),
-        ).body as AuthenticatedUser
+        val user2 =
+            userController.login(
+                UserLoginCredentialsInput("user2", "User_123dsad"),
+            ).body as AuthenticatedUser
 
-        val channel3 = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel3",
-                Visibility.PRIVATE,
-            ),
-            user2,
-        ).body as ChannelOutputModel
+        val channel3 =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel3",
+                    Visibility.PRIVATE,
+                ),
+                user2,
+            ).body as ChannelOutputModel
 
-        val channelInvitation = invitationController.createChannelInvitation(
-            InvitationInputModelChannel(
-                user1.user.id,
-                channel3.id,
-                Role.READ_WRITE,
-            ),
-            user2,
-        ).body as InvitationOutputModelChannel
+        val channelInvitation =
+            invitationController.createChannelInvitation(
+                InvitationInputModelChannel(
+                    user1.user.id,
+                    channel3.id,
+                    Role.READ_WRITE,
+                ),
+                user2,
+            ).body as InvitationOutputModelChannel
 
         invitationController.acceptChannelInvitation(
             channelInvitation.id,
@@ -332,7 +343,6 @@ class ChannelControllerTests{
 
         val channels = result.body as ChannelList
         assertEquals(3, channels.nChannels)
-
     }
 
     @ParameterizedTest
@@ -350,13 +360,14 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
         val result = channelController.updateChannelName(channel.id, "channel123", admin)
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -380,10 +391,8 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-
         val result = channelController.updateChannelName(0, "channel123", admin)
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
     }
 
     @ParameterizedTest
@@ -402,41 +411,44 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
-        val nonMemberRegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "nonMember@test.com",
-                channel.id,
-                Role.READ_WRITE,
-            ),
-            admin,
-        ).body as InvitationOutputModelRegister
+        val nonMemberRegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "nonMember@test.com",
+                    channel.id,
+                    Role.READ_WRITE,
+                ),
+                admin,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "nonMember", "nonMember@test.com", "NonMember_123dsad"
+                "nonMember",
+                "nonMember@test.com",
+                "NonMember_123dsad",
             ),
             nonMemberRegisterInvitation.id,
         ).body as User
 
-        val nonMember = userController.login(
-            UserLoginCredentialsInput("nonMember", "NonMember_123dsad"),
-        ).body as AuthenticatedUser
+        val nonMember =
+            userController.login(
+                UserLoginCredentialsInput("nonMember", "NonMember_123dsad"),
+            ).body as AuthenticatedUser
 
         channelController.leaveChannel(channel.id, nonMember.user.id, nonMember)
 
         val result = channelController.updateChannelName(channel.id, "channel123", nonMember)
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
-
     }
-
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -453,13 +465,14 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
         val result = channelController.leaveChannel(channel.id, admin.user.id, admin)
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -481,33 +494,38 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
-        val member1RegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "member1@test.com",
-                channel.id,
-                Role.READ_WRITE,
-            ),
-            admin,
-        ).body as InvitationOutputModelRegister
+        val member1RegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "member1@test.com",
+                    channel.id,
+                    Role.READ_WRITE,
+                ),
+                admin,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "member1", "member1@test.com", "Member_123dsad"
+                "member1",
+                "member1@test.com",
+                "Member_123dsad",
             ),
             member1RegisterInvitation.id,
         ).body as User
 
-        val member1 = userController.login(
-            UserLoginCredentialsInput("member1", "Member_123dsad"),
-        ).body as AuthenticatedUser
+        val member1 =
+            userController.login(
+                UserLoginCredentialsInput("member1", "Member_123dsad"),
+            ).body as AuthenticatedUser
 
         invitationController.createRegisterInvitation(
             InvitationInputModelRegister(
@@ -518,20 +536,22 @@ class ChannelControllerTests{
             admin,
         )
 
-        val channel2 = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel2",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel2 =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel2",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
-        val result = channelController.addUserToChannel(
-            channel2.id,
-            member1.user.id,
-            Role.READ_WRITE,
-            admin
-        )
+        val result =
+            channelController.addUserToChannel(
+                channel2.id,
+                member1.user.id,
+                Role.READ_WRITE,
+                admin,
+            )
         assertEquals(HttpStatus.OK, result.statusCode)
 
         val members = channelController.getChannelMembers(channel2.id, admin).body as UserList
@@ -554,71 +574,183 @@ class ChannelControllerTests{
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
             ).body as AuthenticatedUser
 
-        val channel = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel1",
-                Visibility.PRIVATE,
-            ),
-            admin,
-        ).body as ChannelOutputModel
+        val channel =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                admin,
+            ).body as ChannelOutputModel
 
-        val user2RegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "user2@test.com",
-                channel.id,
-                Role.READ_WRITE,
-            ),
-            admin,
-        ).body as InvitationOutputModelRegister
+        val user2RegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "user2@test.com",
+                    channel.id,
+                    Role.READ_WRITE,
+                ),
+                admin,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "user2", "user2@test.com", "User2_123dsad"
+                "user2",
+                "user2@test.com",
+                "User2_123dsad",
             ),
             user2RegisterInvitation.id,
         ).body as User
 
-        val user2 = userController.login(
-            UserLoginCredentialsInput("user2", "User2_123dsad"),
-        ).body as AuthenticatedUser
+        val user2 =
+            userController.login(
+                UserLoginCredentialsInput("user2", "User2_123dsad"),
+            ).body as AuthenticatedUser
 
-        val user3RegisterInvitation = invitationController.createRegisterInvitation(
-            InvitationInputModelRegister(
-                "user3@test.com",
-                channel.id,
-                Role.READ_WRITE,
-            ),
-            admin,
-        ).body as InvitationOutputModelRegister
+        val user3RegisterInvitation =
+            invitationController.createRegisterInvitation(
+                InvitationInputModelRegister(
+                    "user3@test.com",
+                    channel.id,
+                    Role.READ_WRITE,
+                ),
+                admin,
+            ).body as InvitationOutputModelRegister
 
         userController.register(
             UserRegisterInput(
-                "user3", "user3@test.com", "User3_123dsad"
+                "user3",
+                "user3@test.com",
+                "User3_123dsad",
             ),
             user3RegisterInvitation.id,
         ).body as User
 
-        val user3 = userController.login(
-            UserLoginCredentialsInput("user3", "User3_123dsad"),
-        ).body as AuthenticatedUser
+        val user3 =
+            userController.login(
+                UserLoginCredentialsInput("user3", "User3_123dsad"),
+            ).body as AuthenticatedUser
 
-        val channel2 = channelController.createChannel(
-            CreateChannelInputModel(
-                "channel2",
-                Visibility.PRIVATE,
-            ),
-            user2,
-        ).body as ChannelOutputModel
+        val channel2 =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel2",
+                    Visibility.PRIVATE,
+                ),
+                user2,
+            ).body as ChannelOutputModel
 
-        val result = channelController.addUserToChannel(
-            channel2.id,
-            user3.user.id,
-            Role.READ_WRITE,
-            admin
-        )
+        val result =
+            channelController.addUserToChannel(
+                channel2.id,
+                user3.user.id,
+                Role.READ_WRITE,
+                admin,
+            )
 
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
-
     }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `createChannel should fails`(trxManager: TransactionManager){
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
+        ).body as User
+
+        val channelCreator =
+            userController.login(
+                UserLoginCredentialsInput("admin2", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        val result =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                channelCreator,
+            )
+
+        assertEquals(HttpStatus.CREATED, result.statusCode)
+        assert(result.body is ChannelOutputModel)
+        val result2 =
+            channelController.createChannel(
+                CreateChannelInputModel(
+                    "channel1",
+                    Visibility.PRIVATE,
+                ),
+                channelCreator,
+            )
+        assertEquals(HttpStatus.CONFLICT, result2.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `addUserToChannel should fail`(trxManager: TransactionManager){
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
+        ).body as User
+
+        val channelCreator =
+            userController.login(
+                UserLoginCredentialsInput("admin2", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        val result = channelController.getChannelById(-1, channelCreator)
+        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `getChannelById should fail`(trxManager: TransactionManager){
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
+        ).body as User
+
+        val channelCreator =
+            userController.login(
+                UserLoginCredentialsInput("admin2", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+        val result = channelController.getChannelById(-1, channelCreator)
+        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `get channel by name should fail`(trxManager: TransactionManager) {
+        val userController = createUserController(trxManager)
+        val channelController = createChannelController(trxManager)
+
+        userController.registerFirstUser(
+            UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
+        ).body as User
+
+        val channelCreator =
+            userController.login(
+                UserLoginCredentialsInput("admin2", "Admin_123dsad"),
+            ).body as AuthenticatedUser
+
+        channelController.createChannel(
+            CreateChannelInputModel(
+                "channel1",
+                Visibility.PRIVATE,
+            ),
+            channelCreator,
+        ).body as ChannelOutputModel
+
+        val result = channelController.getChannelByName("channel2", channelCreator, -1, 0)
+        assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+    }
+
 
 }

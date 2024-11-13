@@ -80,7 +80,6 @@ class InvitationService(
             return@run success(createdInvitation)
         }
 
-
     fun createChannelInvitation(
         senderId: Int,
         receiverId: Int,
@@ -112,7 +111,10 @@ class InvitationService(
             return@run success(createdInvitation)
         }
 
-    fun acceptChannelInvitation(invitationId: Int, userId: Int): Either<InvitationError, Channel> =
+    fun acceptChannelInvitation(
+        invitationId: Int,
+        userId: Int,
+    ): Either<InvitationError, Channel> =
         trxManager.run {
             userRepo.findById(userId) ?: return@run failure(InvitationError.UserNotFound)
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
@@ -120,8 +122,8 @@ class InvitationService(
             val invitation: ChannelInvitation =
                 invitationRepo.findChannelInvitationById(invitationId)
                     ?: return@run failure(InvitationError.InvitationNotFound)
-            if(invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
-            if(invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) return@run failure(InvitationError.InvitationExpired)
+            if (invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
+            if (invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) return@run failure(InvitationError.InvitationExpired)
 
             if (invitation.isUsed) return@run failure(InvitationError.InvitationAlreadyUsed)
             val channel =
@@ -130,16 +132,21 @@ class InvitationService(
             return@run success(channel)
         }
 
-    fun declineChannelInvitation(invitationId: Int, userId: Int): Either<InvitationError, Boolean> =
+    fun declineChannelInvitation(
+        invitationId: Int,
+        userId: Int,
+    ): Either<InvitationError, Boolean> =
         trxManager.run {
-            val invitation = invitationRepo.findChannelInvitationById(invitationId) ?: return@run failure(InvitationError.InvitationNotFound)
-
+            val invitation =
+                invitationRepo.findChannelInvitationById(invitationId)
+                    ?: return@run failure(InvitationError.InvitationNotFound)
             userRepo.findById(userId) ?: return@run failure(InvitationError.UserNotFound)
             if (userId < 0) return@run failure(InvitationError.NegativeIdentifier)
 
-            if(invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
-            if(invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) return@run failure(InvitationError.InvitationExpired)
-
+            if (invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
+            if (invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) {
+                return@run failure(InvitationError.InvitationExpired)
+            }
             val declined = invitationRepo.deleteChannelInvitationById(invitationId)
             return@run success(declined)
         }

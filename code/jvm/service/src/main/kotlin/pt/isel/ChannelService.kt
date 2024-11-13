@@ -22,7 +22,6 @@ sealed class ChannelError {
     data object InvalidLimit : ChannelError()
 
     data object Unauthorized : ChannelError()
-
 }
 
 /**
@@ -76,7 +75,7 @@ class ChannelService(private val trxManager: TransactionManager) {
         }
 
     // TODO: Implement pagination
-    //TODO should return User and corresponding role, its already implemented in the repository
+    // TODO should return User and corresponding role, its already implemented in the repository
     fun getChannelMembers(channelId: Int): Either<ChannelError, List<User>> =
         trxManager.run {
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
@@ -94,22 +93,21 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channels)
         }
 
-
-    //TODO this operation doesn't make sense
+    // TODO this operation doesn't make sense
     fun addUserToChannel(
         userToAdd: Int,
         channelId: Int,
         role: Role,
-        userAdding: Int
+        userAddingId: Int,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             if (userToAdd < 0 || channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val userToAddInfo = userRepo.findById(userToAdd) ?: return@run failure(ChannelError.UserNotFound)
-            val userAdding = userRepo.findById(userAdding) ?: return@run failure(ChannelError.UserNotFound)
+            val userAdding = userRepo.findById(userAddingId) ?: return@run failure(ChannelError.UserNotFound)
             val channel =
                 channelRepo.findById(channelId)
                     ?: return@run failure(ChannelError.ChannelNotFound)
-            if(!channelRepo.getChannelMembers(channel).contains(userAdding)) return@run failure(ChannelError.Unauthorized)
+            if (!channelRepo.getChannelMembers(channel).contains(userAdding)) return@run failure(ChannelError.Unauthorized)
             if (channelRepo.getChannelMembers(channel).contains(userToAddInfo)) {
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
@@ -119,13 +117,13 @@ class ChannelService(private val trxManager: TransactionManager) {
     fun updateChannelName(
         channelId: Int,
         name: String,
-        userId: Int
+        userId: Int,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
-            if(!channelRepo.getChannelMembers(channel).contains(user)) return@run failure(ChannelError.Unauthorized)
+            if (!channelRepo.getChannelMembers(channel).contains(user)) return@run failure(ChannelError.Unauthorized)
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
             return@run success(channelRepo.updateChannelName(channel, name))
