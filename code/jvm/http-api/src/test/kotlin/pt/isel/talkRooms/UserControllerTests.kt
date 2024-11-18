@@ -72,9 +72,9 @@ class UserControllerTests {
         ),
         testClock,
     )
-
-    private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
-    private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
+    private fun createEmitters(trxManager: TransactionManager) = ChEmitter(trxManager)
+    private fun createChannelService(trxManager: TransactionManager, emitter: ChEmitter) = ChannelService(trxManager, emitter)
+    private fun createChannelController(trxManager: TransactionManager, emitter: ChEmitter) = ChannelController(createChannelService(trxManager, emitter))
 
     private fun createInvitationService(
         trxManager: TransactionManager,
@@ -164,7 +164,7 @@ class UserControllerTests {
     @MethodSource("transactionManagers")
     fun `register user with invitation then login`(trxManager: TransactionManager) {
         val controllerUser = UserController(createUserService(trxManager, TestClock()))
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter = createEmitters(trxManager))
         controllerUser.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
         )

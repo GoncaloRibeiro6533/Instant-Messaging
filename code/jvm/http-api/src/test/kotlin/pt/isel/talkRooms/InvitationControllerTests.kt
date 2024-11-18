@@ -98,7 +98,7 @@ class InvitationControllerTests {
         private fun createChannelController(trxManager: TransactionManager) =
             ChannelController(createChannelService(trxManager))
 
-        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
+        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager, ChEmitter(trxManager))
 
         private fun createUserController(trxManager: TransactionManager) =
             UserController(createUserService(trxManager, TestClock()))
