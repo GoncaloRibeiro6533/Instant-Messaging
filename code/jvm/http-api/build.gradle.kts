@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.3.3"
+    //  id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -30,7 +30,7 @@ dependencies {
 
     // To use SLF4J
     implementation("org.slf4j:slf4j-api:2.0.16")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     // for JDBI and Postgres Tests
     testImplementation(project(":repository-jdbi"))
     testImplementation("org.jdbi:jdbi3-core:3.37.1")

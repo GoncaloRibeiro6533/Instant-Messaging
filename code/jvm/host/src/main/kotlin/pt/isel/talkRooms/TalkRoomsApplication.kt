@@ -1,3 +1,5 @@
+@file:Suppress("ktlint")
+
 package pt.isel.talkRooms
 
 import kotlinx.datetime.Clock
@@ -13,10 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import pt.isel.Sha256TokenEncoder
-import pt.isel.TransactionManagerJdbi
-import pt.isel.UsersDomainConfig
-import pt.isel.configureWithAppRequirements
+import pt.isel.*
 import pt.isel.pipeline.AuthenticatedUserArgumentResolver
 import pt.isel.pipeline.AuthenticationInterceptor
 import kotlin.time.Duration.Companion.hours
@@ -64,8 +63,8 @@ class TalkRoomsApplication {
     fun usersDomainConfig() =
         UsersDomainConfig(
             tokenSizeInBytes = 256 / 8,
-            tokenTtl = 24.hours,
-            tokenRollingTtl = 1.hours,
+            tokenTtl = 24.hours * 7, // 24.hours,
+            tokenRollingTtl = 24.hours, // 1.hours,
             maxTokensPerUser = 3,
         )
 }

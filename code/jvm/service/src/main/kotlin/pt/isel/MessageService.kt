@@ -28,7 +28,10 @@ sealed class MessageError {
 }
 
 @Named
-class MessageService(private val trxManager: TransactionManager) {
+class MessageService(
+    private val trxManager: TransactionManager,
+    private val chEmitter: ChEmitter,
+) {
     fun findMessageById(
         id: Int,
         userId: Int,
@@ -54,7 +57,9 @@ class MessageService(private val trxManager: TransactionManager) {
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val members = channelRepo.getChannelMembers(channel)
             if (!members.containsKey(user)) return@run failure(MessageError.UserNotInChannel)
-            return@run success(messageRepo.createMessage(user, channel, text, LocalDateTime.now()))
+            val message = messageRepo.createMessage(user, channel, text, LocalDateTime.now())
+            chEmitter.sendEventOfNewMessage(channel, message)
+            return@run success(message)
         }
 
     fun getMsgHistory(

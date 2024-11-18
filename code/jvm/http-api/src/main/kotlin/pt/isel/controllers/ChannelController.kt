@@ -10,18 +10,21 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import pt.isel.AuthenticatedUser
 import pt.isel.ChannelError
 import pt.isel.ChannelService
 import pt.isel.Failure
 import pt.isel.Role
 import pt.isel.Success
+import pt.isel.emitters.SSeChannelUpdateEmitterAdapter
 import pt.isel.models.Problem
 import pt.isel.models.channel.ChannelList
 import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.user.UserIdentifiers
 import pt.isel.models.user.UserList
+import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("api/channels")
@@ -239,6 +242,22 @@ class ChannelController(
             is Failure ->
                 handleChannelError(result.value)
         }
+    }
+
+    @GetMapping("/{channelId}/listen")
+    fun listen(
+        @PathVariable channelId: Int,
+        user: AuthenticatedUser,
+    ): SseEmitter {
+        val sseEmitter =
+            SseEmitter(
+                TimeUnit.HOURS.toMillis(1),
+            )
+        channelService.addEmitter(
+            channelId,
+            SSeChannelUpdateEmitterAdapter(sseEmitter),
+        )
+        return sseEmitter
     }
 
     fun handleChannelError(error: ChannelError): ResponseEntity<*> {

@@ -31,7 +31,10 @@ sealed class ChannelError {
  *
  */
 @Named
-class ChannelService(private val trxManager: TransactionManager) {
+class ChannelService(
+    private val trxManager: TransactionManager,
+    private val chEmitter: ChEmitter,
+) {
     fun getChannelById(id: Int): Either<ChannelError, Channel> =
         trxManager.run {
             if (id < 0) return@run failure(ChannelError.NegativeIdentifier)
@@ -71,6 +74,7 @@ class ChannelService(private val trxManager: TransactionManager) {
                 return@run failure(ChannelError.ChannelNameAlreadyExists)
             }
             val channel = channelRepo.createChannel(name, user, visibility)
+            channelRepo.addUserToChannel(user, channel, Role.READ_WRITE)
             return@run success(channel)
         }
 
@@ -93,7 +97,7 @@ class ChannelService(private val trxManager: TransactionManager) {
             return@run success(channels)
         }
 
-    // TODO this operation doesn't make sense
+    // TODO this operation doesn't make sense and doesnt work
     fun addUserToChannel(
         userToAdd: Int,
         channelId: Int,
@@ -111,7 +115,9 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (channelRepo.getChannelMembers(channel).contains(userToAddInfo)) {
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
-            return@run success(channelRepo.addUserToChannel(userToAddInfo, channel, role))
+            val updatedChannel = channelRepo.addUserToChannel(userToAddInfo, channel, role)
+            chEmitter.sendEventOfNewMember(channel, userToAddInfo, role)
+            return@run success(updatedChannel)
         }
 
     fun updateChannelName(
@@ -126,7 +132,9 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (!channelRepo.getChannelMembers(channel).contains(user)) return@run failure(ChannelError.Unauthorized)
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
             if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
-            return@run success(channelRepo.updateChannelName(channel, name))
+            val updatedChannel = channelRepo.updateChannelName(channel, name)
+            chEmitter.sendEventOfChannelNameUpdated(channel, updatedChannel)
+            return@run success(updatedChannel)
         }
 
     fun leaveChannel(
@@ -137,6 +145,13 @@ class ChannelService(private val trxManager: TransactionManager) {
             if (userId < 0 || channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
-            return@run success(channelRepo.leaveChannel(user, channel))
+            val result = channelRepo.leaveChannel(user, channel) // TODO rename to removeUserFromChannel
+            chEmitter.sendEventOfMemberExited(channel, user)
+            return@run success(result)
         }
+
+    fun addEmitter(
+        channelId: Int,
+        listener: ChannelUpdateEmitter,
+    ) = chEmitter.addEmitter(channelId, listener)
 }
