@@ -1,22 +1,6 @@
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import pt.isel.AuthenticatedUser
-import pt.isel.Channel
-import pt.isel.ChannelError
-import pt.isel.ChannelService
-import pt.isel.Failure
-import pt.isel.InvitationService
-import pt.isel.RegisterInvitation
-import pt.isel.Role
-import pt.isel.Sha256TokenEncoder
-import pt.isel.Success
-import pt.isel.TransactionManager
-import pt.isel.TransactionManagerInMem
-import pt.isel.User
-import pt.isel.UserService
-import pt.isel.UsersDomain
-import pt.isel.UsersDomainConfig
-import pt.isel.Visibility
+import pt.isel.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -74,7 +58,7 @@ class ChannelServiceTests {
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
-        channelService = ChannelService(trxManager)
+        channelService = ChannelService(trxManager, ChEmitter(trxManager))
         userService = createUserService(trxManager, testClock)
         invitationService = createInvitationService(trxManager)
     }

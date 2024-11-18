@@ -95,11 +95,13 @@ class ChannelControllerTests {
             ),
         )
 
+        private fun  createEmitters(trxManager: TransactionManager) = ChEmitter(trxManager)
+
         private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
 
-        private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
+        private fun createChannelController(trxManager: TransactionManager, emitter: ChEmitter) = ChannelController(createChannelService(trxManager, emitter))
 
-        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
+        private fun createChannelService(trxManager: TransactionManager, emitter: ChEmitter) = ChannelService(trxManager,emitter)
 
         private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
     }
@@ -107,8 +109,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `create channel should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -135,8 +138,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channel by id should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -163,8 +167,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channel by name should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -190,8 +195,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channel members should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
         val invitationController = createInvitationController(trxManager)
 
         userController.registerFirstUser(
@@ -241,8 +247,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channel members of non existing channel should return error`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -260,8 +267,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channels of user should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
         val invitationController = createInvitationController(trxManager)
 
         userController.registerFirstUser(
@@ -348,8 +356,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `update channel's name should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -379,8 +388,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `update name of non existing channel should return an error`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -398,8 +408,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `update name of a channel where the user is not a member should return an error`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
         val invitationController = createInvitationController(trxManager)
 
         userController.registerFirstUser(
@@ -453,8 +464,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `leave channel should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -481,8 +493,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add member to channel should succeed`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
         val invitationController = createInvitationController(trxManager)
 
         userController.registerFirstUser(
@@ -561,8 +574,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add member to channel where the user is not in should return an error`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
         val invitationController = createInvitationController(trxManager)
 
         userController.registerFirstUser(
@@ -654,8 +668,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `createChannel should fails`(trxManager: TransactionManager){
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -691,8 +706,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `addUserToChannel should fail`(trxManager: TransactionManager){
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -710,8 +726,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `getChannelById should fail`(trxManager: TransactionManager){
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -728,8 +745,9 @@ class ChannelControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get channel by name should fail`(trxManager: TransactionManager) {
+        val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),

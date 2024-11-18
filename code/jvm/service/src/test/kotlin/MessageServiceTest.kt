@@ -1,16 +1,6 @@
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import pt.isel.AuthenticatedUser
-import pt.isel.Channel
-import pt.isel.ChannelService
-import pt.isel.Failure
-import pt.isel.InvitationService
-import pt.isel.Message
-import pt.isel.MessageError
-import pt.isel.MessageService
-import pt.isel.RegisterInvitation
-import pt.isel.Role
-import pt.isel.Sha256TokenEncoder
+import pt.isel.*
 import pt.isel.Success
 import pt.isel.TransactionManager
 import pt.isel.TransactionManagerInMem
@@ -77,8 +67,9 @@ class MessageServiceTest {
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
-        channelService = ChannelService(trxManager)
-        messageService = MessageService(trxManager)
+        val emitter = ChEmitter(trxManager)
+        channelService = ChannelService(trxManager, emitter)
+        messageService = MessageService(trxManager, emitter)
         userService = createUserService(trxManager, testClock)
         invitationService = createInvitationService(trxManager)
     }

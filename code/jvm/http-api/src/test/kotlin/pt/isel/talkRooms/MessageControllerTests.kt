@@ -73,23 +73,30 @@ class MessageControllerTests {
             testClock,
         )
 
-        private fun createMessageService(trxManager: TransactionManager) = MessageService(trxManager)
+        private fun createEmitters(trxManager: TransactionManager) = ChEmitter(trxManager)
+        private fun createMessageService(trxManager: TransactionManager, emitter: ChEmitter) =
+            MessageService(trxManager, emitter)
 
-        private fun createMessageController(trxManager: TransactionManager) = MessageController(createMessageService(trxManager))
+        private fun createMessageController(trxManager: TransactionManager, emitter: ChEmitter) =
+            MessageController(createMessageService(trxManager, emitter))
 
-        private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
+        private fun createUserController(trxManager: TransactionManager) =
+            UserController(createUserService(trxManager, TestClock()))
 
-        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager)
+        private fun createChannelService(trxManager: TransactionManager, emitter: ChEmitter) =
+            ChannelService(trxManager, emitter)
 
-        private fun createChannelController(trxManager: TransactionManager) = ChannelController(createChannelService(trxManager))
+        private fun createChannelController(trxManager: TransactionManager, emitter: ChEmitter) =
+            ChannelController(createChannelService(trxManager, emitter))
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when sending a message to a channel, then the message is sent`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -123,9 +130,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a message by id, then the message is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
@@ -165,9 +173,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a message history, then the message history is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
@@ -232,9 +241,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a message history with limit and skip, then the message history is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
@@ -299,9 +309,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a message history with invalid channel id, then a NOT_FOUND is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
@@ -331,9 +342,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a message with invalid id, then a not found is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
@@ -361,7 +373,8 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when sending a message with invalid channel id then a bad request is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
 
         userController.registerFirstUser(
@@ -387,9 +400,10 @@ class MessageControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when sending a message with black content then a bad request is returned`(trxManager: TransactionManager) {
-        val messageController = createMessageController(trxManager)
+        val emitter: ChEmitter = createEmitters(trxManager)
+        val messageController = createMessageController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "email@test.com", "Admin_123dsad"),
