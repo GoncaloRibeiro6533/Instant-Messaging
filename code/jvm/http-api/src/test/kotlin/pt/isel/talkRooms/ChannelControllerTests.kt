@@ -570,9 +570,8 @@ class ChannelControllerTests {
         val result =
             channelController.addUserToChannel(
                 channel2.id,
-                member1.user.id,
                 Role.READ_WRITE,
-                admin,
+                member1,
             )
         assertEquals(HttpStatus.OK, result.statusCode)
 
@@ -582,7 +581,7 @@ class ChannelControllerTests {
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `add member to channel where the user is not in should return an error`(trxManager: TransactionManager) {
+    fun `add member to channel where the user is not in`(trxManager: TransactionManager) {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
@@ -666,12 +665,11 @@ class ChannelControllerTests {
         val result =
             channelController.addUserToChannel(
                 channel2.id,
-                user3.user.id,
                 Role.READ_WRITE,
-                admin,
+                user3,
             )
 
-        assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+        assertEquals(HttpStatus.OK, result.statusCode)
     }
 
     @ParameterizedTest

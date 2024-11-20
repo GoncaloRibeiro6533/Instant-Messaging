@@ -238,7 +238,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val exception = channelService.addUserToChannel(-1, channel.value.id, Role.READ_WRITE, user.value.id)
+        val exception = channelService.addUserToChannel(-1, channel.value.id, Role.READ_WRITE)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.NegativeIdentifier, exception.value)
     }
@@ -250,7 +250,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val exception = channelService.addUserToChannel(user.value.id, -1, Role.READ_WRITE, user.value.id)
+        val exception = channelService.addUserToChannel(user.value.id, -1, Role.READ_WRITE)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.NegativeIdentifier, exception.value)
     }
@@ -262,7 +262,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val exception = channelService.addUserToChannel(999, channel.value.id, Role.READ_WRITE, user.value.id)
+        val exception = channelService.addUserToChannel(999, channel.value.id, Role.READ_WRITE)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.UserNotFound, exception.value)
     }
@@ -274,7 +274,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val exception = channelService.addUserToChannel(user.value.id, 999, Role.READ_WRITE, user.value.id)
+        val exception = channelService.addUserToChannel(user.value.id, 999, Role.READ_WRITE)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.ChannelNotFound, exception.value)
     }
@@ -296,7 +296,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val exception = channelService.addUserToChannel(user.value.id, channel.value.id, Role.READ_WRITE, user.value.id)
+        val exception = channelService.addUserToChannel(user.value.id, channel.value.id, Role.READ_WRITE)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.UserAlreadyInChannel, exception.value)
     }

@@ -98,22 +98,18 @@ class ChannelService(
             return@run success(channels)
         }
 
-    // TODO this operation doesn't make sense and doesnt work
-    // todo delete new param
+
     fun addUserToChannel(
         userToAdd: Int,
         channelId: Int,
         role: Role,
-        userAddingId: Int,
     ): Either<ChannelError, Channel> =
         trxManager.run {
             if (userToAdd < 0 || channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val userToAddInfo = userRepo.findById(userToAdd) ?: return@run failure(ChannelError.UserNotFound)
-            val userAdding = userRepo.findById(userAddingId) ?: return@run failure(ChannelError.UserNotFound)
             val channel =
                 channelRepo.findById(channelId)
                     ?: return@run failure(ChannelError.ChannelNotFound)
-            if (!channelRepo.getChannelMembers(channel).contains(userAdding)) return@run failure(ChannelError.Unauthorized)
             if (channelRepo.getChannelMembers(channel).contains(userToAddInfo)) {
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
@@ -122,7 +118,6 @@ class ChannelService(
             return@run success(updatedChannel)
         }
 
-    // todo should receive user from controller (user: User)
     fun updateChannelName(
         channelId: Int,
         name: String,
@@ -140,7 +135,6 @@ class ChannelService(
             return@run success(updatedChannel)
         }
 
-    // todo change parameter to user: User
     fun leaveChannel(
         userId: Int,
         channelId: Int,

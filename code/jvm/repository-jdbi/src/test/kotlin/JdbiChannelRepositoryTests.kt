@@ -251,6 +251,7 @@ class JdbiChannelRepositoryTests {
     }
 
     // TODO
+
   /*  @Test
     fun `leave channel should fail if user is not in the channel`() {
         runWithHandle { handle ->
@@ -263,6 +264,4 @@ class JdbiChannelRepositoryTests {
             }
         }
     }*/
-
-    // TODO
 }

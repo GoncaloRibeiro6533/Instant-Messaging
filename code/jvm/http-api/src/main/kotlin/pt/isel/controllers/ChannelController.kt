@@ -63,14 +63,13 @@ class ChannelController(
         }
     }
 
-    @PutMapping("/{channelId}/add/{userId}/{role}")
+    @PutMapping("/{channelId}/add/{role}")
     fun addUserToChannel(
         @PathVariable channelId: Int,
-        @PathVariable userId: Int,
         @PathVariable role: Role,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.addUserToChannel(userId, channelId, role, user.user.id)) {
+        return when (val result = channelService.addUserToChannel(user.user.id, channelId, role)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(

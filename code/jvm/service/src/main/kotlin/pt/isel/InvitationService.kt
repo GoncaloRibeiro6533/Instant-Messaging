@@ -111,7 +111,6 @@ class InvitationService(
             return@run success(createdInvitation)
         }
 
-    // todo change parameter to user: User
     fun acceptChannelInvitation(
         invitationId: Int,
         userId: Int,
@@ -133,7 +132,6 @@ class InvitationService(
             return@run success(channel)
         }
 
-    // todo change parameter to user: User
     fun declineChannelInvitation(
         invitationId: Int,
         userId: Int,
