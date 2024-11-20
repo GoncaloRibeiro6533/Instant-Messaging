@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.postgresql.ds.PGSimpleDataSource
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.*
@@ -38,11 +39,18 @@ class ChannelControllerTests {
                     },
                 ).configureWithAppRequirements()
 
+        private val logger = LoggerFactory.getLogger(ChannelControllerTests::class.java)
+
         @JvmStatic
         fun transactionManagers(): Stream<TransactionManager> =
             Stream.of(
-                TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJdbi(jdbi).also { cleanup(it) },
+                TransactionManagerInMem().also {
+                    cleanup(it)
+                    logger.info("## Cleaned up InMem")
+                                               },
+                TransactionManagerJdbi(jdbi).also { cleanup(it)
+                    logger.info("## Cleaned up JDBI")
+                                                  },
             )
 
         private fun cleanup(trxManager: TransactionManager) {
@@ -490,6 +498,7 @@ class ChannelControllerTests {
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
+    //TODO cant add another member to channel, not implemented
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `add member to channel should succeed`(trxManager: TransactionManager) {

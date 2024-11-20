@@ -24,7 +24,7 @@ class MockSessionRepository : SessionRepository {
             .sortedByDescending { it.lastUsedAt }
             .drop(maxTokens - 1)
             .forEach { tokens.remove(it) }
-        val session = Token(token.token, userId, Instant.DISTANT_FUTURE, Instant.DISTANT_PAST)
+        val session = Token(token.token, userId, token.createdAt, token.lastUsedAt)
         tokens.add(session)
         return session
     }

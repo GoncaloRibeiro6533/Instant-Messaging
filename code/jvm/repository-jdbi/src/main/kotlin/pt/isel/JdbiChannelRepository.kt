@@ -19,13 +19,6 @@ class JdbiChannelRepository(
                 .executeAndReturnGeneratedKeys()
                 .mapTo(Int::class.java)
                 .one()
-
-        handle.createUpdate("INSERT INTO dbo.user_channel_role (user_id, channel_id, role_name) VALUES (:user_id, :channel_id, :role)")
-            .bind("user_id", creator.id)
-            .bind("channel_id", id)
-            .bind("role", Role.READ_WRITE)
-            .execute()
-
         return Channel(id, name, creator, visibility)
     }
 
@@ -135,17 +128,6 @@ class JdbiChannelRepository(
         user: User,
         channel: Channel,
     ): Channel {
-        val userInChannel =
-            handle.createQuery("SELECT COUNT(*) FROM dbo.user_channel_role WHERE user_id = :user_id AND channel_id = :channel_id")
-                .bind("user_id", user.id)
-                .bind("channel_id", channel.id)
-                .mapTo(Int::class.java)
-                .one()
-
-        if (userInChannel == 0) {
-            throw Exception("User is not in the channel")
-        }
-
         handle.createUpdate("DELETE FROM dbo.user_channel_role WHERE user_id = :user_id AND channel_id = :channel_id")
             .bind("user_id", user.id)
             .bind("channel_id", channel.id)

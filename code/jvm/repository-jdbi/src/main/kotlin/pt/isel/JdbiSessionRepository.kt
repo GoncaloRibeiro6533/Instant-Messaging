@@ -13,7 +13,7 @@ class JdbiSessionRepository(
     override fun createSession(
         userId: Int,
         token: Token,
-        maxTokens: Int,
+        maxTokens: Int
     ): Token {
         val deletions =
             handle

@@ -4,12 +4,6 @@ VALUES
     ('bob@example.com', 'bob', 'hashed_password2'),
     ('charlie@example.com', 'charlie', 'hashed_password3');
 
-INSERT INTO dbo.ROLE (name, description)
-VALUES
-    ('READ-WRITE', 'Can read and write messages'),
-    ('READ-ONLY', 'Can only read messages');
-
-
 
 INSERT INTO dbo.CHANNEL (name, creator_id, visibility)
 VALUES
