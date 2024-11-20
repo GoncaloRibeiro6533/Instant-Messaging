@@ -34,7 +34,6 @@ class MockChannelRepository : ChannelRepository {
     ): Channel {
         val channel = Channel(currentId++, name, creator, visibility)
         channels.add(channel)
-        usersInChannel.add(channel to UserRole(creator, Role.READ_WRITE))
         return channel
     }
 
@@ -76,9 +75,9 @@ class MockChannelRepository : ChannelRepository {
         user: User,
         channel: Channel,
     ): Channel {
-        val user: Pair<Channel, UserRole> =
+        val userToLeaveCh: Pair<Channel, UserRole> =
             usersInChannel.first { it.first.id == channel.id && it.second.user.id == user.id }
-        usersInChannel.remove(user)
+        usersInChannel.remove(userToLeaveCh)
         return channel
     }
 
