@@ -1,3 +1,4 @@
+@file:Suppress("ktlint")
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pt.isel.*

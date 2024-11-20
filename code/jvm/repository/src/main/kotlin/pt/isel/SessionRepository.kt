@@ -1,7 +1,5 @@
 package pt.isel
 
-import kotlinx.datetime.Instant
-
 interface SessionRepository {
     fun findByToken(token: String): Token?
 

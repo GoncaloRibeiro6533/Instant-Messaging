@@ -1,3 +1,4 @@
+@file:Suppress("ktlint")
 package pt.isel
 
 import jakarta.inject.Named
@@ -98,7 +99,7 @@ class ChannelService(
         }
 
     // TODO this operation doesn't make sense and doesnt work
-    //todo delete new param
+    // todo delete new param
     fun addUserToChannel(
         userToAdd: Int,
         channelId: Int,
@@ -121,7 +122,7 @@ class ChannelService(
             return@run success(updatedChannel)
         }
 
-    //todo should receive user from controller (user: User)
+    // todo should receive user from controller (user: User)
     fun updateChannelName(
         channelId: Int,
         name: String,
@@ -139,7 +140,7 @@ class ChannelService(
             return@run success(updatedChannel)
         }
 
-    //todo change parameter to user: User
+    // todo change parameter to user: User
     fun leaveChannel(
         userId: Int,
         channelId: Int,

@@ -1,6 +1,5 @@
 package pt.isel.mocks
 
-import kotlinx.datetime.Instant
 import pt.isel.SessionRepository
 import pt.isel.Token
 
