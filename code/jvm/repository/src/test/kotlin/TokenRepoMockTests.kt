@@ -45,51 +45,51 @@ class TokenRepoMockTests {
 
     @Test
     fun `Test create session`() {
-        val s = repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
+        val s = repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
         assertEquals(user.id, s.userId)
     }
 
     @Test
     fun `Test get session history`() {
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
-        val sessions = repoSessions.getSessionHistory(user.id, 2, 0)
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
+        val sessions = repoSessions.getSessionHistory(user, 2, 0)
         assertEquals(2, sessions.size)
     }
 
     @Test
     fun `Test delete session`() {
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
-        val isDeleted = repoSessions.deleteSession("token")
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
+        val isDeleted = repoSessions.deleteSession(token)
         assertEquals(true, isDeleted)
     }
 
     @Test
     fun `Test find by token`() {
-        val session = repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
+        val session = repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
         val foundSession = repoSessions.findByToken("token")
         assertEquals(session, foundSession)
     }
 
     @Test
     fun `Test find by user id`() {
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
-        val sessions = repoSessions.findByUserId(user.id)
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
+        val sessions = repoSessions.findByUser(user)
         assertEquals(2, sessions.size)
     }
 
     @Test
     fun `Test clear`() {
-        repoSessions.createSession(user.id, token, usersDomain.maxNumberOfTokensPerUser)
+        repoSessions.createSession(user, token, usersDomain.maxNumberOfTokensPerUser)
         repoSessions.clear()
-        val sessions = repoSessions.findByUserId(user.id)
+        val sessions = repoSessions.findByUser(user)
         assertEquals(0, sessions.size)
     }
 
     @Test
     fun `Delete non existing session`() {
-        val isDeleted = repoSessions.deleteSession("token")
+        val isDeleted = repoSessions.deleteSession(token)
         assertEquals(false, isDeleted)
     }
 }

@@ -23,9 +23,14 @@ class MockChannelRepository : ChannelRepository {
         limit: Int,
         skip: Int,
     ): List<Channel> =
-        channels.filter { it.name.trim().uppercase().contains(name.uppercase()) }
-            .drop(skip)
-            .take(limit)
+        if (limit == 1 && skip == 0) {
+            channels.filter { it.name.trim().contains(name) }
+                .take(limit)
+        } else {
+            channels.filter { it.name.trim().uppercase().contains(name.uppercase()) }
+                .drop(skip)
+                .take(limit).sortedBy { it.name }
+        }
 
     override fun createChannel(
         name: String,

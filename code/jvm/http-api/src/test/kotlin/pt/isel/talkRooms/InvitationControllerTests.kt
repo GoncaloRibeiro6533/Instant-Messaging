@@ -78,6 +78,7 @@ class InvitationControllerTests {
             tokenTtl: Duration = 30.days,
             tokenRollingTtl: Duration = 30.minutes,
             maxTokensPerUser: Int = 3,
+            emitter: UpdatesEmitter
         ) = InvitationService(
             trxManager,
             UsersDomain(
@@ -89,16 +90,18 @@ class InvitationControllerTests {
                     tokenRollingTtl,
                     maxTokensPerUser = maxTokensPerUser,
                 ),
-            )
+            ),
+            emitter
         )
 
-        private fun createInvitationController(trxManager: TransactionManager) =
-            InvitationController(createInvitationService(trxManager))
+        private fun createInvitationController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            InvitationController(createInvitationService(trxManager, emitter = emitter))
 
-        private fun createChannelController(trxManager: TransactionManager) =
-            ChannelController(createChannelService(trxManager))
+        private fun createChannelController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            ChannelController(createChannelService(trxManager, emitter))
 
-        private fun createChannelService(trxManager: TransactionManager) = ChannelService(trxManager, ChEmitter(trxManager))
+        private fun createChannelService(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            ChannelService(trxManager, emitter)
 
         private fun createUserController(trxManager: TransactionManager) =
             UserController(createUserService(trxManager, TestClock()))
@@ -107,9 +110,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when creating a register invitation then it should return the invitation`(trxManager: TransactionManager) {
-        val controllerInvitation = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val controllerInvitation = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         // when: creating an user
         userController.registerFirstUser(
@@ -145,9 +149,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when creating a channel invitation then it should return the invitation`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -212,9 +217,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when creating an invitation with an invalid email then it should return an error`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
@@ -249,9 +255,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when creating an invitation with an email that already exists then it should return an error`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
@@ -304,9 +311,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when accepting a channel invitation then it should return the invitation`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
@@ -366,9 +374,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when accepting another person's channel invitation it should return an error`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
@@ -448,9 +457,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `decline invitation`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@test.com", "Admin_123dsad"),
@@ -515,9 +525,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when declining someone else's invitation, it should return unauthorized`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
+        val channelController = createChannelController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@tes.com", "Admin_123dsad"),
@@ -580,10 +591,10 @@ class InvitationControllerTests {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `when getting a list of invitations then it should return the list`(trxManager: TransactionManager) {
-        val invitationController = createInvitationController(trxManager)
+        val emitter = UpdatesEmitter(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
         val userController = createUserController(trxManager)
-        val channelController = createChannelController(trxManager)
-
+        val channelController = createChannelController(trxManager, emitter)
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@tes.com", "Admin_123dsad"),
         ).body as User

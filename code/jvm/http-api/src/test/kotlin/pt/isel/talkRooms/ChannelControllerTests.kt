@@ -89,6 +89,7 @@ class ChannelControllerTests {
             tokenTtl: Duration = 30.days,
             tokenRollingTtl: Duration = 30.minutes,
             maxTokensPerUser: Int = 3,
+            emitter: UpdatesEmitter
         ) = InvitationService(
             trxManager,
             UsersDomain(
@@ -101,17 +102,23 @@ class ChannelControllerTests {
                     maxTokensPerUser = maxTokensPerUser,
                 ),
             ),
+            emitter = emitter
         )
 
-        private fun  createEmitters(trxManager: TransactionManager) = ChEmitter(trxManager)
+        private fun  createEmitters(trxManager: TransactionManager) =
+            UpdatesEmitter(trxManager)
 
-        private fun createInvitationController(trxManager: TransactionManager) = InvitationController(createInvitationService(trxManager))
+        private fun createInvitationController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            InvitationController(createInvitationService(trxManager, emitter = emitter))
 
-        private fun createChannelController(trxManager: TransactionManager, emitter: ChEmitter) = ChannelController(createChannelService(trxManager, emitter))
+        private fun createChannelController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            ChannelController(createChannelService(trxManager, emitter))
 
-        private fun createChannelService(trxManager: TransactionManager, emitter: ChEmitter) = ChannelService(trxManager,emitter)
+        private fun createChannelService(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+            ChannelService(trxManager,emitter)
 
-        private fun createUserController(trxManager: TransactionManager) = UserController(createUserService(trxManager, TestClock()))
+        private fun createUserController(trxManager: TransactionManager) =
+            UserController(createUserService(trxManager, TestClock()))
     }
 
     @ParameterizedTest
@@ -206,7 +213,7 @@ class ChannelControllerTests {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
-        val invitationController = createInvitationController(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -278,7 +285,7 @@ class ChannelControllerTests {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
-        val invitationController = createInvitationController(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
@@ -419,7 +426,7 @@ class ChannelControllerTests {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
-        val invitationController = createInvitationController(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -505,7 +512,7 @@ class ChannelControllerTests {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
-        val invitationController = createInvitationController(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),
@@ -585,7 +592,7 @@ class ChannelControllerTests {
         val emitter = createEmitters(trxManager)
         val userController = createUserController(trxManager)
         val channelController = createChannelController(trxManager, emitter)
-        val invitationController = createInvitationController(trxManager)
+        val invitationController = createInvitationController(trxManager, emitter)
 
         userController.registerFirstUser(
             UserRegisterInput("admin", "admin@mail.com", "Admin_123dsad"),

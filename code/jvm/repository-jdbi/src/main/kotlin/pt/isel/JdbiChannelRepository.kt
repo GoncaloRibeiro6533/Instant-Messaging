@@ -54,11 +54,20 @@ class JdbiChannelRepository(
         limit: Int,
         skip: Int,
     ): List<Channel> {
-        return handle.createQuery(
-            """
+        val query =
+            if (limit == 1 && skip == 0) {
+                """
             SELECT c.*, u.username, u.email FROM dbo.CHANNEL c 
-            JOIN dbo.USER u ON c.creator_id = u.id WHERE UPPER(c.name) LIKE UPPER(:name) || '%' LIMIT :limit OFFSET :skip;
-            """.trimIndent(),
+            JOIN dbo.USER u ON c.creator_id = u.id WHERE c.name LIKE :name || '%' LIMIT :limit OFFSET :skip;
+            """
+            } else {
+                """
+            SELECT c.*, u.username, u.email FROM dbo.CHANNEL c 
+            JOIN dbo.USER u ON c.creator_id = u.id WHERE UPPER(c.name) LIKE UPPER(:name) || '%' ORDER BY c.name LIMIT :limit OFFSET :skip;
+            """
+            }
+        return handle.createQuery(
+            query.trimIndent(),
         )
             .bind("name", name)
             .bind("limit", limit)

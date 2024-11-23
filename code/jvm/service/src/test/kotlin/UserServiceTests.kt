@@ -42,6 +42,7 @@ class UserServiceTests {
         tokenTtl: Duration = 30.days,
         tokenRollingTtl: Duration = 30.minutes,
         maxTokensPerUser: Int = 3,
+        emitter: UpdatesEmitter
     ) = InvitationService(
         trxManager,
         UsersDomain(
@@ -54,14 +55,16 @@ class UserServiceTests {
                 maxTokensPerUser = maxTokensPerUser,
             ),
         ),
+        emitter,
     )
 
     @BeforeEach
     fun setUp() {
         val trxManager = TransactionManagerInMem()
+        val emitter = UpdatesEmitter(trxManager)
         userService = createUserService(trxManager, testClock)
-        invitationService = createInvitationService(trxManager)
-        channelService = ChannelService(trxManager, ChEmitter(trxManager))
+        invitationService = createInvitationService(trxManager, emitter= emitter)
+        channelService = ChannelService(trxManager, emitter)
     }
 
     @Test

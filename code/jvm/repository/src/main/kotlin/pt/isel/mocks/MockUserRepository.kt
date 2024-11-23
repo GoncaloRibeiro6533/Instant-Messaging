@@ -15,9 +15,14 @@ class MockUserRepository : UserRepository {
         limit: Int,
         skip: Int,
     ): List<User> =
-        users.filter { it.username.trim().uppercase().contains(username.uppercase()) }
-            .drop(skip)
-            .take(limit)
+        if (limit == 1 && skip == 0) {
+            users.filter { it.username.trim().contains(username) }
+                .take(limit)
+        } else {
+            users.filter { it.username.trim().uppercase().contains(username.uppercase()) }
+                .drop(skip)
+                .take(limit).sortedBy { it.username }
+        }
 
     override fun createUser(
         username: String,

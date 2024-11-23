@@ -37,6 +37,7 @@ sealed class InvitationError {
 class InvitationService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
+    private val emitter: UpdatesEmitter,
 ) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
@@ -107,7 +108,7 @@ class InvitationService(
                     role,
                     LocalDateTime.now(),
                 )
-
+            emitter.sendEventOfNewInvitation(createdInvitation)
             return@run success(createdInvitation)
         }
 
@@ -124,11 +125,13 @@ class InvitationService(
                     ?: return@run failure(InvitationError.InvitationNotFound)
             if (invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
             if (invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) return@run failure(InvitationError.InvitationExpired)
-
             if (invitation.isUsed) return@run failure(InvitationError.InvitationAlreadyUsed)
+            val members = channelRepo.getChannelMembers(invitation.channel)
+            if (members.any { it.key == invitation.receiver }) return@run failure(InvitationError.AlreadyInChannel)
             val channel =
                 channelRepo.addUserToChannel(invitation.receiver, invitation.channel, invitation.role)
             invitationRepo.updateChannelInvitation(invitation)
+            emitter.sendEventOfNewMember(channel, invitation.receiver, invitation.role, members.keys)
             return@run success(channel)
         }
 

@@ -1,23 +1,30 @@
 package pt.isel
 
+import kotlinx.datetime.Instant
+
 interface SessionRepository {
     fun findByToken(token: String): Token?
 
-    fun findByUserId(userId: Int): List<Token>
+    fun findByUser(user: User): List<Token>
 
     fun createSession(
-        userId: Int,
+        user: User,
         token: Token,
         maxTokens: Int,
     ): Token
 
     fun getSessionHistory(
-        userId: Int,
+        user: User,
         limit: Int,
         skip: Int,
     ): List<Token>
 
-    fun deleteSession(token: String): Boolean
+    fun deleteSession(token: Token): Boolean
 
     fun clear(): Unit
+
+    fun updateSession(
+        token: Token,
+        lastTimeUsed: Instant,
+    ): Token
 }

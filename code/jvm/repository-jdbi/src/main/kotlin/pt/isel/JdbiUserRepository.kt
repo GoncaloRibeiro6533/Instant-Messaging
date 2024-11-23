@@ -52,7 +52,9 @@ class JdbiUserRepository(
         limit: Int,
         skip: Int,
     ): List<User> {
-        return handle.createQuery("SELECT * FROM dbo.User WHERE UPPER(username) LIKE UPPER(:username) || '%' LIMIT :limit OFFSET :skip")
+        return handle.createQuery(
+            "SELECT * FROM dbo.User WHERE UPPER(username) LIKE UPPER(:username) || '%' ORDER BY username LIMIT :limit OFFSET :skip",
+        )
             .bind("username", username)
             .bind("limit", limit)
             .bind("skip", skip)

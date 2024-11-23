@@ -1,7 +1,9 @@
 package pt.isel.mocks
 
+import kotlinx.datetime.Instant
 import pt.isel.SessionRepository
 import pt.isel.Token
+import pt.isel.User
 
 class MockSessionRepository : SessionRepository {
     private val tokens = mutableListOf<Token>()
@@ -10,45 +12,50 @@ class MockSessionRepository : SessionRepository {
         return tokens.firstOrNull { it.token.validationInfo == token }
     }
 
-    override fun findByUserId(userId: Int): List<Token> {
-        return tokens.filter { it.userId == userId }
+    override fun findByUser(user: User): List<Token> {
+        return tokens.filter { it.userId == user.id }
     }
 
     override fun createSession(
-        userId: Int,
+        user: User,
         token: Token,
         maxTokens: Int,
     ): Token {
-        tokens.filter { it.userId == userId }
+        tokens.filter { it.userId == user.id }
             .sortedByDescending { it.lastUsedAt }
             .drop(maxTokens - 1)
             .forEach { tokens.remove(it) }
-        val session = Token(token.token, userId, token.createdAt, token.lastUsedAt)
+        val session = Token(token.token, user.id, token.createdAt, token.lastUsedAt)
         tokens.add(session)
         return session
     }
 
     override fun getSessionHistory(
-        userId: Int,
+        user: User,
         limit: Int,
         skip: Int,
     ): List<Token> {
-        return tokens.filter { it.userId == userId }
+        return tokens.filter { it.userId == user.id }
             .drop(skip)
             .take(limit)
     }
 
-    override fun deleteSession(token: String): Boolean {
-        val session = tokens.firstOrNull { it.token.validationInfo == token }
-        return if (session != null) {
-            tokens.remove(session)
-            true
-        } else {
-            false
-        }
+    override fun deleteSession(token: Token): Boolean {
+        return tokens.remove(token)
     }
 
     override fun clear() {
         tokens.clear()
+    }
+
+    override fun updateSession(
+        token: Token,
+        lastTimeUsed: Instant,
+    ): Token {
+        val session = tokens.first { it.token == token.token }
+        val updatedSession = Token(token.token, token.userId, token.createdAt, lastTimeUsed)
+        tokens.remove(session)
+        tokens.add(updatedSession)
+        return updatedSession
     }
 }

@@ -118,15 +118,15 @@ class UserService(
                     createdAt = now,
                     lastUsedAt = now,
                 )
-            sessionRepo.createSession(user.id, newToken, usersDomain.maxNumberOfTokensPerUser)
+            sessionRepo.createSession(user, newToken, usersDomain.maxNumberOfTokensPerUser)
             return@run success(AuthenticatedUser(user, newToken.token.validationInfo))
         }
 
     fun logoutUser(token: String) =
         trxManager.run {
-            sessionRepo.findByToken(token)?.let { userRepo.findById(it.userId) }
-                ?: return@run failure(UserError.SessionExpired)
-            sessionRepo.deleteSession(token)
+            val session = sessionRepo.findByToken(token) ?: return@run failure(UserError.SessionExpired)
+            userRepo.findById(session.userId) ?: return@run failure(UserError.UserNotFound)
+            sessionRepo.deleteSession(session)
             return@run success(true)
         }
 
@@ -175,9 +175,10 @@ class UserService(
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run null
             if (!usersDomain.isTokenTimeValid(clock, session)) {
-                sessionRepo.deleteSession(token)
+                sessionRepo.deleteSession(session)
                 return@run null
             }
+            sessionRepo.updateSession(session, clock.now())
             return@run userRepo.findById(session.userId)
         }
 }

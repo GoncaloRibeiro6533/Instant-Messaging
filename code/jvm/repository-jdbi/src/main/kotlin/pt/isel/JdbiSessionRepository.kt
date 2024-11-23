@@ -11,7 +11,7 @@ class JdbiSessionRepository(
     private val handle: Handle,
 ) : SessionRepository {
     override fun createSession(
-        userId: Int,
+        user: User,
         token: Token,
         maxTokens: Int,
     ): Token {
@@ -26,7 +26,7 @@ class JdbiSessionRepository(
                                 order by last_used_at desc offset :offset
                         )
                     """.trimIndent(),
-                ).bind("user_id", userId)
+                ).bind("user_id", user.id)
                 .bind("offset", maxTokens - 1)
                 .execute()
 
@@ -38,7 +38,7 @@ class JdbiSessionRepository(
                 VALUES (:token, :user_id, :created_at, :last_used_at)
             """.trimIndent(),
         ).bind("token", token.token.validationInfo)
-            .bind("user_id", userId)
+            .bind("user_id", user.id)
             .bind("created_at", token.createdAt.epochSeconds)
             .bind("last_used_at", token.lastUsedAt.epochSeconds)
             .executeAndReturnGeneratedKeys()
@@ -54,38 +54,55 @@ class JdbiSessionRepository(
             .orElse(null)
     }
 
-    override fun findByUserId(userId: Int): List<Token> {
+    override fun findByUser(user: User): List<Token> {
         return handle.createQuery(
             "SELECT * FROM dbo.token WHERE user_id = :userId",
-        ).bind("userId", userId)
+        ).bind("userId", user.id)
             .mapTo(Token::class.java)
             .list()
     }
 
     override fun getSessionHistory(
-        userId: Int,
+        user: User,
         limit: Int,
         skip: Int,
     ): List<Token> {
         return handle.createQuery(
             "SELECT * FROM dbo.token WHERE user_id = :userId LIMIT :limit OFFSET :skip",
-        ).bind("userId", userId)
+        ).bind("userId", user.id)
             .bind("limit", limit)
             .bind("skip", skip)
             .mapTo(Token::class.java)
             .list()
     }
 
-    override fun deleteSession(token: String): Boolean {
+    override fun deleteSession(token: Token): Boolean {
         return handle.createUpdate(
             "DELETE FROM dbo.token WHERE token = :token",
-        ).bind("token", token)
+        ).bind("token", token.token.validationInfo)
             .execute() > 0
     }
 
     override fun clear() {
         handle.createUpdate("DELETE FROM dbo.token")
             .execute()
+    }
+
+    override fun updateSession(
+        token: Token,
+        lastTimeUsed: Instant,
+    ): Token {
+        return handle.createUpdate(
+            """
+            UPDATE dbo.token
+            SET last_used_at = :last_used_at
+            WHERE token = :token
+            """.trimIndent(),
+        ).bind("last_used_at", lastTimeUsed.epochSeconds)
+            .bind("token", token.token.validationInfo)
+            .executeAndReturnGeneratedKeys()
+            .map(TokenMapper())
+            .one()
     }
 
     private class TokenMapper : RowMapper<Token> {

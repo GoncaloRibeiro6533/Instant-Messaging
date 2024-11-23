@@ -174,13 +174,27 @@ class JdbiChannelRepositoryTests {
         runWithHandle { handle ->
             val user = JdbiUserRepository(handle).createUser("user", "user@test.com", "password")
             JdbiChannelRepository(handle).createChannel("channel1", user, Visibility.PUBLIC)
+            assertEquals(
+                "channel1",
+                JdbiChannelRepository(handle).getChannelByName("channel1", 1, 0).first().name,
+            )
             JdbiChannelRepository(handle).createChannel("channel2", user, Visibility.PUBLIC)
+            assertEquals(
+                "channel2",
+                JdbiChannelRepository(handle).getChannelByName("channel2", 1, 0).first().name,
+            )
             JdbiChannelRepository(handle).createChannel("channel3", user, Visibility.PUBLIC)
+            assertEquals(
+                "channel3",
+                JdbiChannelRepository(handle).getChannelByName("channel3", 1, 0).first().name,
+            )
 
             val foundChannel = JdbiChannelRepository(handle).getChannelByName("channel", 2, 1)
+            assertEquals(2, foundChannel.size)
             assertEquals("channel2", foundChannel[0].name)
-
+            assertEquals("channel3", foundChannel[1].name)
             val foundChannel2 = JdbiChannelRepository(handle).getChannelByName("channel", 2, 0)
+            assertEquals(2, foundChannel2.size)
             assertEquals("channel1", foundChannel2[0].name)
 
             val foundChannel3 = JdbiChannelRepository(handle).getChannelByName("channel", 2, 2)

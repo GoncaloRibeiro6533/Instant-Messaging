@@ -72,15 +72,18 @@ class UserControllerTests {
         ),
         testClock,
     )
-    private fun createEmitters(trxManager: TransactionManager) = ChEmitter(trxManager)
-    private fun createChannelService(trxManager: TransactionManager, emitter: ChEmitter) = ChannelService(trxManager, emitter)
-    private fun createChannelController(trxManager: TransactionManager, emitter: ChEmitter) = ChannelController(createChannelService(trxManager, emitter))
+    private fun createEmitters(trxManager: TransactionManager) = UpdatesEmitter(trxManager)
+    private fun createChannelService(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+        ChannelService(trxManager, emitter)
+    private fun createChannelController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
+        ChannelController(createChannelService(trxManager, emitter))
 
     private fun createInvitationService(
         trxManager: TransactionManager,
         tokenTtl: Duration = 30.days,
         tokenRollingTtl: Duration = 30.minutes,
         maxTokensPerUser: Int = 3,
+        emitter: UpdatesEmitter
     ) = InvitationService(
         trxManager,
         UsersDomain(
@@ -92,7 +95,8 @@ class UserControllerTests {
                 tokenRollingTtl,
                 maxTokensPerUser = maxTokensPerUser,
             ),
-        )
+        ),
+        emitter,
     )
 
     @ParameterizedTest
@@ -182,8 +186,10 @@ class UserControllerTests {
                 ),
                 login,
             ).body as ChannelOutputModel
+        val emitter = createEmitters(trxManager)
         val invitation =
-            InvitationController(createInvitationService(trxManager)).createRegisterInvitation(
+            InvitationController(createInvitationService(trxManager, emitter = emitter))
+                .createRegisterInvitation(
                 InvitationInputModelRegister(
                     "receiver@test.com",
                     channelToRegister.id,

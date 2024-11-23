@@ -1,11 +1,11 @@
 package pt.isel
 
-interface ChannelUpdateEmitter {
+interface UpdateEmitter {
     /**
      * Emits a new channel message.
      * @param signal the message to emit
      */
-    fun emit(signal: ChannelUpdate)
+    fun emit(signal: SseEvent)
 
     /**
      * Registers a callback to be invoked when the emitter completes.
