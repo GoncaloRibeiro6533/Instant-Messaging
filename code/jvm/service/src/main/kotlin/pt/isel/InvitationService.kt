@@ -129,7 +129,7 @@ class InvitationService(
             val members = channelRepo.getChannelMembers(invitation.channel)
             if (members.any { it.key == invitation.receiver }) return@run failure(InvitationError.AlreadyInChannel)
             val channel =
-                channelRepo.addUserToChannel(invitation.receiver, invitation.channel, invitation.role)
+                channelRepo.joinChannel(invitation.receiver, invitation.channel, invitation.role)
             invitationRepo.updateChannelInvitation(invitation)
             emitter.sendEventOfNewMember(channel, invitation.receiver, invitation.role, members.keys)
             return@run success(channel)

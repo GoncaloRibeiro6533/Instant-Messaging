@@ -575,7 +575,7 @@ class ChannelControllerTests {
             ).body as ChannelOutputModel
 
         val result =
-            channelController.addUserToChannel(
+            channelController.joinChannel(
                 channel2.id,
                 Role.READ_WRITE,
                 member1,
@@ -670,7 +670,7 @@ class ChannelControllerTests {
             ).body as ChannelOutputModel
 
         val result =
-            channelController.addUserToChannel(
+            channelController.joinChannel(
                 channel2.id,
                 Role.READ_WRITE,
                 user3,

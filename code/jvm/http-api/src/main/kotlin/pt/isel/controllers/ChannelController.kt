@@ -61,12 +61,12 @@ class ChannelController(
     }
 
     @PutMapping("/{channelId}/add/{role}")
-    fun addUserToChannel(
+    fun joinChannel(
         @PathVariable channelId: Int,
         @PathVariable role: Role,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.addUserToChannel(user.user.id, channelId, role)) {
+        return when (val result = channelService.joinChannel(user.user.id, channelId, role)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(
@@ -215,7 +215,7 @@ class ChannelController(
     }
 
     @PutMapping("/{channelId}/leave/{userId}")
-    fun leaveChannel(
+    fun leaveChannel( //todo change to removeUserFromChannel
         @PathVariable channelId: Int,
         @PathVariable userId: Int,
         user: AuthenticatedUser,

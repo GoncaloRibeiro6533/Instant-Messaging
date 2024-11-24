@@ -58,7 +58,7 @@ class MockChannelRepository : ChannelRepository {
         return usersMap
     }
 
-    override fun addUserToChannel(
+    override fun joinChannel(
         user: User,
         channel: Channel,
         role: Role,

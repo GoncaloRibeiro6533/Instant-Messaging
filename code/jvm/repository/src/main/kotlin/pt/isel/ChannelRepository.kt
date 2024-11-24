@@ -20,7 +20,7 @@ interface ChannelRepository {
 
     fun getChannelMembers(channel: Channel): Map<User, Role>
 
-    fun addUserToChannel(
+    fun joinChannel(
         user: User,
         channel: Channel,
         role: Role,

@@ -73,7 +73,7 @@ class JdbiChannelRepositoryTests {
             val channel = JdbiChannelRepository(handle).createChannel("channel1", admin, Visibility.PUBLIC)
             val user = JdbiUserRepository(handle).createUser("username", "user@test.com", "password")
 
-            JdbiChannelRepository(handle).addUserToChannel(user, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(user, channel, Role.READ_WRITE)
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)
             assertTrue(channelMembers.containsKey(user))
@@ -86,7 +86,7 @@ class JdbiChannelRepositoryTests {
             val admin = JdbiUserRepository(handle).createUser("admin", "admin@test.com", "password")
 
             assertThrows<Exception> {
-                JdbiChannelRepository(handle).addUserToChannel(
+                JdbiChannelRepository(handle).joinChannel(
                     User(-1, "username", "user@test.com"),
                     Channel(-1, "channel1", admin, Visibility.PUBLIC),
                     Role.READ_WRITE,
@@ -210,9 +210,9 @@ class JdbiChannelRepositoryTests {
             val user2 = JdbiUserRepository(handle).createUser("user2", "user2@test.com", "password")
 
             val channel = JdbiChannelRepository(handle).createChannel("channel1", admin, Visibility.PUBLIC)
-            JdbiChannelRepository(handle).addUserToChannel(admin, channel, Role.READ_WRITE)
-            JdbiChannelRepository(handle).addUserToChannel(user, channel, Role.READ_WRITE)
-            JdbiChannelRepository(handle).addUserToChannel(user2, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(admin, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(user, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(user2, channel, Role.READ_WRITE)
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)
             assertEquals(3, channelMembers.size)
@@ -253,8 +253,8 @@ class JdbiChannelRepositoryTests {
             val admin = JdbiUserRepository(handle).createUser("admin", "admin@test.com", "password")
             val user = JdbiUserRepository(handle).createUser("user", "user@test.com", "password")
             val channel = JdbiChannelRepository(handle).createChannel("channel1", admin, Visibility.PUBLIC)
-            JdbiChannelRepository(handle).addUserToChannel(admin, channel, Role.READ_WRITE)
-            JdbiChannelRepository(handle).addUserToChannel(user, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(admin, channel, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(user, channel, Role.READ_WRITE)
             JdbiChannelRepository(handle).leaveChannel(user, channel)
 
             val channelMembers = JdbiChannelRepository(handle).getChannelMembers(channel)

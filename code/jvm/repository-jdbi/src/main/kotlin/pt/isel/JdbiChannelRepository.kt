@@ -22,7 +22,7 @@ class JdbiChannelRepository(
         return Channel(id, name, creator, visibility)
     }
 
-    override fun addUserToChannel(
+    override fun joinChannel(
         user: User,
         channel: Channel,
         role: Role,

@@ -92,7 +92,7 @@ class UserService(
             val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
             invitation = invitation.markAsUsed()
             invitationRepo.updateRegisterInvitation(invitation)
-            channelRepo.addUserToChannel(user, invitation.channel, invitation.role)
+            channelRepo.joinChannel(user, invitation.channel, invitation.role)
             return@run success(user)
         }
 

@@ -77,7 +77,7 @@ class ChannelService(
                 return@run failure(ChannelError.ChannelNameAlreadyExists)
             }
             val channel = channelRepo.createChannel(name, user, visibility)
-            channelRepo.addUserToChannel(user, channel, Role.READ_WRITE)
+            channelRepo.joinChannel(user, channel, Role.READ_WRITE)
             return@run success(channel)
         }
 
@@ -101,7 +101,7 @@ class ChannelService(
         }
 
 
-    fun addUserToChannel(
+    fun joinChannel(
         userToAdd: Int,
         channelId: Int,
         role: Role,
@@ -116,7 +116,7 @@ class ChannelService(
             if (members.contains(userToAddInfo)) {
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
-            val updatedChannel = channelRepo.addUserToChannel(userToAddInfo, channel, role)
+            val updatedChannel = channelRepo.joinChannel(userToAddInfo, channel, role)
             emitter.sendEventOfNewMember(channel, userToAddInfo, role, members.keys)
             return@run success(updatedChannel)
         }

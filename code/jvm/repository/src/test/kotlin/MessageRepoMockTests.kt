@@ -29,7 +29,7 @@ class MessageRepoMockTests {
     private val repoChannels =
         MockChannelRepository().also {
             channel = it.createChannel("channel", user, Visibility.PUBLIC)
-            it.addUserToChannel(user, channel, Role.READ_WRITE)
+            it.joinChannel(user, channel, Role.READ_WRITE)
         }
     private val repoMessages = MockMessageRepo()
 
