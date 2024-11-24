@@ -46,6 +46,7 @@ class InvitationController(
                         UserIdentifiers(
                             result.value.sender.id,
                             result.value.sender.username,
+                            result.value.sender.email,
                         ),
                         result.value.email,
                         ChannelOutputModel(
@@ -54,6 +55,7 @@ class InvitationController(
                             UserIdentifiers(
                                 result.value.channel.creator.id,
                                 result.value.channel.creator.username,
+                                result.value.channel.creator.email,
                             ),
                             result.value.channel.visibility,
                         ),
@@ -89,10 +91,12 @@ class InvitationController(
                         UserIdentifiers(
                             result.value.sender.id,
                             result.value.sender.username,
+                            result.value.sender.email,
                         ),
                         UserIdentifiers(
                             result.value.receiver.id,
                             result.value.receiver.username,
+                            result.value.receiver.email,
                         ),
                         ChannelOutputModel(
                             result.value.channel.id,
@@ -100,6 +104,7 @@ class InvitationController(
                             UserIdentifiers(
                                 result.value.channel.creator.id,
                                 result.value.channel.creator.username,
+                                result.value.channel.creator.email,
                             ),
                             result.value.channel.visibility,
                         ),
@@ -158,12 +163,16 @@ class InvitationController(
                         result.value.map {
                             InvitationOutputModelChannel(
                                 it.id,
-                                UserIdentifiers(it.sender.id, it.sender.username),
-                                UserIdentifiers(it.receiver.id, it.receiver.username),
+                                UserIdentifiers(it.sender.id, it.sender.username, it.sender.email),
+                                UserIdentifiers(it.receiver.id, it.receiver.username, it.receiver.email),
                                 ChannelOutputModel(
                                     it.channel.id,
                                     it.channel.name,
-                                    UserIdentifiers(it.channel.creator.id, it.channel.creator.username),
+                                    UserIdentifiers(
+                                        it.channel.creator.id,
+                                        it.channel.creator.username,
+                                        it.channel.creator.email,
+                                        ),
                                     it.channel.visibility,
                                 ),
                                 it.role,

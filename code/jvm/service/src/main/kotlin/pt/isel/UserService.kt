@@ -175,10 +175,29 @@ class UserService(
         trxManager.run {
             val session = sessionRepo.findByToken(token) ?: return@run null
             if (!usersDomain.isTokenTimeValid(clock, session)) {
-                sessionRepo.deleteSession(session)
                 return@run null
             }
             sessionRepo.updateSession(session, clock.now())
             return@run userRepo.findById(session.userId)
+        }
+
+    fun registerPDM(
+        username: String,
+        email: String,
+        password: String,
+    ): Either<UserError, User> =
+        trxManager.run {
+            if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
+            if (email.isBlank()) return@run failure(UserError.EmailCannotBeBlank)
+            if (!usersDomain.isValidEmail(email)) return@run failure(UserError.InvalidEmail)
+            if (userRepo.findByEmail(email) != null) return@run failure(UserError.EmailAlreadyInUse)
+            if (username.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
+            val matches = userRepo.findUserMatchesUsername(username.trim())
+            if (matches != null) return@run failure(UserError.UsernameAlreadyExists)
+            if (!usersDomain.isPasswordStrong(password)) return@run failure(UserError.WeakPassword)
+            val passwordValidationInfo = usersDomain.createPasswordValidationInformation(password)
+            val user = userRepo.createUser(username, email, passwordValidationInfo.validationInfo)
+            return@run success(user)
         }
 }

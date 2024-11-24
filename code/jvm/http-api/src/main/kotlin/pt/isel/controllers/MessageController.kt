@@ -42,6 +42,7 @@ class MessageController(private val messageService: MessageService) {
                         sender = UserIdentifiers(
                             id = result.value.sender.id,
                             username = result.value.sender.username,
+                            email = result.value.sender.email,
                         ),
                         channel = ChannelIdentifiers(
                             id = result.value.channel.id,
@@ -77,6 +78,7 @@ class MessageController(private val messageService: MessageService) {
                         sender = UserIdentifiers(
                             id = result.value.sender.id,
                             username = result.value.sender.username,
+                            email = result.value.sender.email,
                         ),
                         channel = ChannelIdentifiers(
                             id = result.value.channel.id,
@@ -122,6 +124,7 @@ class MessageController(private val messageService: MessageService) {
                                 sender = UserIdentifiers(
                                     id = it.sender.id,
                                     username = it.sender.username,
+                                    email = it.sender.email,
                                 ),
                                 content = it.content,
                                 timestamp = it.timestamp

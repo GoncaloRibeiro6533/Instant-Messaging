@@ -82,12 +82,11 @@ class ChannelService(
         }
 
     // TODO: Implement pagination
-    // TODO should return User and corresponding role, its already implemented in the repository
-    fun getChannelMembers(channelId: Int): Either<ChannelError, List<User>> =
+    fun getChannelMembers(channelId: Int): Either<ChannelError, Map<User, Role>> =
         trxManager.run {
             if (channelId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
-            val members = channelRepo.getChannelMembers(channel).keys.toList()
+            val members = channelRepo.getChannelMembers(channel)
             return@run success(members)
         }
 

@@ -116,7 +116,7 @@ class UserController(
         return when (val result: Either<UserError, User> = userService.getUserById(id)) {
             is Success ->
                 ResponseEntity.status(HttpStatus.OK).body(
-                    UserIdentifiers(result.value.id, result.value.username),
+                    UserIdentifiers(result.value.id, result.value.username, result.value.email),
                 )
             is Failure ->
                 handleUserError(result.value)
@@ -134,7 +134,7 @@ class UserController(
             userService.findUserByUsername(username, limit, skip)
         return when (result) {
             is Success -> {
-                val userList = result.value.map { UserIdentifiers(it.id, it.username) }
+                val userList = result.value.map { UserIdentifiers(it.id, it.username, it.email) }
                 ResponseEntity.status(HttpStatus.OK).body(UserList(userList, result.value.size))
             }
             is Failure ->
@@ -146,6 +146,24 @@ class UserController(
     fun deleteUser(user: AuthenticatedUser): ResponseEntity<*> {
         return when (val result: Either<UserError, Unit> = userService.deleteUser(user.user.id)) {
             is Success -> ResponseEntity.status(HttpStatus.OK).body(null)
+            is Failure ->
+                handleUserError(result.value)
+        }
+    }
+
+    // Only use this endpoint for the PDM project
+    @GetMapping("/pdm/register")
+    fun registerPDM(
+        @RequestBody userRegisterInput: UserRegisterInput,
+    ): ResponseEntity<*> {
+        val result: Either<UserError, User> =
+            userService.registerPDM(
+                userRegisterInput.username.trim(),
+                userRegisterInput.email.trim(),
+                userRegisterInput.password,
+            )
+        return when (result) {
+            is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
             is Failure ->
                 handleUserError(result.value)
         }

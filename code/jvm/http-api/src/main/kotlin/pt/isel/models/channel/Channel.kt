@@ -1,5 +1,6 @@
 package pt.isel.models.channel
 
+import pt.isel.Role
 import pt.isel.Visibility
 import pt.isel.models.user.UserIdentifiers
 
@@ -23,4 +24,14 @@ data class ChannelList(
 data class ChannelIdentifiers(
     val id: Int,
     val name: String,
+)
+
+data class ChannelMember(
+    val user: UserIdentifiers,
+    val role: Role,
+)
+
+data class ChannelMembersList(
+    val nMembers: Int,
+    val members: List<ChannelMember>,
 )

@@ -18,10 +18,11 @@ import pt.isel.Role
 import pt.isel.Success
 import pt.isel.models.Problem
 import pt.isel.models.channel.ChannelList
+import pt.isel.models.channel.ChannelMember
+import pt.isel.models.channel.ChannelMembersList
 import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.user.UserIdentifiers
-import pt.isel.models.user.UserList
 
 @RestController
 @RequestMapping("api/channels")
@@ -50,6 +51,7 @@ class ChannelController(
                             UserIdentifiers(
                                 id = result.value.creator.id,
                                 username = result.value.creator.username,
+                                email = result.value.creator.email,
                             ),
                         visibility = result.value.visibility,
                     )
@@ -76,6 +78,7 @@ class ChannelController(
                             UserIdentifiers(
                                 id = result.value.creator.id,
                                 username = result.value.creator.username,
+                                email = result.value.creator.email,
                             ),
                         visibility = result.value.visibility,
                     )
@@ -101,6 +104,7 @@ class ChannelController(
                             UserIdentifiers(
                                 id = result.value.creator.id,
                                 username = result.value.creator.username,
+                                email = result.value.creator.email,
                             ),
                         visibility = result.value.visibility,
                     )
@@ -129,6 +133,7 @@ class ChannelController(
                                 UserIdentifiers(
                                     id = it.creator.id,
                                     username = it.creator.username,
+                                    email = it.creator.email,
                                 ),
                             visibility = it.visibility,
                         )
@@ -149,12 +154,17 @@ class ChannelController(
             is Success -> {
                 val outputModel =
                     result.value.map {
-                        UserIdentifiers(
-                            id = it.id,
-                            username = it.username,
+                        ChannelMember(
+                            user =
+                                UserIdentifiers(
+                                    id = it.key.id,
+                                    username = it.key.username,
+                                    email = it.key.email,
+                                ),
+                            role = it.value,
                         )
                     }
-                ResponseEntity.status(HttpStatus.OK).body(UserList(outputModel, result.value.size))
+                ResponseEntity.status(HttpStatus.OK).body(ChannelMembersList(outputModel.size, outputModel))
             }
             is Failure ->
                 handleChannelError(result.value)
@@ -177,6 +187,7 @@ class ChannelController(
                                 UserIdentifiers(
                                     id = it.creator.id,
                                     username = it.creator.username,
+                                    email = it.creator.email,
                                 ),
                             visibility = it.visibility,
                         )
@@ -204,6 +215,7 @@ class ChannelController(
                             UserIdentifiers(
                                 id = result.value.creator.id,
                                 username = result.value.creator.username,
+                                email = result.value.creator.email,
                             ),
                         visibility = result.value.visibility,
                     )
@@ -214,8 +226,9 @@ class ChannelController(
         }
     }
 
+    // todo change to removeUserFromChannel
     @PutMapping("/{channelId}/leave/{userId}")
-    fun leaveChannel( //todo change to removeUserFromChannel
+    fun leaveChannel(
         @PathVariable channelId: Int,
         @PathVariable userId: Int,
         user: AuthenticatedUser,
@@ -230,6 +243,7 @@ class ChannelController(
                             UserIdentifiers(
                                 id = result.value.creator.id,
                                 username = result.value.creator.username,
+                                email = result.value.creator.email,
                             ),
                         visibility = result.value.visibility,
                     )

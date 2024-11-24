@@ -122,9 +122,10 @@ class ChannelServiceTests {
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
         val result = channelService.getChannelMembers(channel.value.id)
-        assertIs<Success<List<User>>>(result)
-        assertEquals(user.value, result.value[0])
+        assertIs<Success<Map<User, Role>>>(result)
         assertEquals(1, result.value.size)
+        assertEquals(user.value, result.value.keys.first())
+        assertEquals(Role.READ_WRITE, result.value.values.first())
     }
 
     @Test
@@ -147,10 +148,10 @@ class ChannelServiceTests {
         val user2 = userService.createUser("user2", "bob@mail.com", "Strong_Password123", invitation.value.id)
         assertIs<Success<User>>(user2)
         val members = channelService.getChannelMembers(channel.value.id)
-        assertIs<Success<List<User>>>(members)
+        assertIs<Success<Map<User, Role>>>(members)
         assertEquals(2, members.value.size)
-        assertEquals(user.value, members.value[0])
-        assertEquals(user2.value, members.value[1])
+        assertEquals(user.value, members.value.keys.first())
+        assertEquals(user2.value, members.value.keys.last())
     }
 
     @Test
@@ -420,8 +421,9 @@ class ChannelServiceTests {
         val leave = channelService.leaveChannel(user.value.id, channel.value.id)
         assertIs<Success<Channel>>(leave)
         val members = channelService.getChannelMembers(channel.value.id)
-        assertIs<Success<List<User>>>(members)
+        assertIs<Success<Map<User,Role>>>(members)
         assertEquals(0, members.value.size)
+        assertEquals(user.value, leave.value.creator)
     }
 
     @Test

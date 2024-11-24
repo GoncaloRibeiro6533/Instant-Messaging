@@ -589,4 +589,72 @@ class UserServiceTests {
         val result = userService.getUserByToken(logged.value.token)
         assertEquals(admin.value, result)
     }
+
+    @Test
+    fun `registerPDM should succeed and return user`() {
+        val result = userService.registerPDM("Bob", "bob@email.com", "Strong_Password123")
+        assertIs<Success<User>>(result)
+        assertEquals("Bob", result.value.username)
+        assertEquals("bob@email.com", result.value.email)
+    }
+
+    @Test
+    fun `registerPDM should return UsernameCannotBeBlank when username is blank`() {
+        val result = userService.registerPDM("", "bob@example.com", "Strong_Password123")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UsernameCannotBeBlank, result.value)
+    }
+
+    @Test
+    fun `registerPDM should return UsernameToLong when username is greater than MAX_USERNAME_LENGTH characters`() {
+        val result =
+            userService.registerPDM("a".repeat(User.MAX_USERNAME_LENGTH + 1), "bob@example.com", "Strong_Password123")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.UsernameToLong, result.value)
+    }
+
+    @Test
+    fun `registerPDM should return InvalidEmail when email is invalid`() {
+        val result = userService.registerPDM("Bob", "bob", "Strong_Password123")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.InvalidEmail, result.value)
+    }
+
+    @Test
+    fun `registerPDM should return EmailCannotBeBlank when email is blank`() {
+        val result = userService.registerPDM("Bob", "", "Strong_Password123")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.EmailCannotBeBlank, result.value)
+    }
+    @Test
+    fun `registerPDM should return PasswordCannotBeBlank when password is blank`() {
+        val result = userService.registerPDM("Bob", "bob@example.com", "")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.PasswordCannotBeBlank, result.value)
+    }
+
+    @Test
+    fun `registerPDM should return UsernameAlreadyExists when username already exists`() {
+        val result = userService.registerPDM("Bob", "bob@example.com", "Strong_Password123")
+        assertIs<Success<User>>(result)
+        val result2 = userService.registerPDM("Bob", "bob123@example.com", "Strong_Password123")
+        assertIs<Failure<UserError>>(result2)
+        assertEquals(UserError.UsernameAlreadyExists, result2.value)
+    }
+
+    @Test
+    fun `registerPDM should return EmailAlreadyInUse when email already exists`() {
+        val result = userService.registerPDM("Bob", "bob@example.com", "Strong_Password123")
+        assertIs<Success<User>>(result)
+        val result2 = userService.registerPDM("Bob2", "bob@example.com", "Strong_Password123")
+        assertIs<Failure<UserError>>(result2)
+        assertEquals(UserError.EmailAlreadyInUse, result2.value)
+    }
+
+    @Test
+    fun `registerPDM should return WeakPassword when password is weak`() {
+        val result = userService.registerPDM("Bob", "bob@example.com", "weak")
+        assertIs<Failure<UserError>>(result)
+        assertEquals(UserError.WeakPassword, result.value)
+    }
 }

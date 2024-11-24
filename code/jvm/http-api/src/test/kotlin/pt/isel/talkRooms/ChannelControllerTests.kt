@@ -15,6 +15,7 @@ import pt.isel.controllers.ChannelController
 import pt.isel.controllers.InvitationController
 import pt.isel.controllers.UserController
 import pt.isel.models.channel.ChannelList
+import pt.isel.models.channel.ChannelMembersList
 import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.invitation.InvitationInputModelChannel
@@ -255,8 +256,8 @@ class ChannelControllerTests {
         val result = channelController.getChannelMembers(channel.id, channelCreator)
         assertEquals(HttpStatus.OK, result.statusCode)
 
-        val members = result.body as UserList
-        assertEquals(2, members.nUsers)
+        val members = result.body as ChannelMembersList
+        assertEquals(2, members.nMembers)
     }
 
     @ParameterizedTest
@@ -582,8 +583,8 @@ class ChannelControllerTests {
             )
         assertEquals(HttpStatus.OK, result.statusCode)
 
-        val members = channelController.getChannelMembers(channel2.id, admin).body as UserList
-        assertEquals(2, members.nUsers)
+        val members: ChannelMembersList = channelController.getChannelMembers(channel2.id, admin).body as ChannelMembersList
+        assertEquals(2, members.nMembers)
     }
 
     @ParameterizedTest
