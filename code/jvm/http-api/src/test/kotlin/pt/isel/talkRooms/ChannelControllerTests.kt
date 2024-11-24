@@ -22,7 +22,6 @@ import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
 import pt.isel.models.invitation.InvitationOutputModelChannel
 import pt.isel.models.invitation.InvitationOutputModelRegister
-import pt.isel.models.user.UserList
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream

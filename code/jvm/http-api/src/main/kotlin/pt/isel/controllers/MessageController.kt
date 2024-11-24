@@ -1,4 +1,3 @@
-@file:Suppress("ktlint")
 package pt.isel.controllers
 
 import org.springframework.http.HttpStatus
@@ -11,12 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import pt.isel.AuthenticatedUser
+import pt.isel.Channel
 import pt.isel.Failure
 import pt.isel.MessageError
 import pt.isel.MessageService
 import pt.isel.Success
-import pt.isel.models.*
-import pt.isel.models.channel.ChannelIdentifiers
+import pt.isel.User
+import pt.isel.models.MessageHistoryOutputModel
+import pt.isel.models.MessageInfoOutputModel
+import pt.isel.models.MessageInputModel
+import pt.isel.models.MessageOutputModel
+import pt.isel.models.Problem
 import pt.isel.models.user.UserIdentifiers
 
 @RestController
@@ -39,15 +43,24 @@ class MessageController(private val messageService: MessageService) {
                 val outputModel =
                     MessageOutputModel(
                         msgId = result.value.id,
-                        sender = UserIdentifiers(
-                            id = result.value.sender.id,
-                            username = result.value.sender.username,
-                            email = result.value.sender.email,
-                        ),
-                        channel = ChannelIdentifiers(
-                            id = result.value.channel.id,
-                            name = result.value.channel.name,
-                        ),
+                        sender =
+                            UserIdentifiers(
+                                id = result.value.sender.id,
+                                username = result.value.sender.username,
+                                email = result.value.sender.email,
+                            ),
+                        channel =
+                            Channel(
+                                id = result.value.channel.id,
+                                name = result.value.channel.name,
+                                creator =
+                                    User(
+                                        id = result.value.channel.creator.id,
+                                        username = result.value.channel.creator.username,
+                                        email = result.value.channel.creator.email,
+                                    ),
+                                visibility = result.value.channel.visibility,
+                            ),
                         content = result.value.content,
                         timestamp = result.value.timestamp,
                     )
@@ -75,15 +88,24 @@ class MessageController(private val messageService: MessageService) {
                 val outputModel =
                     MessageOutputModel(
                         msgId = result.value.id,
-                        sender = UserIdentifiers(
-                            id = result.value.sender.id,
-                            username = result.value.sender.username,
-                            email = result.value.sender.email,
-                        ),
-                        channel = ChannelIdentifiers(
-                            id = result.value.channel.id,
-                            name = result.value.channel.name,
-                        ),
+                        sender =
+                            UserIdentifiers(
+                                id = result.value.sender.id,
+                                username = result.value.sender.username,
+                                email = result.value.sender.email,
+                            ),
+                        channel =
+                            Channel(
+                                id = result.value.channel.id,
+                                name = result.value.channel.name,
+                                creator =
+                                    User(
+                                        id = result.value.channel.creator.id,
+                                        username = result.value.channel.creator.username,
+                                        email = result.value.channel.creator.email,
+                                    ),
+                                visibility = result.value.channel.visibility,
+                            ),
                         content = result.value.content,
                         timestamp = result.value.timestamp,
                     )
@@ -113,23 +135,32 @@ class MessageController(private val messageService: MessageService) {
             is Success -> {
                 val outputModel =
                     MessageHistoryOutputModel(
-                        channel = ChannelIdentifiers(
-                            id = result.value[0].channel.id,
-                            name = result.value[0].channel.name,
-                        ),
+                        channel =
+                            Channel(
+                                id = result.value[0].channel.id,
+                                name = result.value[0].channel.name,
+                                creator =
+                                    User(
+                                        id = result.value[0].channel.creator.id,
+                                        username = result.value[0].channel.creator.username,
+                                        email = result.value[0].channel.creator.email,
+                                    ),
+                                visibility = result.value[0].channel.visibility,
+                            ),
                         messages =
-                        result.value.map {
-                            MessageInfoOutputModel(
-                                msgId = it.id,
-                                sender = UserIdentifiers(
-                                    id = it.sender.id,
-                                    username = it.sender.username,
-                                    email = it.sender.email,
-                                ),
-                                content = it.content,
-                                timestamp = it.timestamp
-                            )
-                        },
+                            result.value.map {
+                                MessageInfoOutputModel(
+                                    msgId = it.id,
+                                    sender =
+                                        UserIdentifiers(
+                                            id = it.sender.id,
+                                            username = it.sender.username,
+                                            email = it.sender.email,
+                                        ),
+                                    content = it.content,
+                                    timestamp = it.timestamp,
+                                )
+                            },
                         nrOfMessages = result.value.size,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
