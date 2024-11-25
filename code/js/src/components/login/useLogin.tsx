@@ -1,9 +1,6 @@
 import * as React from "react"
-import { useEffect } from "react"
 import { useAuth } from "../auth/AuthProvider"
-import { useLocation, Navigate } from "react-router-dom"
 import { services } from "../../App"
-import { AuthenticatedUser } from "../../domain/AuthenticatedUser"
 
 type State = 
     {name: "editing", error?: string, username: string, password: string, } |

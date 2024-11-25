@@ -1,0 +1,96 @@
+import { ChannelService } from '../interfaces/ChannelService';
+import { Channel } from '../../domain/Channel';
+import { Visibility } from '../../domain/Visibility';
+import { Role } from '../../domain/Role';
+import { User } from '../../domain/User';
+import { ChannelMember } from '../../domain/ChannelMember';
+import { Repo } from '../../App';
+
+export class ChannelServiceMock implements ChannelService {
+    repo: Repo;
+
+    constructor(repo: Repo) {
+      this.repo = repo;
+    }
+
+
+    async createChannel(token: string, name: string, visibility: string): Promise<Channel> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        const channel: Channel = this.repo.channelRepo.createChannel(user, name, visibility);
+        return channel;
+    }
+
+    async joinChannel(token: string, channelId: number, role: Role): Promise<Channel> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        const channel = this.repo.channelRepo.joinChannel(user, channelId, role);
+        return channel;
+    }
+
+    async searchChannelByName(token: string, name: string, limit: number, skip: number): Promise<Channel[]> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        return this.repo.channelRepo.channels.filter(channel => channel.name.includes(name)).slice(skip, skip + limit);
+    }
+
+    async getChannelMembers(token: string, channelId: number): Promise<ChannelMember[]> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        return this.repo.channelRepo.getChannelMembers(user, channelId);
+    }
+
+    async getChannelsOfUser(token: string, userId: number): Promise<Channel[]> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        return this.repo.channelRepo.getChannelsOfUser(user, userId);
+    }
+
+    async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        return this.repo.channelRepo.updateChannelName(user, channelId, newName);
+    }
+
+    async leaveChannel(token: string, channelId: number): Promise<Channel> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
+        if (!channel) {
+            throw new Error('Channel not found');
+        }
+        const channelMember = this.repo.channelRepo.channelMembers.get(channel)!.find(member => member.user.id === user.id);
+        if (!channelMember) {
+            throw new Error('User not in channel');
+        }
+        this.repo.channelRepo.channelMembers.set(channel, this.repo.channelRepo.channelMembers.get(channel)!.filter(member => member.user.id !== user.id));
+        return channel;
+    }
+
+    async deleteChannel(token: string, channelId: number): Promise<void> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
+        if (!channel) {
+            throw new Error('Channel not found');
+        }
+        this.repo.channelRepo.channels = this.repo.channelRepo.channels.filter(channel => channel.id !== channelId);
+        this.repo.channelRepo.channelMembers.delete(channel);
+    }
+}
