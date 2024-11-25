@@ -18,8 +18,7 @@ const router = createBrowserRouter(
                 </AuthProvider>,
             "children": [
                 {
-                    "path": "/logout",
-                    element: <Logout />,
+                   
                 },
             ]   
         },
