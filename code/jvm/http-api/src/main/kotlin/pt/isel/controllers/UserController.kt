@@ -152,7 +152,7 @@ class UserController(
     }
 
     // Only use this endpoint for the PDM project
-    @GetMapping("/pdm/register")
+    @PostMapping("/pdm/register")
     fun registerPDM(
         @RequestBody userRegisterInput: UserRegisterInput,
     ): ResponseEntity<*> {
