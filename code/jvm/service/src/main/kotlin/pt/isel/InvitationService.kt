@@ -70,6 +70,7 @@ class InvitationService(
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val channel =
                 channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
+            val code = usersDomain.generateTokenValue() // TODO: Generate code for invitation
             val createdInvitation =
                 invitationRepo.createRegisterInvitation(
                     user,

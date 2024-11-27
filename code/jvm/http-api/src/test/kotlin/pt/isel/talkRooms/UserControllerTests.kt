@@ -16,10 +16,12 @@ import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.invitation.InvitationInputModelRegister
 import pt.isel.models.invitation.InvitationOutputModelRegister
+import pt.isel.models.user.UserList
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -211,4 +213,65 @@ class UserControllerTests {
         assertEquals("receiver", receiver.user.username)
         assertEquals("receiver@test.com", receiver.user.email)
     }
+
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `login should succeed`(trxManager: TransactionManager) {
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        val user = controllerUser.registerFirstUser(
+            UserRegisterInput("Bob", "bob@example.com", "Strong_password_1234"))
+        assertEquals(HttpStatus.CREATED, user.statusCode)
+        val token = controllerUser.login(
+            UserLoginCredentialsInput("Bob", "Strong_password_1234")
+        )
+        assertEquals(HttpStatus.OK, token.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `login should fail with bad request`(trxManager: TransactionManager){
+        val controller = UserController(createUserService(trxManager, TestClock()))
+        val newUser = controller.registerFirstUser(
+        UserRegisterInput("Bob", "bob@example.com", "Bob_123dsad")
+        )
+        assertEquals(HttpStatus.BAD_REQUEST, newUser.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `register user with pdm endpoint should succeed`(trxManager: TransactionManager){
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        val newUser = controllerUser.registerPDM(
+            UserRegisterInput("Bob", "bob@example.com", "Strong_password_1234")
+        )
+        assertEquals(HttpStatus.CREATED, newUser.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `register user with pdm endpoint should fail`(trxManager: TransactionManager) {
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        val newUser = controllerUser.registerPDM(
+            UserRegisterInput("Bob", "bob@example.com", "1234")
+        )
+        assertEquals(HttpStatus.BAD_REQUEST, newUser.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `search user with username`(trxManager: TransactionManager) {
+        val controllerUser = UserController(createUserService(trxManager, TestClock()))
+        controllerUser.registerFirstUser(
+            UserRegisterInput("admin", "admin@example.com", "Admin_123dsad"))
+        val token = controllerUser.login(
+            UserLoginCredentialsInput("admin", "Admin_123dsad")
+        ).body as AuthenticatedUser
+        assertIs<AuthenticatedUser>(token)
+        val searchResult = controllerUser.searchUser("admin", 10, 0, token)
+        assertEquals(HttpStatus.OK, searchResult.statusCode)
+        assertEquals(1, (searchResult.body as UserList).users.size)
+        assertEquals("admin", (searchResult.body as UserList).users[0].username)
+    }
+
 }
