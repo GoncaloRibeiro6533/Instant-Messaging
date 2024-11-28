@@ -2,9 +2,10 @@
 import * as React from "react"
 
 import { AuthContext } from "../auth/AuthProvider"
+import { useAuth } from "../auth/AuthProvider"
 
 export function LogoutButton() {
-    const {setUser} = React.useContext(AuthContext)
+    const [user, setUser] = useAuth()
     function logoutHandler() {
         localStorage.removeItem('user')
         setUser(undefined)

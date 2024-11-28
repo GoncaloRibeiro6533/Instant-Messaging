@@ -5,7 +5,7 @@ import { AuthenticatedUser } from '../../domain/AuthenticatedUser'
 
 type AuthContextType = {
     user: AuthenticatedUser | undefined,
-    setUser: (user :AuthenticatedUser) => void,
+    setUser: (user :AuthenticatedUser | undefined) => void,
 }
 
 export const AuthContext = createContext<AuthContextType>({
