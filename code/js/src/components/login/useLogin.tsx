@@ -4,7 +4,7 @@ import { services } from "../../App"
 
 type State = 
     {name: "editing", error?: string, username: string, password: string, } |
-    {name: "submitting", username: string, password: string, } |
+    {name: "submitting", username: string, password: string } | 
     {name: "redirecting", username: string, password: string}/*
     {name: string, error: string, username: string, password: string, } */
 
@@ -23,7 +23,7 @@ function reduce(state: State, action: Action): State {
     switch (state.name) {
         case "editing": {
             if (action.type === "edit") {
-                return { ...state, [action.field]: action.value }
+                return { ...state, [action.field]: action.value, error: undefined }
             } else if (action.type === "submit") {
                 return { name: "submitting", username: state.username, password: state.password }
             } else {
@@ -62,16 +62,16 @@ function reduce(state: State, action: Action): State {
 
 export function useLogin() : [State, { 
     onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
-    onChange: (ev: React.FormEvent<HTMLInputElement>) => void 
+    onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void 
 }] {
    const [state, dispatch] = React.useReducer(reduce, 
         { 
             name: "editing",
             username: "", 
             password: "" ,
-            error: ""
+            error: undefined
         })
-    const [, setUser] = useAuth()
+    const [userAuth, setUser] = useAuth()
     async function onSubmit(ev: React.FormEvent<HTMLFormElement>) {
         ev.preventDefault()
         if (state.name !== "editing") {
@@ -82,17 +82,17 @@ export function useLogin() : [State, {
         const password = state.password
         try {
             const user = await services.userService.login(username, password)
-            if (user) {
+            if (user !== undefined) {
                 setUser(user)
                 dispatch({ type: "success" })
-            } else {
+           } else {
                 dispatch({ type: "error", message: "Invalid username or password" })
             }
         } catch (e) {
             dispatch({ type: "error", message: e.message })
         }
     }    
-    function onChange(ev: React.FormEvent<HTMLInputElement>) { dispatch({ type: "edit", field: ev.currentTarget.name as "username" | "password", value: ev.currentTarget.value }) }
+    function onChange(ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { dispatch({ type: "edit", field: ev.currentTarget.name as "username" | "password", value: ev.currentTarget.value }) }
     return[
         state
         ,

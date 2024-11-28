@@ -93,4 +93,20 @@ export class ChannelServiceMock implements ChannelService {
         this.repo.channelRepo.channels = this.repo.channelRepo.channels.filter(channel => channel.id !== channelId);
         this.repo.channelRepo.channelMembers.delete(channel);
     }
+
+    async getChannelById(token: string, channelId: number): Promise<Channel> {
+        const user = this.repo.userRepo.getUserByToken(token)
+        if (!user) {
+            throw new Error("Invalid token");
+        }
+        const channel_members = this.repo.channelRepo.getChannelMembers(user, channelId);
+        if(!channel_members.find(member => member.user.id === user.id)) {
+            throw new Error("User not in channel");
+        }
+        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
+        if (!channel) {
+            throw new Error('Channel not found');
+        }
+        return channel
+    }
 }

@@ -7,7 +7,7 @@ import { Visibility } from "../../../domain/Visibility";
 export interface MessageRepoInterface {
     messages: Array<Message>;
     createMessage(user: User, channel: Channel, content: string, timestamp: Date): Message;
-    getMessages(user: User, channel: Channel, limit: number, skip: number): Message[];
+    getMessages(channel: Channel, limit: number, skip: number): Message[];
 
 }
 
@@ -31,7 +31,7 @@ export class MessageRepo implements MessageRepoInterface {
                 visibility: Visibility.PUBLIC
             },
             content: 'Hello',
-            timestamp: new Date("2021-09-01T00:00:00Z")
+            timestamp: new Date("2024-11-26T12:33:24Z")
         } 
     ]
 
@@ -47,7 +47,7 @@ export class MessageRepo implements MessageRepoInterface {
         return message;
     }
 
-    getMessages(user: User, channel: Channel, limit: number, skip: number): Message[] {
+    getMessages(channel: Channel, limit: number, skip: number): Message[] {
         return this.messages.filter(message => message.channel.id === channel.id).slice(skip, skip + limit);
     }
 

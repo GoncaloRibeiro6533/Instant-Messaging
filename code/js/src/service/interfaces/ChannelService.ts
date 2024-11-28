@@ -11,6 +11,7 @@ export interface ChannelService {
     getChannelMembers(token: string, channelId: number): Promise<ChannelMember[]>;
     getChannelsOfUser(token: string, userId: number): Promise<Channel[]>;
     updateChannelName(token: string, channelId: number, newName: string): Promise<Channel>;
+    getChannelById(token: string, channelId: number): Promise<Channel>;
     leaveChannel(token: string, channelId: number): Promise<Channel>;
 }
 

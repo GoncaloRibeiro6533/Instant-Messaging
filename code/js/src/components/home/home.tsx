@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Link, Outlet } from "react-router-dom";
 import { AuthContext, AuthProvider } from "../auth/AuthProvider";
+import { LogoutButton } from "../logout/logoutButton";
+import { LoginButton } from "../login/loginButton";
 
 export function Home() {
   const { user } = React.useContext(AuthContext);
@@ -10,13 +12,17 @@ export function Home() {
         {user ? (
             <div>
               <p>Welcome, {user.user.username}!</p>
-              <li><Link to="/logout">Logout</Link></li>
+              <LogoutButton />
+              <li><Link to="/about">About</Link></li>
+              <li><Link to="/channel/1">Channel 1</Link></li>
+              <Outlet />
               </div>
         ) : (
             <div>
                 <p>Welcome! Please log in.</p>
                 <ol>
-                    <li><Link to="/login">Login</Link></li>
+                    <LoginButton />
+                    <li><Link to="/about">About</Link></li>
                 </ol>
                 <Outlet />
             </div>

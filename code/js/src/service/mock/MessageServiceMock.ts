@@ -47,6 +47,6 @@ export class MessageServiceMock implements MessageService {
             if (!channelsOfUser.find(channel => channel.id === ch.id)) {
                 throw new Error("User is not a member of this channel");
             }
-            return this.repo.messageRepo.getMessages(user, ch, limit, skip);
+            return this.repo.messageRepo.getMessages(ch, limit, skip);
     }
 }

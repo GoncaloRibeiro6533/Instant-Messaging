@@ -16,6 +16,7 @@ interface ChannelRepoInterface {
     getChannelsOfUser(user: User, userId: number): Channel[];
     updateChannelName(user: User, channelId: number, newName: string): Channel;
     leaveChannel(user: User, channelId: number): Channel;
+    getChannelById(channelId: number): Channel;
 }
 
 export class ChannelRepo implements ChannelRepoInterface {
@@ -66,9 +67,6 @@ export class ChannelRepo implements ChannelRepoInterface {
 
     joinChannel(user: User, channelId: number, role: Role): Channel {
         const channel = this.channels.find(channel => channel.id === channelId);
-        if (!channel) {
-            throw new Error('Channel not found');
-        }
         const channelMember: ChannelMember = {
             user,
             role
@@ -83,9 +81,6 @@ export class ChannelRepo implements ChannelRepoInterface {
 
     getChannelMembers(user: User, channelId: number): ChannelMember[] {
         const channel = this.channels.find(channel => channel.id === channelId);
-        if (!channel) {
-            throw new Error('Channel not found');
-        }
         return this.channelMembers.get(channel)!;
     }
 
@@ -95,32 +90,24 @@ export class ChannelRepo implements ChannelRepoInterface {
 
     updateChannelName(user: User, channelId: number, newName: string): Channel {
         const channel = this.channels.find(channel => channel.id === channelId);
-        if (!channel) {
-            throw new Error('Channel not found');
-        }
         channel.name = newName;
         return channel;
     }
 
     leaveChannel(user: User, channelId: number): Channel {
         const channel = this.channels.find(channel => channel.id === channelId);
-        if (!channel) {
-            throw new Error('Channel not found');
-        }
         const channelMemberIndex = this.channelMembers.get(channel)!.findIndex(member => member.user.id === user.id);
-        if (channelMemberIndex === -1) {
-            throw new Error('User not found in channel');
-        }
         this.channelMembers.get(channel)!.splice(channelMemberIndex, 1);
         return channel;
     }
 
     deleteChannel(user: User, channelId: number): void {
         const channelIndex = this.channels.findIndex(channel => channel.id === channelId);
-        if (channelIndex === -1) {
-            throw new Error('Channel not found');
-        }
         this.channels.splice(channelIndex, 1);
         this.channelMembers.delete(this.channels[channelIndex]);
+    }
+
+    getChannelById(channelId: number): Channel {
+        return this.channels.find(channel => channel.id === channelId)!;
     }
 }

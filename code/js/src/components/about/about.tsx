@@ -30,9 +30,8 @@ const authors: AuthorInfo[] = [
 
 const githubRepo = "https://github.com/isel-leic-daw/2024-daw-leic53d-g06-53d"
 
-const root = ReactDom.createRoot(document.getElementById('container'))
 
-const AboutElem: React.FC = () => {
+export const About: React.FC = () => {
     return (
         <div>
             <h1>About Us</h1>
@@ -58,10 +57,3 @@ const AboutElem: React.FC = () => {
     )
 }
 
-export function about() {
-    root.render(
-        <div>
-            <AboutElem></AboutElem>
-        </div>
-    )
-}
