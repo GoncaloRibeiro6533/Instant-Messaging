@@ -29,11 +29,12 @@ export class ChannelServiceMock implements ChannelService {
     }
 
     async searchChannelByName(token: string, name: string, limit: number, skip: number): Promise<Channel[]> {
-        const user = this.repo.userRepo.getUserByToken(token)
+        const user = this.repo.userRepo.getUserByToken(token);
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.channelRepo.channels.filter(channel => channel.name.includes(name)).slice(skip, skip + limit);
+        const userChannels = this.repo.channelRepo.getChannelsOfUser(user, user.id);
+        return userChannels.filter(channel => channel.name.includes(name)).slice(skip, skip + limit);
     }
 
     async getChannelMembers(token: string, channelId: number): Promise<ChannelMember[]> {

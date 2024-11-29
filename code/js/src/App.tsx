@@ -16,6 +16,7 @@ import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
+import {ChannelsList} from "./components/channels/channelsList";
 //import { ChannelsList} from './components/channels/channelsList'
 
 const router = createBrowserRouter(
@@ -25,7 +26,6 @@ const router = createBrowserRouter(
             element: 
                     <><MenuAppBar /><Home /></>,
             "children": [
-               
             ]   
         },
         {
@@ -45,14 +45,15 @@ const router = createBrowserRouter(
                 <About />
             </AuthRequire>
         },
-        /*{
+        {
             "path": "/channels",
             element:
-            <AuthProvider>
-                <MenuAppBar/>
-                <ChannelsList />
-            </AuthProvider>
-        {
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <ChannelsList/>
+                </AuthRequire>
+        },
+        /*{
             "path": "/profile",
             element:
             <AuthRequire>
@@ -60,12 +61,14 @@ const router = createBrowserRouter(
                 <Profile />
             </AuthRequire>
         }
-]
 
          */
+]
 
 
-    ]
+
+
+
 )
 
 export const userRepoMock = new UserRepo()

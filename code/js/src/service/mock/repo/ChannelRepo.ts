@@ -51,7 +51,7 @@ export class ChannelRepo implements ChannelRepoInterface {
                 email: 'charl@email.com'
             },
             visibility: Visibility.PRIVATE
-        }
+        },
     ]
 
     public channelMembers: Map<Channel, Array<ChannelMember>> = new Map([
@@ -73,10 +73,22 @@ export class ChannelRepo implements ChannelRepoInterface {
                         email: 'alice@email.com'
                     },
                     role: Role.READ_WRITE
-                }
+                },
             ]
-        ]
-    ]);
+        ],
+        [
+            this.channels[1],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ]]);
 
     createChannel(user: User, name: string, visibility: string): Channel {
         const channel: Channel = {
@@ -113,7 +125,13 @@ export class ChannelRepo implements ChannelRepoInterface {
     }
 
     getChannelsOfUser(user: User, userId: number): Channel[] {
-        return this.channels.filter(channel => this.channelMembers.get(channel)!.find(member => member.user.id === userId));
+        const userChannels: Channel[] = [];
+        this.channelMembers.forEach((members, channel) => {
+            if (members.find(member => member.user.id === userId)) {
+                userChannels.push(channel);
+            }
+        })
+        return userChannels;
     }
 
     updateChannelName(user: User, channelId: number, newName: string): Channel {
