@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
-import Logo from '../img/logo.png';
 import Alert from '@mui/material/Alert';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useRegister } from './useRegister';
+import Logo from '../../../public/logo.png';
+
 
 export function Register() {
     const {id} = useParams();

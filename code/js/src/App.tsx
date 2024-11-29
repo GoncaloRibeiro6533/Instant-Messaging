@@ -15,7 +15,7 @@ import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
-import Profile from './components/profile/profile'
+import { AuthRequire } from './components/auth/AuthRequire'
 //import { ChannelsList} from './components/channels/channelsList'
 
 const router = createBrowserRouter(
