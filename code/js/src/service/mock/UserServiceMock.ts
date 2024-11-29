@@ -7,10 +7,10 @@ import { Repo } from "../../App";
 export class UserServiceMock implements UserService {
     repo: Repo;
 
-  constructor(repo: Repo) {
-    this.repo = repo;
-  }
- 
+    constructor(repo: Repo) {
+        this.repo = repo;
+    }
+
     async login(username: string, password: string): Promise<AuthenticatedUser | undefined> {
         await delay(1000);
         const user = this.repo.userRepo.users.find(user => user.username === username);
@@ -65,5 +65,19 @@ export class UserServiceMock implements UserService {
         this.repo.userRepo.updateUser(user);
         return user;
     }
+
+    async getUserById(token: string, userId: number): Promise<User> {
+        await delay(500);
+        const userVerify = this.repo.userRepo.tokens.get(token);
+        if (!userVerify) {
+            throw new Error("Invalid token");
+        }
+        const user = this.repo.userRepo.users.find(user => user.id === userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user;
+    }
+
 }
 

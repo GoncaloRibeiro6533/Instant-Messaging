@@ -1,5 +1,5 @@
 import {
-    createBrowserRouter, Link, Navigate, Outlet, RouterProvider, useParams
+    createBrowserRouter, Link, Outlet, RouterProvider, useParams,
 } from 'react-router-dom'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Home } from './components/home/home'
@@ -12,11 +12,11 @@ import { ChannelRepo } from './service/mock/repo/ChannelRepo'
 import { MessageRepo } from './service/mock/repo/MessageRepo'
 import { ChannelServiceMock} from './service/mock/ChannelServiceMock'
 import { MessageServiceMock } from './service/mock/MessageServiceMock'
-import { AuthRequire } from './components/auth/AuthRequire'
 import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import Profile from './components/profile/profile'
+//import { ChannelsList} from './components/channels/channelsList'
 
 const router = createBrowserRouter(
     [
@@ -25,6 +25,7 @@ const router = createBrowserRouter(
             element: 
                     <><MenuAppBar /><Home /></>,
             "children": [
+               
             ]   
         },
         {
@@ -33,8 +34,8 @@ const router = createBrowserRouter(
          },
         {
             "path": "/login",
-            element: 
-                    <Login/>
+            element:
+                 <Login />
          },
          {
             "path": "/about",
@@ -44,15 +45,27 @@ const router = createBrowserRouter(
                 <About />
             </AuthRequire>
         },
+        /*{
+            "path": "/channels",
+            element:
+            <AuthProvider>
+                <MenuAppBar/>
+                <ChannelsList />
+            </AuthProvider>
         {
             "path": "/profile",
-            element: 
+            element:
             <AuthRequire>
                 <MenuAppBar/>
                 <Profile />
             </AuthRequire>
         }
 ]
+
+         */
+
+
+    ]
 )
 
 export const userRepoMock = new UserRepo()

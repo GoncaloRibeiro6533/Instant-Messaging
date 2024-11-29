@@ -7,4 +7,5 @@ export interface UserService {
     register(email: string, username: string, password: string, invitationId: number): Promise<User>;
     logOut(token: string): Promise<void>;
     updateUsername(token: string, newUsername: string): Promise<User>;
+    getUserById(token: string, userId: number): Promise<User>;
 }

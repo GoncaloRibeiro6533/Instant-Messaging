@@ -31,6 +31,26 @@ export class ChannelRepo implements ChannelRepoInterface {
                 email: 'bob@example.com'
             },
             visibility: Visibility.PUBLIC
+        },
+        {
+            id: 2,
+            name: 'Channel 2',
+            creator: {
+                id: 2,
+                username: 'Alice',
+                email: 'alice@email.com'
+            },
+            visibility: Visibility.PUBLIC
+        },
+        {
+            id: 3,
+            name: 'Channel 3',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
         }
     ]
 
@@ -43,6 +63,14 @@ export class ChannelRepo implements ChannelRepoInterface {
                         id: 1,
                         username: 'Bob',
                         email: 'bob@example.com'
+                    },
+                    role: Role.READ_WRITE
+                },
+                {
+                    user: {
+                        id: 2,
+                        username: 'Alice',
+                        email: 'alice@email.com'
                     },
                     role: Role.READ_WRITE
                 }

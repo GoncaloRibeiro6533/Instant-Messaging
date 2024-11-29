@@ -8,9 +8,6 @@ type State =
     {name: "redirecting", username: string, password: string}/*
     {name: string, error: string, username: string, password: string, } */
 
-
-
-
 type Action = 
     { type: "edit", field: "username" | "password", value: string } 
     | { type: "submit" } 
@@ -94,8 +91,7 @@ export function useLogin() : [State, {
     }    
     function onChange(ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { dispatch({ type: "edit", field: ev.currentTarget.name as "username" | "password", value: ev.currentTarget.value }) }
     return[
-        state
-        ,
+        state,
         {
             onSubmit: onSubmit,
             onChange: onChange
