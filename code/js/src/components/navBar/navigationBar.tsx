@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import InboxIcon from '@mui/icons-material/Inbox';
+import LoginIcon from '@mui/icons-material/Login';
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -19,8 +21,8 @@ import { useNavigate } from 'react-router-dom';
 const menuItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'About', path: '/about', icon: <InfoIcon /> },
-    { label: 'Login', path: '/login', icon: < InfoIcon/> },
-    { label: 'Channels List', path: '/channels', icon: <InfoIcon /> },
+    { label: 'Login', path: '/login', icon: < LoginIcon/> },
+    { label: 'Channels List', path: '/channels', icon: <InboxIcon /> },
 ];
 
 export default function MenuDrawer() {

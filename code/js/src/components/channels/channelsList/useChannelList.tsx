@@ -1,8 +1,8 @@
 
 import * as React from "react";
-import { services } from "../../App";
-import { Channel } from "../../domain/Channel";
-import {AuthContext} from "../auth/AuthProvider";
+import { services } from "../../../App";
+import { Channel } from "../../../domain/Channel";
+import {AuthContext} from "../../auth/AuthProvider";
 
 
 type State =
@@ -52,7 +52,7 @@ export function useChannelList(): [State, onChange: () => void] {
     }
 
     React.useEffect(() => {
-        loadChannels().then(r => console.log(r));
+        loadChannels()
     }, [user.user.id]);
 
     return [state, loadChannels];

@@ -1,7 +1,6 @@
 import {
-    createBrowserRouter, Link, Outlet, RouterProvider, useParams,
+    createBrowserRouter, RouterProvider,
 } from 'react-router-dom'
-import { AuthProvider } from './components/auth/AuthProvider'
 import { Home } from './components/home/home'
 import { Login } from './components/login/login'
 import * as React from 'react'
@@ -16,7 +15,8 @@ import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
-import {ChannelsList} from "./components/channels/channelsList";
+import {ChannelsList} from "./components/channels/channelsList/channelsList";
+import {ChannelDetails} from "./components/channels/channelDetails";
 //import { ChannelsList} from './components/channels/channelsList'
 
 const router = createBrowserRouter(
@@ -63,6 +63,14 @@ const router = createBrowserRouter(
         }
 
          */
+        {
+            "path": "/channels/:id",
+            element:
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <ChannelDetails/>
+                </AuthRequire>
+        }
 ]
 
 
