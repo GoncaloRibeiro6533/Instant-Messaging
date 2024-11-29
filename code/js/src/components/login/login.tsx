@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useLogin } from './useLogin';
 import { Navigate, useLocation } from 'react-router-dom';
-import Logo from '../img/logo.png';
+import Logo from '../../../public/logo.png';
 import Alert from '@mui/material/Alert';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';

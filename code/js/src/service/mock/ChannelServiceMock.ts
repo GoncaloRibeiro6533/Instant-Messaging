@@ -1,10 +1,8 @@
-import { ChannelService } from '../interfaces/ChannelService';
-import { Channel } from '../../domain/Channel';
-import { Visibility } from '../../domain/Visibility';
-import { Role } from '../../domain/Role';
-import { User } from '../../domain/User';
-import { ChannelMember } from '../../domain/ChannelMember';
-import { Repo } from '../../App';
+import {ChannelService} from '../interfaces/ChannelService';
+import {Channel} from '../../domain/Channel';
+import {Role} from '../../domain/Role';
+import {ChannelMember} from '../../domain/ChannelMember';
+import {Repo} from '../../App';
 
 export class ChannelServiceMock implements ChannelService {
     repo: Repo;
@@ -19,8 +17,7 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        const channel: Channel = this.repo.channelRepo.createChannel(user, name, visibility);
-        return channel;
+        return this.repo.channelRepo.createChannel(user, name, visibility);
     }
 
     async joinChannel(token: string, channelId: number, role: Role): Promise<Channel> {
@@ -28,8 +25,7 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        const channel = this.repo.channelRepo.joinChannel(user, channelId, role);
-        return channel;
+        return this.repo.channelRepo.joinChannel(user, channelId, role);
     }
 
     async searchChannelByName(token: string, name: string, limit: number, skip: number): Promise<Channel[]> {

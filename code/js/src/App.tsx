@@ -1,6 +1,4 @@
-import {
-    createBrowserRouter, Link, Outlet, RouterProvider, useParams,
-} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Home } from './components/home/home'
 import { Login } from './components/login/login'
@@ -8,15 +6,13 @@ import * as React from 'react'
 import { UserServiceMock } from './service/mock/UserServiceMock'
 import Service from './service/Service'
 import { UserRepo } from './service/mock/repo/UserRepo'
-import { Channel } from './components/channel/channel'
 import { ChannelRepo } from './service/mock/repo/ChannelRepo'
 import { MessageRepo } from './service/mock/repo/MessageRepo'
 import { ChannelServiceMock} from './service/mock/ChannelServiceMock'
 import { MessageServiceMock } from './service/mock/MessageServiceMock'
-import { AuthRequire } from './components/auth/AuthRequire'
 import { About } from './components/about/about'
-import { AuthContext } from './components/auth/AuthProvider'
 import MenuAppBar from './components/navBar/navigationBar'
+//import { ChannelsList} from './components/channels/channelsList'
 
 const router = createBrowserRouter(
     [
@@ -34,30 +30,27 @@ const router = createBrowserRouter(
         {
             "path": "/login",
             element: 
-                 <AuthProvider>
-                    <Login />
-                 </AuthProvider>
+                 <AuthProvider> <Login /> </AuthProvider>
          },
          {
             "path": "/about",
             element: 
             <AuthProvider>
-            <AuthRequire>
                 <MenuAppBar/>
                 <About />
-            </AuthRequire>
             </AuthProvider>
         },
-        {
-            "path": "/channel/:channelId",
-            "element": 
-                <AuthProvider>
-                    <AuthRequire>
-                        <MenuAppBar/>
-                        <Channel/>
-                    </AuthRequire>,
-                </AuthProvider>
+        /*{
+            "path": "/channels",
+            element:
+            <AuthProvider>
+                <MenuAppBar/>
+                <ChannelsList />
+            </AuthProvider>
         }
+
+         */
+
 
     ]
 )
