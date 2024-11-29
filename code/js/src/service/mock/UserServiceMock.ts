@@ -23,6 +23,7 @@ export class UserServiceMock implements UserService {
         }
         const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         this.repo.userRepo.tokens.set(token, user.id);
+        console.log(this.repo.userRepo.tokens);
         return Promise.resolve({
             user,
             token

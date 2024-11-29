@@ -1,5 +1,5 @@
 import {
-    createBrowserRouter, Link, Outlet, RouterProvider, useParams,
+    createBrowserRouter, RouterProvider,
 } from 'react-router-dom'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Home } from './components/home/home'
@@ -16,6 +16,8 @@ import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
+import {ChannelsList} from "./components/channels/channelsList/channelsList";
+import {ChannelDetails} from "./components/channels/channelDetails";
 //import { ChannelsList} from './components/channels/channelsList'
 import { Profile } from './components/profile/profile'
 import { Message } from './components/channel/message'
@@ -30,7 +32,6 @@ const router = createBrowserRouter(
             element: 
                     <><MenuAppBar /><Home /></>,
             "children": [
-               
             ]   
         },
         {
@@ -51,11 +52,20 @@ const router = createBrowserRouter(
             </AuthRequire>
         },
        {
+        {
+            "path": "/channels",
+            element:
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <ChannelsList/>
+                </AuthRequire>
+        },
+        /*{
             "path": "/profile",
             element:
             <AuthRequire>
             <MenuAppBar/>
-                <Profile />            
+                <Profile />
             </AuthRequire>
         },
         {
@@ -87,10 +97,25 @@ const router = createBrowserRouter(
             element:
             <ChatBox />
             },
+        }
+
+         */
+        {
+            "path": "/channels/:id",
+            element:
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <ChannelDetails/>
+                </AuthRequire>
+        }
 ]
+
+
 
 )
 
+
+)
 const message = [
     {
         id: 0,

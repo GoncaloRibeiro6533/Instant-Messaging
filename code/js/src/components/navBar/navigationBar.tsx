@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import InboxIcon from '@mui/icons-material/Inbox';
+import LoginIcon from '@mui/icons-material/Login';
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -21,14 +23,14 @@ import { AuthContext } from '../auth/AuthProvider';
 const menuItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'About', path: '/about', icon: <InfoIcon /> },
-    { label: 'Login', path: '/login', icon: <InfoIcon /> },
-    { label: 'Channels List', path: '/channels', icon: <InfoIcon /> },
+    { label: 'Login', path: '/login', icon: < LoginIcon/> },
+    { label: 'Channels List', path: '/channels', icon: <InboxIcon /> },
 ];
 
 export default function MenuDrawer() {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const navigate = useNavigate();
-    const { user } = React.useContext(AuthContext)    
+    const { user } = React.useContext(AuthContext)
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -41,7 +43,7 @@ export default function MenuDrawer() {
         setIsDrawerOpen(open);
     };
 
-    return ( 
+    return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar
                 position="static"
@@ -125,10 +127,10 @@ export default function MenuDrawer() {
                     <ListItem
                         sx={{
                             marginTop: 'auto',
-                            marginBottom: '60px',  
-                            display: 'flex',       
-                            justifyContent: 'center', 
-                            textAlign: 'center',   
+                            marginBottom: '60px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            textAlign: 'center',
                         }}
                         >
                     <LogoutButton />

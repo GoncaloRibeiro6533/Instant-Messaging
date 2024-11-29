@@ -1,8 +1,8 @@
-/*
+
 import * as React from "react";
-import { services } from "../../App";
-import { Channel } from "../../domain/Channel";
-import {AuthContext} from "../auth/AuthProvider";
+import { services } from "../../../App";
+import { Channel } from "../../../domain/Channel";
+import {AuthContext} from "../../auth/AuthProvider";
 
 
 type State =
@@ -11,7 +11,6 @@ type State =
     | { name: "error", message: string };
 
 type Action =
-    { type: "edit", field: "name", value: string }
     | { type: "load" }
     | { type: "success", channels: Channel[] }
     | { type: "error", message: string };
@@ -45,7 +44,6 @@ export function useChannelList(): [State, onChange: () => void] {
     async function loadChannels() {
         dispatch({ type: "load" });
         try {
-
             const channels = await services.channelService.getChannelsOfUser(user.token,user.user.id);
             dispatch({ type: "success", channels });
         } catch (e) {
@@ -54,10 +52,9 @@ export function useChannelList(): [State, onChange: () => void] {
     }
 
     React.useEffect(() => {
-        loadChannels().then(r => console.log(r));
+        loadChannels()
     }, [user.user.id]);
 
     return [state, loadChannels];
 }
 
- */
