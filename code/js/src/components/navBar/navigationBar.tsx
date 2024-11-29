@@ -15,17 +15,20 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
+import { LogoutButton } from '../logout/logoutButton';
+import { AuthContext } from '../auth/AuthProvider';
 
 const menuItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'About', path: '/about', icon: <InfoIcon /> },
-    { label: 'Login', path: '/login', icon: < InfoIcon/> },
+    { label: 'Login', path: '/login', icon: <InfoIcon /> },
     { label: 'Channels List', path: '/channels', icon: <InfoIcon /> },
 ];
 
 export default function MenuDrawer() {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const navigate = useNavigate();
+    const { user } = React.useContext(AuthContext)    
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -38,13 +41,14 @@ export default function MenuDrawer() {
         setIsDrawerOpen(open);
     };
 
-    return (
+    return ( 
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static"
-                    sx={{
-                        backgroundColor: '#000000',
-                        color: '#FFFFFF',
-                    }}
+            <AppBar
+                position="static"
+                sx={{
+                    backgroundColor: '#000000',
+                    color: '#FFFFFF',
+                }}
             >
                 <Toolbar>
                     {/* Menu Icon to toggle Drawer */}
@@ -60,12 +64,16 @@ export default function MenuDrawer() {
                     </IconButton>
 
                     {/* Title */}
-                    <Typography variant="h6" component="div" sx={{flexGrow: 1,}}>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         ChImp
                     </Typography>
 
                     {/* Account Circle */}
-                    <IconButton size="large" aria-label="account of current user" sx={{color: '#FFFFFF'}}
+                    <IconButton
+                        size="large"
+                        aria-label="account of current user"
+                        sx={{ color: '#FFFFFF' }}
+                        onClick={() => navigate('/profile')}
                     >
                         <AccountCircle />
                     </IconButton>
@@ -73,25 +81,38 @@ export default function MenuDrawer() {
             </AppBar>
 
             {/* Drawer Component */}
-            <Drawer anchor="left" open={isDrawerOpen} onClose={toggleDrawer(false)}
-                    PaperProps={{
-                        sx: {
-                            width: 250,
-                            backgroundColor: '#242424',
-                            color: '#FFFFFF',
-                        },
-                    }}
+            <Drawer
+                anchor="left"
+                open={isDrawerOpen}
+                onClose={toggleDrawer(false)}
+                PaperProps={{
+                    sx: {
+                        width: 250,
+                        backgroundColor: '#242424',
+                        color: '#FFFFFF',
+                        display: 'flex',
+                        flexDirection: 'column',  // Arrange content in a column
+                        height: '100vh',  // Full height
+                    },
+                }}
             >
-                <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
-                    <List>
+                <Box
+                    role="presentation"
+                    onClick={toggleDrawer(false)}
+                    onKeyDown={toggleDrawer(false)}
+                    sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}  // Ensure the Box takes up full height
+                >
+                    {/* Menu items */}
+                    <List sx={{ flexGrow: 1 }}>
                         {menuItems.map((item, index) => (
                             <ListItem key={index} disablePadding>
                                 <ListItemButton
                                     onClick={() => navigate(item.path)}
-                                    sx={{'&:hover': {backgroundColor: '#333',},
+                                    sx={{
+                                        '&:hover': { backgroundColor: '#333' },
                                     }}
                                 >
-                                    <ListItemIcon sx={{color: '#FFFFFF'}}>
+                                    <ListItemIcon sx={{ color: '#FFFFFF' }}>
                                         {item.icon}
                                     </ListItemIcon>
                                     <ListItemText primary={item.label} />
@@ -99,6 +120,19 @@ export default function MenuDrawer() {
                             </ListItem>
                         ))}
                     </List>
+
+                    {/* Logout Button */}
+                    <ListItem
+                        sx={{
+                            marginTop: 'auto',
+                            marginBottom: '60px',  
+                            display: 'flex',       
+                            justifyContent: 'center', 
+                            textAlign: 'center',   
+                        }}
+                        >
+                    <LogoutButton />
+                   </ListItem>
                 </Box>
             </Drawer>
         </Box>

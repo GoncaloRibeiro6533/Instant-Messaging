@@ -25,6 +25,11 @@ export class UserRepo implements UserRepoInterface {
             id: 1,
             username: 'Bob',
             email: 'bob@example.com'
+        },
+        {
+            id: 2,
+            username: 'Alice',
+            email: 'alice@example.com'
         }
     ];
     public usersPassword: Map<number, string> = new Map([

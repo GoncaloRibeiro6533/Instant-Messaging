@@ -12,7 +12,6 @@ export function Home() {
         {user ? (
             <div>
               <p>Welcome, {user.user.username}!</p>
-              <LogoutButton />
               <li><Link to="/about">About</Link></li>
               <Link to="/register/14">Register</Link>
               <Outlet />
