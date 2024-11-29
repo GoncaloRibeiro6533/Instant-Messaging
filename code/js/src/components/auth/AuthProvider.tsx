@@ -12,6 +12,7 @@ export const AuthContext = createContext<AuthContextType>({
     user: undefined,
     setUser: () => {
     },
+    
 
 })
 

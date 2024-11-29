@@ -29,21 +29,18 @@ export class UserServiceMock implements UserService {
         })
     }
 
-    async register(email: string, password: string): Promise<AuthenticatedUser> {
+    async register(email: string, username:string, password: string, invitationId:number): Promise<User> {
         await delay(1000);
-        const user = {
-            id: this.repo.userRepo.nextId++,
-            username: email.split('@')[0],
-            email
-        };
-        this.repo.userRepo.users.push(user);
-        this.repo.userRepo.usersPassword.set(user.id, password);
-        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        this.repo.userRepo.tokens.set(token, user.id);
-        return {
-            user,
-            token
-        };
+        //TODO check if email is already in use
+        if (this.repo.userRepo.users.find(user => user.email === email)) {
+            throw new Error("Email already in use");
+        }
+        if (this.repo.userRepo.users.find(user => user.username === username)) {
+            throw new Error("Username already in use");
+        }
+        //TODO check if invitationId is valid
+        const user = this.repo.userRepo.createUser(username, email, password);
+        return user;
     }
 
     async logOut(token: string): Promise<void> {
@@ -61,7 +58,11 @@ export class UserServiceMock implements UserService {
         if (!user) {
             throw new Error("User not found");
         }
+        if (this.repo.userRepo.users.find(user => user.username === newUsername)) {
+            throw new Error("Username already in use");
+        }
         user.username = newUsername;
+        this.repo.userRepo.updateUser(user);
         return user;
     }
 }

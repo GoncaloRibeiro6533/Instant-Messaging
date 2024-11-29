@@ -14,7 +14,7 @@ export function Home() {
               <p>Welcome, {user.user.username}!</p>
               <LogoutButton />
               <li><Link to="/about">About</Link></li>
-              <li><Link to="/channel/1">Channel 1</Link></li>
+              <Link to="/register/14">Register</Link>
               <Outlet />
               </div>
         ) : (

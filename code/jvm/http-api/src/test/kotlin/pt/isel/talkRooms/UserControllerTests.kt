@@ -232,10 +232,14 @@ class UserControllerTests {
     @MethodSource("transactionManagers")
     fun `login should fail with bad request`(trxManager: TransactionManager){
         val controller = UserController(createUserService(trxManager, TestClock()))
+        val firstUser = controller.registerFirstUser(
+            UserRegisterInput("Alice", "alice@example.com", "Bob_123dsad")
+        )
+        assertEquals(HttpStatus.CREATED, firstUser.statusCode)
         val newUser = controller.registerFirstUser(
         UserRegisterInput("Bob", "bob@example.com", "Bob_123dsad")
         )
-        assertEquals(HttpStatus.BAD_REQUEST, newUser.statusCode)
+        assertEquals(HttpStatus.CONFLICT, newUser.statusCode)
     }
 
     @ParameterizedTest

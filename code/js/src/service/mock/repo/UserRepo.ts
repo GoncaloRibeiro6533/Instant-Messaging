@@ -31,6 +31,10 @@ export class UserRepo implements UserRepoInterface {
         [1, '123'],
     ]);
 
+    private invitations = new Map<number, string>(
+        [[1, "alice@example.com"]]
+    );
+
     createUser(username: string, email: string, password: string): User {
         const user = {
             id: this.nextId++,

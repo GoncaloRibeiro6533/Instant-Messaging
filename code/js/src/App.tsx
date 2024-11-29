@@ -1,5 +1,5 @@
 import {
-    createBrowserRouter, Link, Outlet, RouterProvider, useParams,
+    createBrowserRouter, Link, Navigate, Outlet, RouterProvider, useParams
 } from 'react-router-dom'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Home } from './components/home/home'
@@ -8,58 +8,51 @@ import * as React from 'react'
 import { UserServiceMock } from './service/mock/UserServiceMock'
 import Service from './service/Service'
 import { UserRepo } from './service/mock/repo/UserRepo'
-import { Channel } from './components/channel/channel'
 import { ChannelRepo } from './service/mock/repo/ChannelRepo'
 import { MessageRepo } from './service/mock/repo/MessageRepo'
 import { ChannelServiceMock} from './service/mock/ChannelServiceMock'
 import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { AuthRequire } from './components/auth/AuthRequire'
 import { About } from './components/about/about'
-import { AuthContext } from './components/auth/AuthProvider'
 import MenuAppBar from './components/navBar/navigationBar'
+import { Register } from './components/register/register'
+import Profile from './components/profile/profile'
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
             element: 
-                <AuthProvider>
-                    <MenuAppBar/>
-                    <Home />
-                </AuthProvider>,
+                    <><MenuAppBar /><Home /></>,
             "children": [
-               
             ]   
         },
         {
+            "path": "/register/:id",
+            element: <Register/>
+         },
+        {
             "path": "/login",
             element: 
-                 <AuthProvider>
-                    <Login />
-                 </AuthProvider>
+                    <Login/>
          },
          {
             "path": "/about",
             element: 
-            <AuthProvider>
             <AuthRequire>
                 <MenuAppBar/>
                 <About />
             </AuthRequire>
-            </AuthProvider>
         },
         {
-            "path": "/channel/:channelId",
-            "element": 
-                <AuthProvider>
-                    <AuthRequire>
-                        <MenuAppBar/>
-                        <Channel/>
-                    </AuthRequire>,
-                </AuthProvider>
+            "path": "/profile",
+            element: 
+            <AuthRequire>
+                <MenuAppBar/>
+                <Profile />
+            </AuthRequire>
         }
-
-    ]
+]
 )
 
 export const userRepoMock = new UserRepo()
@@ -88,6 +81,6 @@ export const services: Service = mockService;
 
 export function App() {
     return (
-            <RouterProvider router={router} />
+            <RouterProvider router={router} future={{ v7_startTransition: true }}/>
     );
   }
