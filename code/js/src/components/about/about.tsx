@@ -1,5 +1,4 @@
 import * as React from "react"
-import * as ReactDom from 'react-dom/client'
 import Button from '@mui/material/Button'
 import EmailIcon from '@mui/icons-material/Email'
 import Link from '@mui/material/Link'

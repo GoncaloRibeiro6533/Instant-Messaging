@@ -8,21 +8,33 @@ import { useNavigate } from 'react-router-dom';
 interface ChannelProps {
     channel: Channel;
     onLeave: () => void;
+    loadChannels?: () => void;
+    handleLeaveChannel: (channelId: number) => void;
 }
 
-export function Channel({ channel, onLeave }: ChannelProps) {
+export function Channel({ channel, onLeave, loadChannels, handleLeaveChannel }: ChannelProps) {
     const navigate = useNavigate();
 
     const handleClick = () => {
         navigate(`/channel/${channel.id}`);
     };
 
-    /*const handleLeaveClick = () => {
+    const handleLeaveClick = async () => {
+        handleLeaveChannel(channel.id);
         onLeave();
-    };*/
+        if (loadChannels) {
+            loadChannels();
+        }
+    };
 
     return (
-        <div style={{ width: '100%', padding: '16px', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center' }}>
+        <div style={{
+            width: '100%',
+            padding: '16px',
+            borderBottom: '1px solid #ddd',
+            display: 'flex',
+            alignItems: 'center'
+        }}>
             <ListItemButton onClick={handleClick}>
                 <Avatar sx={{ bgcolor: getRandomColor(channel.id), width: 40, height: 40 }}>
                     {channel.name.charAt(0)}

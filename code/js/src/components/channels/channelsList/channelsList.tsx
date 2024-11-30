@@ -1,17 +1,17 @@
 import * as React from 'react';
-import {Channel} from '../../../domain/Channel';
-import {AuthContext} from '../../auth/AuthProvider';
-import {useChannelList} from './useChannelList';
-import {services} from '../../../App';
+import { Channel } from '../../../domain/Channel';
+import { AuthContext } from '../../auth/AuthProvider';
+import { useChannelList } from './useChannelList';
+import { services } from '../../../App';
 import Logo from "../../../../public/logo.png";
-import {getRandomColor} from '../../utils/channelLogoColor';
-import {Channel as ChannelComponent} from '../channel';
-import {useNavigate} from "react-router-dom";
+import { getRandomColor } from '../../utils/channelLogoColor';
+import { Channel as ChannelComponent } from '../channel';
+import { useNavigate } from "react-router-dom";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import {Add} from "@mui/icons-material";
-import {Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField} from '@mui/material';
+import { Add } from "@mui/icons-material";
+import { Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import {Visibility} from "../../../domain/Visibility";
+import { Visibility } from "../../../domain/Visibility";
 
 export function ChannelsList() {
     const { user } = React.useContext(AuthContext);
@@ -25,6 +25,10 @@ export function ChannelsList() {
         loadChannels();
     }, [user.user.id]);
 
+    const handleSelectChannel = (channel: Channel) => {
+        setSelectedChannel(channel);
+    };
+
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchChannels(term);
@@ -37,6 +41,22 @@ export function ChannelsList() {
             }
         } else {
             setSearchResults([]);
+        }
+    };
+
+    const handleLeaveChannel = async (channelId: number) => {
+        try {
+            await services.channelService.leaveChannel(user.token, channelId);
+
+            loadChannels();
+
+            if (selectedChannel && selectedChannel.id === channelId) {
+                setSelectedChannel(null);
+            }
+
+            console.log(`Channel ${channelId} deleted`);
+        } catch (error) {
+            console.error("Error deleting channel:", error.message);
         }
     };
 
@@ -66,7 +86,7 @@ export function ChannelsList() {
                     value={searchChannels}
                     onChange={handleSearch}
                     sx={{ marginBottom: '16px' }}
-                    InputProps={{ //todo try another way because its deprecated
+                    InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
@@ -75,9 +95,9 @@ export function ChannelsList() {
                     }}
                 />
                 <List>
-                    {channelsToDisplay.map((channel: Channel) => (
-                        <React.Fragment key={channel.id}>
-                            <ListItemButton onClick={() => setSelectedChannel(channel)}>
+                    {channelsToDisplay.map((channel: Channel, index) => (
+                        <React.Fragment key={`${channel.id}-${index}`}>
+                            <ListItemButton onClick={() => handleSelectChannel(channel)}>
                                 <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
                                     {channel.name.charAt(0)}
                                 </Avatar>
@@ -92,6 +112,8 @@ export function ChannelsList() {
                                         />
                                     }
                                     sx={{ marginLeft: 2 }}
+                                    primaryTypographyProps={{ component: 'span' }}
+                                    secondaryTypographyProps={{ component: 'span' }}
                                 />
                             </ListItemButton>
                             <Divider />
@@ -99,13 +121,29 @@ export function ChannelsList() {
                     ))}
                 </List>
             </Box>
+
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {selectedChannel && <ChannelComponent channel={selectedChannel} onLeave={() => {
-                    setSelectedChannel(null);
-                }} />}
+                {selectedChannel && (
+                    <ChannelComponent
+                        channel={selectedChannel}
+                        onLeave={() => setSelectedChannel(null)}
+                        loadChannels={loadChannels}
+                        handleLeaveChannel={handleLeaveChannel}
+                    />
+                )}
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     {!selectedChannel && (
-                        <img src={Logo} alt="Logo" width={250} style={{ opacity: 0.5, maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                        <img
+                            src={Logo}
+                            alt="Logo"
+                            width={250}
+                            style={{
+                                opacity: 0.5,
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                            }}
+                        />
                     )}
                 </Box>
             </Box>
