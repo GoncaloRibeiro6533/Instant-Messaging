@@ -3,7 +3,6 @@ import { Channel } from '../../domain/Channel';
 import Avatar from '@mui/material/Avatar';
 import { getRandomColor } from '../utils/channelLogoColor';
 import ListItemButton from "@mui/material/ListItemButton";
-import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
 interface ChannelProps {
@@ -18,9 +17,9 @@ export function Channel({ channel, onLeave }: ChannelProps) {
         navigate(`/channel/${channel.id}`);
     };
 
-    const handleLeaveClick = () => {
+    /*const handleLeaveClick = () => {
         onLeave();
-    };
+    };*/
 
     return (
         <div style={{ width: '100%', padding: '16px', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center' }}>
