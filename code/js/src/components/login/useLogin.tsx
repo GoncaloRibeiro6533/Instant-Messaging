@@ -5,8 +5,7 @@ import { services } from "../../App"
 type State = 
     {name: "editing", error?: string, username: string, password: string, } |
     {name: "submitting", username: string, password: string } | 
-    {name: "redirecting", username: string, password: string}/*
-    {name: string, error: string, username: string, password: string, } */
+    {name: "redirecting", username: string, password: string}
 
 type Action = 
     { type: "edit", field: "username" | "password", value: string } 
@@ -40,27 +39,14 @@ function reduce(state: State, action: Action): State {
             return state
         }
         
-    }/*
-   switch (action.type) {
-        case "edit": {
-            return { ...state, [action.field]: action.value }
-        }
-        case "submit": {
-            return { name: "submitting", username: state.username, password: state.password, error: "" }
-        }
-        case "success": {
-            return { name: "redirecting", username: state.username, password: state.password, error: "" }
-        }
-        case "error": {
-            return { name: "editing", username: state.username, password: "", error: action.message }
-        }
-   }*/
+    }
 }
 
 export function useLogin() : [State, { 
     onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
     onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void 
 }] {
+    
    const [state, dispatch] = React.useReducer(reduce, 
         { 
             name: "editing",

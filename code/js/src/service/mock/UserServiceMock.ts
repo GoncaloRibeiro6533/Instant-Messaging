@@ -21,8 +21,7 @@ export class UserServiceMock implements UserService {
         if (storedPassword !== password) {
             return undefined;
         }
-        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        this.repo.userRepo.tokens.set(token, user.id);
+        const token = this.repo.userRepo.createToken(user.id);
         console.log(this.repo.userRepo.tokens);
         return Promise.resolve({
             user,
@@ -46,16 +45,12 @@ export class UserServiceMock implements UserService {
 
     async logOut(token: string): Promise<void> {
         await delay(1000);
-        this.repo.userRepo.tokens.delete(token);
+        this.repo.userRepo.deleteToken(token);
     }
 
     async updateUsername(token: string, newUsername: string): Promise<User> {
         await delay(1000);
-        const userId = this.repo.userRepo.tokens.get(token);
-        if (!userId) {
-            throw new Error("Invalid token");
-        }
-        const user = this.repo.userRepo.users.find(user => user.id === userId);
+        const user = this.repo.userRepo.getUserByToken(token);
         if (!user) {
             throw new Error("User not found");
         }
@@ -69,7 +64,7 @@ export class UserServiceMock implements UserService {
 
     async getUserById(token: string, userId: number): Promise<User> {
         await delay(500);
-        const userVerify = this.repo.userRepo.tokens.get(token);
+        const userVerify = this.repo.userRepo.getUserByToken(token);
         if (!userVerify) {
             throw new Error("Invalid token");
         }

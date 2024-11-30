@@ -5,11 +5,14 @@ import Logo from '../../../public/logo.png';
 import Alert from '@mui/material/Alert';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { AuthContext } from "../auth/AuthProvider";
+
 
 export function Login() {
     const [state, handlers] = useLogin();
     const location = useLocation();
-    if (state.name === 'redirecting') {
+    const { user } = React.useContext(AuthContext)
+    if (state.name === 'redirecting' || user != undefined) {
         return <Navigate to={location.state?.source || '/'} replace={true} />;
     }
     return (

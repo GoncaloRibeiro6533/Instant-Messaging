@@ -3,7 +3,7 @@ import { User } from '../../../domain/User';
 export interface UserRepoInterface {
     users: Array<User>;
     usersPassword: Map<number, string>;
-    tokens: Map<string, number>;
+    tokens:  Map<number, Array<string>>
     nextId: number;
 
     createUser(username: string, email: string, password: string): User;
@@ -13,13 +13,28 @@ export interface UserRepoInterface {
     getUserByToken(token: string): User | undefined;
     updateUser(user: User): void;
     deleteUser(id: number): void;
-
+    deleteToken(token: string): void;
+    createToken(userId: number): string;
+    addToken(userId: number, token: string): void;
    
 }
 
 export class UserRepo implements UserRepoInterface {
+    constructor() {
+        const savedUser = localStorage.getItem("user");
+        const initialUser = savedUser ? JSON.parse(savedUser) : undefined;
+        if (initialUser) {
+            const id = initialUser.user.id;  
+           this.addToken(initialUser.user.id, initialUser.token);
+           // update memo with local storage user
+           this.users = this.users.filter(user => user.id !== id);
+            this.users.push(initialUser.user);
+        }
+    }
     public nextId = 2;
-    public tokens: Map<string, number> = new Map();
+    public tokens: Map<number, Array<string>> = new Map(
+        [[1, ["123"]]]
+    );
     public users: Array<User> = [
         {
             id: 1,
@@ -40,6 +55,14 @@ export class UserRepo implements UserRepoInterface {
         [[1, "alice@example.com"]]
     );
 
+
+    addToken(userId: number, token: string): void {
+        if (this.tokens.has(userId)) {
+            this.tokens.get(userId)!.push(token);
+        } else {
+            this.tokens.set(userId, [token]);
+        }
+    }
     createUser(username: string, email: string, password: string): User {
         const user = {
             id: this.nextId++,
@@ -64,11 +87,28 @@ export class UserRepo implements UserRepoInterface {
     }
 
     getUserByToken(token: string): User | undefined {
-        const userId = this.tokens.get(token);
-        if (!userId) {
-            return undefined;
+        // Percorre o mapa para encontrar o usuário associado ao token
+        for (const [userId, tokens] of this.tokens.entries()) {
+            if (tokens.includes(token)) {
+                // Retorna o usuário correspondente
+                return this.getUserById(userId);
+            }
         }
-        return this.getUserById(userId);
+        // Retorna undefined se o token não for encontrado
+        return undefined;
+    }
+
+    createToken(userId: number): string {
+        // Gera um token aleatório
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        // Adiciona o token ao mapa
+        if (this.tokens.has(userId)) {
+            this.tokens.get(userId)!.push(token);
+        } else {
+            this.tokens.set(userId, [token]);
+        }
+        // Retorna o token gerado
+        return token;
     }
 
     updateUser(user: User): void {
@@ -78,6 +118,14 @@ export class UserRepo implements UserRepoInterface {
 
     deleteUser(id: number): void {
         this.users = this.users.filter(user => user.id !== id);
+    }
+
+    deleteToken(token: string): void {
+        // Percorre o mapa para encontrar o usuário associado ao token
+        for (const [userId, tokens] of this.tokens.entries()) {
+            // Remove o token do usuário
+            this.tokens.set(userId, tokens.filter(t => t !== token));
+        }
     }
 }
 

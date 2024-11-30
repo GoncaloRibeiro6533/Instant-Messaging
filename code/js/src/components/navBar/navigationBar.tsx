@@ -44,7 +44,11 @@ export default function MenuDrawer() {
     };
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ 
+            flexGrow: 1,
+            margin: 0, // Sem margens internas
+            padding: 0, // Sem preenchimentos internos
+             }}>
             <AppBar
                 position="static"
                 sx={{
@@ -64,7 +68,6 @@ export default function MenuDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-
                     {/* Title */}
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         ChImp
@@ -92,9 +95,10 @@ export default function MenuDrawer() {
                         width: 250,
                         backgroundColor: '#242424',
                         color: '#FFFFFF',
-                        display: 'flex',
-                        flexDirection: 'column',  // Arrange content in a column
-                        height: '100vh',  // Full height
+                        margin: 0, // Remove margens
+                        padding: 0, // Remove preenchimentos
+                        boxSizing: 'border-box', // Garante alinhamento
+                        height: '100vh', // Ocupa altura total
                     },
                 }}
             >

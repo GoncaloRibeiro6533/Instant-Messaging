@@ -23,7 +23,7 @@ import { Profile } from './components/profile/profile'
 import { Message } from './components/channel/message'
 import { Visibility } from './domain/Visibility'
 import { Chat } from '@mui/icons-material'
-import { ChatBox } from './components/channel/chatBox'
+import { ChatBox } from './components/channel/chatBox/chatBox'
 
 const router = createBrowserRouter(
     [
@@ -51,7 +51,6 @@ const router = createBrowserRouter(
                 <About />
             </AuthRequire>
         },
-       {
         {
             "path": "/channels",
             element:
@@ -60,7 +59,7 @@ const router = createBrowserRouter(
                     <ChannelsList/>
                 </AuthRequire>
         },
-        /*{
+        {
             "path": "/profile",
             element:
             <AuthRequire>
@@ -69,37 +68,10 @@ const router = createBrowserRouter(
             </AuthRequire>
         },
         {
-            "path": "/message",
-            element:
-            <Message message={{
-                    id: 0,
-                    sender: {
-                        id: 0,
-                        username: 'Alice',
-                        email: ''
-                    },
-                    channel: {
-                        id: 0,
-                        name: '',
-                        creator: {
-                            id: 0,
-                            username: 'Bob',
-                            email: ''
-                        },
-                        visibility: Visibility.PUBLIC
-                    },
-                    content: 'Banana very very very very very llllllllllllllllllllllllllllllllllllllllllll oooooooooooooooooooo nnnnnnnnnnnnnnnnnn    nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn   gggggggggggggg mmmmmmmmmmmmmrrrrrrrrrrrrreeeeeeeeeeeessssssssssssssssssaaaaaaaaaaaaaaggggggggggggggggggggggggeeeeeeeeeee',
-                    timestamp: new Date()
-                }} />
-        },
-        {
             "path": "/channel",
             element:
             <ChatBox />
-            },
-        }
-
-         */
+        },
         {
             "path": "/channels/:id",
             element:
@@ -109,55 +81,8 @@ const router = createBrowserRouter(
                 </AuthRequire>
         }
 ]
-
-
-
 )
 
-
-)
-const message = [
-    {
-        id: 0,
-        sender: {
-            id: 0,
-            username: 'Alice',
-            email: ''
-        },
-        channel: {
-            id: 0,
-            name: '',
-            creator: {
-                id: 0,
-                username: 'Bob',
-                email: ''
-            },
-            visibility: Visibility.PUBLIC
-        },
-        content: 'Banana very very very very very llllllllllllllllllllllllllllllllllllllllllll oooooooooooooooooooo nnnnnnnnnnnnnnnnnn    nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn   gggggggggggggg mmmmmmmmmmmmmrrrrrrrrrrrrreeeeeeeeeeeessssssssssssssssssaaaaaaaaaaaaaaggggggggggggggggggggggggeeeeeeeeeee',
-        timestamp: new Date()
-    },
-    {
-        id: 1,
-        sender: {
-            id: 0,
-            username: 'Bob',
-            email: ''
-        },
-        channel: {
-            id: 0,
-            name: '',
-            creator: {
-                id: 0,
-                username: 'Bob',
-                email: ''
-            },
-            visibility: Visibility.PUBLIC
-        },
-        content: 'Banana very very very very very',
-        timestamp: new Date()
-    },
-]
 
 export const userRepoMock = new UserRepo()
 export const channelRepoMock = new ChannelRepo()
