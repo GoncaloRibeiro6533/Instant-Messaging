@@ -17,8 +17,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-import { LogoutButton } from '../logout/logoutButton';
+import { Add, Chat, Logout } from "@mui/icons-material";
 import { AuthContext } from '../auth/AuthProvider';
+import { LogoutButton } from '../logout/logoutButton';
 
 const menuItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
@@ -30,7 +31,7 @@ const menuItems = [
 export default function MenuDrawer() {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const navigate = useNavigate();
-    const { user } = React.useContext(AuthContext)
+    const { user } = React.useContext(AuthContext);
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -43,8 +44,23 @@ export default function MenuDrawer() {
         setIsDrawerOpen(open);
     };
 
+    const menuItems = [
+        { label: 'Home', path: '/', icon: <HomeIcon /> },
+        { label: 'About', path: '/about', icon: <InfoIcon /> },
+    ];
+
+    if (user) {
+        menuItems.push(
+            { label: 'Channels List', path: '/channels', icon: <Chat /> },
+            { label: 'Create Channel', path: '/createChannel', icon: <Add /> },
+            { label: 'Logout', path: '/logout', icon: <Logout /> } //todo not working here, maybe move to profile Icon
+        );
+    } else {
+        menuItems.push({ label: 'Login', path: '/login', icon: <LoginIcon /> });
+    }
+
     return (
-        <Box sx={{ 
+        <Box sx={{
             flexGrow: 1,
             margin: 0, // Sem margens internas
             padding: 0, // Sem preenchimentos internos
@@ -118,7 +134,7 @@ export default function MenuDrawer() {
                                         '&:hover': { backgroundColor: '#333' },
                                     }}
                                 >
-                                    <ListItemIcon sx={{ color: '#FFFFFF' }}>
+                                    <ListItemIcon sx={{color: '#FFFFFF'}}>
                                         {item.icon}
                                     </ListItemIcon>
                                     <ListItemText primary={item.label} />

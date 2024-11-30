@@ -18,12 +18,12 @@ const authors: AuthorInfo[] = [
     },
     {
         name: "Gonçalo Ribeiro",
-        email: "a48xxx@alunos.isel.pt",
+        email: "a48305@alunos.isel.pt",
         image: "userImg.png"
     },
     {
         name: "Rosário Machado",
-        email: "a48xxx@alunos.isel.pt",
+        email: "a46042@alunos.isel.pt",
         image: "userImg.png"
     }
 ]

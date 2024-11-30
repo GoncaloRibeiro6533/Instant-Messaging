@@ -3,12 +3,13 @@ import { Link, Outlet } from "react-router-dom";
 import { AuthContext, AuthProvider } from "../auth/AuthProvider";
 import { LogoutButton } from "../logout/logoutButton";
 import { LoginButton } from "../login/loginButton";
+import Logo from "../../../public/logo.png";
 
 export function Home() {
   const { user } = React.useContext(AuthContext);
   return (
-    <div>
-      <h1>Home</h1>
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+          <img src={Logo} alt="Application Logo" style={{ width: '400px', marginBottom: '20px' }} />
         {user ? (
             <div>
               <p>Welcome, {user.user.username}!</p>
@@ -19,13 +20,10 @@ export function Home() {
         ) : (
             <div>
                 <p>Welcome! Please log in.</p>
-                <ol>
                     <LoginButton />
-                    <li><Link to="/about">About</Link></li>
-                </ol>
-                <Outlet />
-            </div>
-        )}
-    </div>
-  );
+                    <Outlet />
+                </div>
+            )}
+        </div>
+    );
 }

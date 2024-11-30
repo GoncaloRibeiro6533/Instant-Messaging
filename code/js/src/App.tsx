@@ -18,38 +18,32 @@ import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
 import {ChannelsList} from "./components/channels/channelsList/channelsList";
 import {ChannelDetails} from "./components/channels/channelDetails";
-//import { ChannelsList} from './components/channels/channelsList'
-import { Profile } from './components/profile/profile'
-import { Message } from './components/channel/message'
-import { Visibility } from './domain/Visibility'
-import { Chat } from '@mui/icons-material'
-import { ChatBox } from './components/channel/chatBox/chatBox'
+import {CreateChannel} from "./components/channels/createChannel";
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
-            element: 
-                    <><MenuAppBar /><Home /></>,
-            "children": [
-            ]   
+            element:
+                <><MenuAppBar /><Home /></>,
+            "children": []
         },
         {
             "path": "/register/:id",
             element: <Register/>
-         },
+        },
         {
             "path": "/login",
             element:
-                 <Login />
-         },
-         {
+                <Login />
+        },
+        {
             "path": "/about",
-            element: 
-            <AuthRequire>
-                <MenuAppBar/>
-                <About />
-            </AuthRequire>
+            element:
+                <>
+                    <MenuAppBar/>
+                    <About />
+                </>
         },
         {
             "path": "/channels",
@@ -66,23 +60,27 @@ const router = createBrowserRouter(
             <MenuAppBar/>
                 <Profile />
             </AuthRequire>
-        },
+        }
+
+         */
         {
-            "path": "/channel",
-            element:
-            <ChatBox />
-        },
-        {
-            "path": "/channels/:id",
+            "path": "/channel/:channelId",
             element:
                 <AuthRequire>
                     <MenuAppBar/>
                     <ChannelDetails/>
                 </AuthRequire>
+        },
+        {
+            "path": "/createChannel",
+            element:
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <CreateChannel />
+                </AuthRequire>
         }
-]
+    ]
 )
-
 
 export const userRepoMock = new UserRepo()
 export const channelRepoMock = new ChannelRepo()
