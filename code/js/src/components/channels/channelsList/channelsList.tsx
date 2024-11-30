@@ -13,7 +13,6 @@ import {Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListIt
 import SearchIcon from '@mui/icons-material/Search';
 import {Visibility} from "../../../domain/Visibility";
 
-// Adicione o botão de criação de canal no componente ChannelsList
 export function ChannelsList() {
     const { user } = React.useContext(AuthContext);
     const [state, loadChannels] = useChannelList();
@@ -67,7 +66,7 @@ export function ChannelsList() {
                     value={searchChannels}
                     onChange={handleSearch}
                     sx={{ marginBottom: '16px' }}
-                    InputProps={{
+                    InputProps={{ //todo try another way because its deprecated
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
