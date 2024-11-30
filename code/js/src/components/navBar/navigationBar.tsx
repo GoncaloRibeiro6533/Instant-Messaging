@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/Inbox';
 import LoginIcon from '@mui/icons-material/Login';
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
@@ -17,17 +16,13 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-
-const menuItems = [
-    { label: 'Home', path: '/', icon: <HomeIcon /> },
-    { label: 'About', path: '/about', icon: <InfoIcon /> },
-    { label: 'Login', path: '/login', icon: < LoginIcon/> },
-    { label: 'Channels List', path: '/channels', icon: <InboxIcon /> },
-];
+import { Add, Chat, Logout } from "@mui/icons-material";
+import { AuthContext } from '../auth/AuthProvider';
 
 export default function MenuDrawer() {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const navigate = useNavigate();
+    const { user } = React.useContext(AuthContext);
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -39,6 +34,21 @@ export default function MenuDrawer() {
         }
         setIsDrawerOpen(open);
     };
+
+    const menuItems = [
+        { label: 'Home', path: '/', icon: <HomeIcon /> },
+        { label: 'About', path: '/about', icon: <InfoIcon /> },
+    ];
+
+    if (user) {
+        menuItems.push(
+            { label: 'Channels List', path: '/channels', icon: <Chat /> },
+            { label: 'Create Channel', path: '/createChannel', icon: <Add /> },
+            { label: 'Logout', path: '/logout', icon: <Logout /> } //todo not working here, maybe move to profile Icon
+        );
+    } else {
+        menuItems.push({ label: 'Login', path: '/login', icon: <LoginIcon /> });
+    }
 
     return (
         <Box sx={{ flexGrow: 1 }}>

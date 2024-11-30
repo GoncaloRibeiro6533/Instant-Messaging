@@ -1,6 +1,4 @@
-import {
-    createBrowserRouter, RouterProvider,
-} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider,} from 'react-router-dom'
 import { Home } from './components/home/home'
 import { Login } from './components/login/login'
 import * as React from 'react'
@@ -17,33 +15,32 @@ import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
 import {ChannelsList} from "./components/channels/channelsList/channelsList";
 import {ChannelDetails} from "./components/channels/channelDetails";
-//import { ChannelsList} from './components/channels/channelsList'
+import {CreateChannel} from "./components/channels/createChannel";
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
-            element: 
-                    <><MenuAppBar /><Home /></>,
-            "children": [
-            ]   
+            element:
+                <><MenuAppBar /><Home /></>,
+            "children": []
         },
         {
             "path": "/register/:id",
             element: <Register/>
-         },
+        },
         {
             "path": "/login",
             element:
-                 <Login />
-         },
-         {
+                <Login />
+        },
+        {
             "path": "/about",
-            element: 
-            <AuthRequire>
-                <MenuAppBar/>
-                <About />
-            </AuthRequire>
+            element:
+                <>
+                    <MenuAppBar/>
+                    <About />
+                </>
         },
         {
             "path": "/channels",
@@ -70,13 +67,16 @@ const router = createBrowserRouter(
                     <MenuAppBar/>
                     <ChannelDetails/>
                 </AuthRequire>
+        },
+        {
+            "path": "/createChannel",
+            element:
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <CreateChannel />
+                </AuthRequire>
         }
-]
-
-
-
-
-
+    ]
 )
 
 export const userRepoMock = new UserRepo()
@@ -105,6 +105,6 @@ export const services: Service = mockService;
 
 export function App() {
     return (
-            <RouterProvider router={router} future={{ v7_startTransition: true }}/>
+        <RouterProvider router={router} future={{ v7_startTransition: true }}/>
     );
-  }
+}

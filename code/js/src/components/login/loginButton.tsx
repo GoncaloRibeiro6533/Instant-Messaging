@@ -1,11 +1,12 @@
-import * as React from "react"
-import { useNavigate } from "react-router-dom"
+import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 export function LoginButton() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     return (
-        <div>
-            <button className="button" onClick={() => navigate("/login")}>LogIn</button>
-        </div>
-    )
+        <Button variant="contained" color="primary" onClick={() => navigate("/login")}>
+            Login
+        </Button>
+    );
 }
