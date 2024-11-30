@@ -61,7 +61,7 @@ const router = createBrowserRouter(
 
          */
         {
-            "path": "/channels/:id",
+            "path": "/channel/:channelId",
             element:
                 <AuthRequire>
                     <MenuAppBar/>

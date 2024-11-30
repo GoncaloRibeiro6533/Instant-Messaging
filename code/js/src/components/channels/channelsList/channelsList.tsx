@@ -100,7 +100,9 @@ export function ChannelsList() {
                 </List>
             </Box>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {selectedChannel && <ChannelComponent channel={selectedChannel} />}
+                {selectedChannel && <ChannelComponent channel={selectedChannel} onLeave={() => {
+                    setSelectedChannel(null);
+                }} />}
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     {!selectedChannel && (
                         <img src={Logo} alt="Logo" width={250} style={{ opacity: 0.5, maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
