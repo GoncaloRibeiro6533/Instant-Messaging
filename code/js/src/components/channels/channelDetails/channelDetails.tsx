@@ -12,7 +12,7 @@ interface ChannelDetailsProps {
     loadChannels: () => void;
     handleLeaveChannel: (channelId: number) => void;
 }
-
+//TODO instead of receiveing handler maybe you should try to create a hook for this, a custom hook named useChannelDetails
 export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetailsProps) {
     const { user } = React.useContext(AuthContext);
     const [channelMembers, setChannelMembers] = React.useState<ChannelMember[]>([]);

@@ -14,8 +14,32 @@ import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
 import {ChannelsList} from "./components/channels/channelsList/channelsList";
-import {ChannelDetails} from "./components/channels/channelDetails";
+import {ChannelDetails} from "./components/channels/channelDetails/channelDetails";
 import {CreateChannel} from "./components/channels/createChannel";
+import {Channel} from "./components/channel/channel";
+import {Profile} from "./components/profile/profile";
+import { useNavigate, useParams } from 'react-router-dom';
+
+
+//TODO
+export function ChannelDetailsWrapper() {
+    const { channelId } = useParams();
+    const navigate = useNavigate();
+    const repo = new ChannelRepo();
+    const channel = repo.getChannelById(Number(channelId));
+    if (!channel) {
+        navigate('/channels');
+        return null;
+    }
+    return (
+        <ChannelDetails
+            channel={channel}
+            onLeave={() => console.log('Channel left')}
+            loadChannels={() => console.log('Channels loaded')}
+            handleLeaveChannel={(channelId: number) => console.log('Channel left')}
+        />
+    );
+}
 
 const router = createBrowserRouter(
     [
@@ -54,20 +78,7 @@ const router = createBrowserRouter(
                     "path": "channel/:channelId",
                     element: <Channel/>
                 },
-                {
-                    "path": "channel/details/:channelId",
-                    element:
-                        <AuthRequire>
-                            <MenuAppBar/>
-                            <ChannelDetails/>
-                        </AuthRequire>
-                },
             ]
-        },
-                    <MenuAppBar />
-                    <ChannelsList />
-                </AuthRequire>
-            ),
         },
         {
             path: "/channel/:channelId",
@@ -80,12 +91,13 @@ const router = createBrowserRouter(
         },
         {
             path: "/createChannel",
-            element: (
+            element: 
                 <AuthRequire>
                     <MenuAppBar />
                     <CreateChannel />
                 </AuthRequire>
-            ),
+        },
+        {
             "path": "/profile",
             element:
             <AuthRequire>

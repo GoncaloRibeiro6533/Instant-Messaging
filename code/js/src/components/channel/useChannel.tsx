@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthProvider';
 
 type State =
     | { name: 'idle' }
-    | { name: 'loading' }
+    | { name: 'loading', channelId: number }
     | { name: 'error'; message: string }
     | { name: 'loaded'; channel: Channel };
 
@@ -19,11 +19,13 @@ function reduce(state: State, action: Action): State {
         case 'idle':
         case 'error':
             if (action.type === 'load') {
-                return { name: 'loading' };
+                return { name: 'loading', channelId: action.channelId };
             }
             return state;
         case 'loading':
-            if (action.type === 'success') {
+            if (action.type === 'load') {
+                return { name: 'loading', channelId: action.channelId };
+            } else if (action.type === 'success' && action.channel.id === state.channelId) {
                 return { name: 'loaded', channel: action.channel };
             } else if (action.type === 'error') {
                 return { name: 'error', message: action.message };
@@ -31,7 +33,7 @@ function reduce(state: State, action: Action): State {
             return state;
         case 'loaded':
             if (action.type === 'load') {
-                return { name: 'loading' };
+                return { name: 'loading', channelId: action.channelId };
             }
             return state;
         default:
@@ -47,8 +49,6 @@ export function useChannel(): [
     const [auth] = useAuth();
 
      async function loadChannel(channelId: string) {
-        if (state.name === 'loading') return;
-        console.log('channelId', channelId);
         const parsedId = parseInt(channelId);
         if (isNaN(parsedId)) {
             dispatch({ type: 'error', message: 'Invalid channel ID' });

@@ -1,10 +1,9 @@
 
 
 import * as React from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Message } from "../message";
 import { useState } from "react";
-import { Visibility } from "../../../domain/Visibility";
 import { ChatTextField } from "../chatTextField/chatTextfield";
 import { repo } from "../../../App";
 

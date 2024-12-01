@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Avatar, Typography, Paper } from '@mui/material';
+import { Box, Avatar, Typography } from '@mui/material';
 import ListItemButton from "@mui/material/ListItemButton";
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatBox } from './chatBox/chatBox';
@@ -16,6 +16,10 @@ export function Channel() {
     const navigate = useNavigate();
     React.useEffect(() => {
         loadChannel(channelId);
+        return () => { 
+            //ignore previous request
+
+        }
     }, [channelId]);
     const handleClick = () => {
         if (state.name === 'loaded') {
