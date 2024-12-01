@@ -1,7 +1,4 @@
-import {
-    createBrowserRouter, RouterProvider,
-} from 'react-router-dom'
-import { AuthProvider } from './components/auth/AuthProvider'
+import {createBrowserRouter, RouterProvider,} from 'react-router-dom'
 import { Home } from './components/home/home'
 import { Login } from './components/login/login'
 import * as React from 'react'
@@ -19,8 +16,6 @@ import { AuthRequire } from './components/auth/AuthRequire'
 import {ChannelsList} from "./components/channels/channelsList/channelsList";
 import {ChannelDetails} from "./components/channels/channelDetails";
 import {CreateChannel} from "./components/channels/createChannel";
-import {Profile} from "./components/profile/profile";
-import {Channel} from "./components/channel/channel";
 
 const router = createBrowserRouter(
     [
@@ -67,9 +62,30 @@ const router = createBrowserRouter(
                             <ChannelDetails/>
                         </AuthRequire>
                 },
-            ]                
+            ]
+        },
+                    <MenuAppBar />
+                    <ChannelsList />
+                </AuthRequire>
+            ),
         },
         {
+            path: "/channel/:channelId",
+            element: (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <ChannelDetailsWrapper />
+                </AuthRequire>
+            ),
+        },
+        {
+            path: "/createChannel",
+            element: (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <CreateChannel />
+                </AuthRequire>
+            ),
             "path": "/profile",
             element:
             <AuthRequire>
@@ -77,17 +93,18 @@ const router = createBrowserRouter(
                 <Profile />
             </AuthRequire>
         },
-       
+
         {
-            "path": "/createChannel",
-            element:
+            path: "/channels/:channelId/leave/:userId",
+            element: (
                 <AuthRequire>
-                    <MenuAppBar/>
-                    <CreateChannel />
+                    <MenuAppBar />
+                    <ChannelsList />
                 </AuthRequire>
-        }
+            ),
+        },
     ]
-)
+);
 
 export const userRepoMock = new UserRepo()
 export const channelRepoMock = new ChannelRepo()

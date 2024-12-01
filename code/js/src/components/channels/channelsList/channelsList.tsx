@@ -45,6 +45,22 @@ export function ChannelsList() {
         }
     };
 
+    const handleLeaveChannel = async (channelId: number) => {
+        try {
+            await services.channelService.leaveChannel(user.token, channelId);
+
+            loadChannels();
+
+            if (selectedChannel && selectedChannel.id === channelId) {
+                setSelectedChannel(null);
+            }
+
+            console.log(`Channel ${channelId} deleted`);
+        } catch (error) {
+            console.error("Error deleting channel:", error.message);
+        }
+    };
+
     if (state.name === 'loading') {
         return <div>Loading...</div>;
     }
@@ -138,5 +154,5 @@ export function ChannelsList() {
             <Outlet />
         </Box>
     );
-    
+
 }

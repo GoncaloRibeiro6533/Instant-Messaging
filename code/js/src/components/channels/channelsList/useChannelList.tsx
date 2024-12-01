@@ -52,7 +52,7 @@ export function useChannelList(): [State, onChange: () => void] {
     }
 
     React.useEffect(() => {
-        loadChannels()
+        loadChannels().then(r => r);
     }, [user.user.id]);
 
     return [state, loadChannels];
