@@ -219,8 +219,10 @@ class InvitationServiceTests {
             invitationService.acceptChannelInvitation(channelInvitation.value.id, user2.value.id)
         assertIs<Success<ChannelInvitation>>(result)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
-        assertIs<Success<List<Channel>>>(channelsOfUser2)
-        assertEquals(channel.value, channelsOfUser2.value[1])
+        assertIs<Success<Map<Channel,Role>>>(channelsOfUser2)
+        assertEquals(2, channelsOfUser2.value.size)
+        assertEquals(ch.value, channelsOfUser2.value.keys.first())
+        assertEquals(Role.READ_WRITE, channelsOfUser2.value.values.first())
     }
 
     @Test
@@ -654,8 +656,10 @@ class InvitationServiceTests {
         val declined = invitationService.declineChannelInvitation(result.value.id, user2.value.id)
         assertIs<Success<Boolean>>(declined)
         val channelsOfUser2 = channelService.getChannelsOfUser(user2.value.id)
-        assertIs<Success<List<Channel>>>(channelsOfUser2)
+        assertIs<Success<Map<Channel,Role>>>(channelsOfUser2)
         assertEquals(1, channelsOfUser2.value.size)
+        assertEquals(ch.value, channelsOfUser2.value.keys.first())
+        assertEquals(Role.READ_WRITE, channelsOfUser2.value.values.first())
     }
 /* //todo fazer teste de erro para o declineChannelInvitation
     @Test

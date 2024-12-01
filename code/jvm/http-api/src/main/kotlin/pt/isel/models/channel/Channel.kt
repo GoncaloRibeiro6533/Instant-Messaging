@@ -21,10 +21,6 @@ data class ChannelList(
     val channels: List<ChannelOutputModel>,
 )
 
-data class ChannelIdentifiers(
-    val id: Int,
-    val name: String,
-)
 
 data class ChannelMember(
     val user: UserIdentifiers,
@@ -34,4 +30,14 @@ data class ChannelMember(
 data class ChannelMembersList(
     val nMembers: Int,
     val members: List<ChannelMember>,
+)
+
+data class ChannelOfUser(
+    val channel: ChannelOutputModel,
+    val role: Role,
+)
+
+data class ChannelOfUserList(
+    val nChannels: Int,
+    val channels: List<ChannelOfUser>,
 )

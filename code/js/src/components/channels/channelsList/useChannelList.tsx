@@ -3,16 +3,16 @@ import * as React from "react";
 import { services } from "../../../App";
 import { Channel } from "../../../domain/Channel";
 import {AuthContext} from "../../auth/AuthProvider";
-
+import {Role} from "../../../domain/Role";
 
 type State =
     | { name: "loading" }
-    | { name: "loaded", channels: Channel[] }
+    | { name: "loaded", channels: Map<Channel,Role> }
     | { name: "error", message: string };
 
 type Action =
     | { type: "load" }
-    | { type: "success", channels: Channel[] }
+    | { type: "success", channels: Map<Channel,Role> }
     | { type: "error", message: string };
 
 function reduce(state: State, action: Action): State {

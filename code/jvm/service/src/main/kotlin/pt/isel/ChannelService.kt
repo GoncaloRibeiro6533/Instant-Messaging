@@ -38,10 +38,13 @@ class ChannelService(
     private val trxManager: TransactionManager,
     private val emitter: UpdatesEmitter,
 ) {
-    fun getChannelById(id: Int): Either<ChannelError, Channel> =
+    fun getChannelById(user: User, id: Int): Either<ChannelError, Channel> =
         trxManager.run {
             if (id < 0) return@run failure(ChannelError.NegativeIdentifier)
             val channel = channelRepo.findById(id) ?: return@run failure(ChannelError.ChannelNotFound)
+            val members = channelRepo.getChannelMembers(channel)
+            if (user !in members.keys) return@run failure(ChannelError.Unauthorized)
+           // val userRole = channelRepo.getChannelMembers(channel).entries.firstOrNull { member-> member.key == user }.value
             return@run success(channel)
         }
 
@@ -56,9 +59,9 @@ class ChannelService(
             if (limit < 0) return@run failure(ChannelError.InvalidLimit)
             if (skip < 0) return@run failure(ChannelError.InvalidSkip)
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)
-            val channels = channelRepo.getChannelByName(name, limit, skip)
+            val channels = channelRepo.getChannelByName(name, limit, skip) //TODO maybe filter channels on repo, we only want the public ones and the ones the user is in
             val userChannels = channelRepo.getChannelsOfUser(user)
-            val filteredChannels = channels.filter { userChannels.contains(it) || it.visibility == Visibility.PUBLIC }
+            val filteredChannels = channels.filter { userChannels.containsKey(it) || it.visibility == Visibility.PUBLIC }
             return@run success(filteredChannels)
         }
 
@@ -91,7 +94,7 @@ class ChannelService(
         }
 
     // TODO: Implement pagination
-    fun getChannelsOfUser(userId: Int): Either<ChannelError, List<Channel>> =
+    fun getChannelsOfUser(userId: Int): Either<ChannelError, Map<Channel,Role>> =
         trxManager.run {
             if (userId < 0) return@run failure(ChannelError.NegativeIdentifier)
             val user = userRepo.findById(userId) ?: return@run failure(ChannelError.UserNotFound)

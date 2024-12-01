@@ -16,7 +16,7 @@ interface ChannelRepository {
     ): Channel
 
     // TODO add role
-    fun getChannelsOfUser(user: User): List<Channel>
+    fun getChannelsOfUser(user: User): Map<Channel, Role>
 
     fun getChannelMembers(channel: Channel): Map<User, Role>
 

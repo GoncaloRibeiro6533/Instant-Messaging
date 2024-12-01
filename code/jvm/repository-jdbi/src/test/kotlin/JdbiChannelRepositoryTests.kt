@@ -264,6 +264,24 @@ class JdbiChannelRepositoryTests {
         }
     }
 
+    @Test
+    fun `get channels of user should return the correct number of channels`() {
+        runWithHandle { handle ->
+            val admin = JdbiUserRepository(handle).createUser("admin", "admin@example.com", "password")
+            val user = JdbiUserRepository(handle).createUser("user", "user@example.com", "password")
+            val channel1 = JdbiChannelRepository(handle).createChannel("channel1", admin, Visibility.PUBLIC)
+            val channel2 = JdbiChannelRepository(handle).createChannel("channel2", user, Visibility.PUBLIC)
+            JdbiChannelRepository(handle).joinChannel(user, channel1, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(admin, channel1, Role.READ_WRITE)
+            JdbiChannelRepository(handle).joinChannel(admin, channel2, Role.READ_ONLY)
+            val channelsOfAdmin = JdbiChannelRepository(handle).getChannelsOfUser(admin)
+            assertEquals(2, channelsOfAdmin.size)
+            assertContains(channelsOfAdmin.keys, channel1)
+            assertContains(channelsOfAdmin.keys, channel2)
+            assertEquals(Role.READ_WRITE, channelsOfAdmin[channel1])
+            assertEquals(Role.READ_ONLY, channelsOfAdmin[channel2])
+        }
+    }
     // TODO
 
   /*  @Test

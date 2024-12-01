@@ -76,16 +76,15 @@ class JdbiChannelRepository(
             .list()
     }
 
-    // TODO add role
-    override fun getChannelsOfUser(user: User): List<Channel> {
+    override fun getChannelsOfUser(user: User): Map<Channel, Role> {
         return handle.createQuery(
             """
             SELECT 
                 ucr.*, 
-                u_creator.username AS username, 
+                u_creator.username AS creator_username, 
                 u_creator.email AS email,
                 ch.creator_id, 
-                ch.name,
+                ch.name AS channel_name,
                 ch.visibility,
                 ch.id
             FROM 
@@ -99,8 +98,8 @@ class JdbiChannelRepository(
             """.trimIndent(),
         )
             .bind("user_id", user.id)
-            .map { rs, _ -> mapRowToChannel(rs) }
-            .list()
+            .map { rs, _ -> mapRowToChannelRoleEntry(rs) }
+            .toMap()
     }
 
     override fun getChannelMembers(channel: Channel): Map<User, Role> {
@@ -163,6 +162,24 @@ class JdbiChannelRepository(
             user,
             Visibility.valueOf(rs.getString("visibility")),
         )
+    }
+
+    private fun mapRowToChannelRoleEntry(rs: ResultSet): Pair<Channel, Role> {
+        val creator =
+            User(
+                rs.getInt("creator_id"),
+                rs.getString("creator_username"),
+                rs.getString("email"),
+            )
+        val channel =
+            Channel(
+                rs.getInt("channel_id"),
+                rs.getString("channel_name"),
+                creator,
+                Visibility.valueOf(rs.getString("visibility")),
+            )
+        val role = Role.valueOf(rs.getString("role_name"))
+        return channel to role
     }
 
     private fun mapRowToUserRoleEntry(rs: ResultSet): Pair<User, Role> {

@@ -1,8 +1,6 @@
 import { MessageService } from '../interfaces/MessageService';
 import { Repo } from '../../App';
 import { Message } from '../../domain/Message';
-import { User } from '../../domain/User';
-import { Channel } from '../../domain/Channel';
 
 export class MessageServiceMock implements MessageService {
     repo: Repo;
@@ -21,7 +19,7 @@ export class MessageServiceMock implements MessageService {
             if (!ch) {
                 throw new Error("Channel not found");
             }
-            const channelsOfUser = this.repo.channelRepo.getChannelsOfUser(user, user.id);
+            const channelsOfUser = Array.from(this.repo.channelRepo.getChannelsOfUser(user, user.id).keys());
             if (!channelsOfUser.find(channel => channel.id === ch.id)) {
                 throw new Error("User is not a member of this channel");
             }
@@ -43,8 +41,8 @@ export class MessageServiceMock implements MessageService {
             if (!ch) {
                 throw new Error("Channel not found");
             }
-            const channelsOfUser = this.repo.channelRepo.getChannelsOfUser(user, user.id);
-            if (!channelsOfUser.find(channel => channel.id === ch.id)) {
+            const channelsOfUser = Array.from(this.repo.channelRepo.getChannelsOfUser(user, user.id).keys());
+            if (!channelsOfUser.find((channel: { id: number; }) => channel.id === ch.id)) {
                 throw new Error("User is not a member of this channel");
             }
             return this.repo.messageRepo.getMessages(ch, limit, skip);

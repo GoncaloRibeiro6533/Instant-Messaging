@@ -35,7 +35,8 @@ export class ChannelServiceMock implements ChannelService {
             throw new Error("Invalid token");
         }
         const userChannels = this.repo.channelRepo.getChannelsOfUser(user, user.id);
-        return userChannels.filter(channel => channel.name.includes(name)).slice(skip, skip + limit);
+        const channels= this.repo.channelRepo.searchChannelByName(name, limit, skip);
+        return channels.filter(channel => channel.visibility === 'PUBLIC' || userChannels.has(channel));
     }
 
     async getChannelMembers(token: string, channelId: number): Promise<ChannelMember[]> {
@@ -46,7 +47,7 @@ export class ChannelServiceMock implements ChannelService {
         return this.repo.channelRepo.getChannelMembers(user, channelId);
     }
 
-    async getChannelsOfUser(token: string, userId: number): Promise<Channel[]> {
+    async getChannelsOfUser(token: string, userId: number): Promise<Map<Channel,Role>> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");

@@ -14,6 +14,7 @@ import {Visibility} from "../../../domain/Visibility";
 import {useLocation} from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import {Outlet} from 'react-router-dom';
+import {Role} from '../../../domain/Role';
 
 
 
@@ -98,7 +99,7 @@ export function ChannelsList() {
                 {/* Torne a lista rolável com overflowY: 'auto' */}
                 <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <List>
-                        {channelsToDisplay.map((channel: Channel) => (
+                    {[...channelsToDisplay.entries()].map(([channel, role]: [Channel, Role]) => (
                             <React.Fragment key={channel.id}>
                                 <ListItemButton onClick={() => navigate("/channels/channel/" + String(channel.id))}>
                                     <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
@@ -128,11 +129,11 @@ export function ChannelsList() {
                                                     channel.visibility === Visibility.PUBLIC ? '#32B7A3' : '#E8556D',
                                             }}
                                         />
-                                    </ListItem>
+                                </ListItem>
                                 </ListItemButton>
                                 <Divider />
                             </React.Fragment>
-                        ))}
+                        ))} 
                     </List>
                 </Box>
             </Box>

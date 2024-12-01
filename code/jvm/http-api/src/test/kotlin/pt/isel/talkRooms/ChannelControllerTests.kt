@@ -14,10 +14,7 @@ import pt.isel.*
 import pt.isel.controllers.ChannelController
 import pt.isel.controllers.InvitationController
 import pt.isel.controllers.UserController
-import pt.isel.models.channel.ChannelList
-import pt.isel.models.channel.ChannelMembersList
-import pt.isel.models.channel.ChannelOutputModel
-import pt.isel.models.channel.CreateChannelInputModel
+import pt.isel.models.channel.*
 import pt.isel.models.invitation.InvitationInputModelChannel
 import pt.isel.models.invitation.InvitationInputModelRegister
 import pt.isel.models.invitation.InvitationOutputModelChannel
@@ -257,6 +254,8 @@ class ChannelControllerTests {
 
         val members = result.body as ChannelMembersList
         assertEquals(2, members.nMembers)
+        assertEquals(Role.READ_WRITE, members.members.first { it.user.username == "member1" }.role)
+        assertEquals(Role.READ_WRITE, members.members.first { it.user.username == "admin2" }.role)
     }
 
     @ParameterizedTest
@@ -364,8 +363,11 @@ class ChannelControllerTests {
         val result = channelController.getChannelsOfUser(user1.user.id, user1)
         assertEquals(HttpStatus.OK, result.statusCode)
 
-        val channels = result.body as ChannelList
+        val channels = result.body as ChannelOfUserList
         assertEquals(3, channels.nChannels)
+        assertEquals(Role.READ_WRITE, channels.channels.first { it.channel.name == "channel1" }.role)
+        assertEquals(Role.READ_WRITE, channels.channels.first { it.channel.name == "channel2" }.role)
+        assertEquals(Role.READ_WRITE, channels.channels.first { it.channel.name == "channel3" }.role)
     }
 
     @ParameterizedTest

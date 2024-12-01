@@ -42,11 +42,10 @@ class MockChannelRepository : ChannelRepository {
         return channel
     }
 
-    override fun getChannelsOfUser(user: User): List<Channel> {
-        val userChannels: List<Channel> =
-            usersInChannel
-                .filter { it.second.user.id == user.id }
-                .map { it.first }
+    override fun getChannelsOfUser(user: User): Map<Channel, Role> {
+        val userChannels: Map<Channel, Role> =
+            usersInChannel.filter { it.second.user.id == user.id }
+                .associate { it.first to it.second.role }
         return userChannels
     }
 

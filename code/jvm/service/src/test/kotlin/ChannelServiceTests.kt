@@ -73,7 +73,7 @@ class ChannelServiceTests {
         assertIs<Success<User>>(user)
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
-        val result = channelService.getChannelById(channel.value.id)
+        val result = channelService.getChannelById(user.value,channel.value.id)
         assertIs<Success<Channel>>(result)
         assertEquals(channel.value.id, result.value.id)
         assertEquals(channel.value, result.value)
@@ -111,8 +111,10 @@ class ChannelServiceTests {
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
         val result = channelService.getChannelsOfUser(user.value.id)
-        assertIs<Success<List<Channel>>>(result)
-        assertEquals(channel.value, result.value[0])
+        assertIs<Success<Map<Channel, Role>>>(result)
+        assertEquals(1, result.value.size)
+        assertEquals(channel.value, result.value.keys.first())
+        assertEquals(Role.READ_WRITE, result.value.values.first())
     }
 
     @Test
@@ -156,7 +158,8 @@ class ChannelServiceTests {
 
     @Test
     fun `Test getChannelById with negative ID`() {
-        val exception = channelService.getChannelById(-1)
+        val exception = channelService.getChannelById(User(1, "user", "user@example.com"),
+                -1)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.NegativeIdentifier, exception.value)
     }
@@ -187,7 +190,7 @@ class ChannelServiceTests {
 
     @Test
     fun `Test getChannelById with non-existent ID`() {
-        val exception = channelService.getChannelById(999)
+        val exception = channelService.getChannelById(User(1, "user", "user@example.com"),999)
         assertIs<Failure<ChannelError>>(exception)
         assertEquals(ChannelError.ChannelNotFound, exception.value)
     }
@@ -289,8 +292,8 @@ class ChannelServiceTests {
             userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val result = channelService.getChannelsOfUser(user.value.id)
-        assertIs<Success<List<Channel>>>(result)
-        assertEquals(emptyList<Channel>(), result.value)
+        assertIs<Success<Map<Channel,Role>>>(result)
+        assertEquals(emptyMap<Channel,Role>(), result.value)
     }
 
     @Test

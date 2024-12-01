@@ -20,6 +20,8 @@ import pt.isel.models.Problem
 import pt.isel.models.channel.ChannelList
 import pt.isel.models.channel.ChannelMember
 import pt.isel.models.channel.ChannelMembersList
+import pt.isel.models.channel.ChannelOfUser
+import pt.isel.models.channel.ChannelOfUserList
 import pt.isel.models.channel.ChannelOutputModel
 import pt.isel.models.channel.CreateChannelInputModel
 import pt.isel.models.user.UserIdentifiers
@@ -94,7 +96,7 @@ class ChannelController(
         @PathVariable id: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.getChannelById(id)) {
+        return when (val result = channelService.getChannelById(user.user, id)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(
@@ -180,19 +182,23 @@ class ChannelController(
             is Success -> {
                 val outputModel =
                     result.value.map {
-                        ChannelOutputModel(
-                            id = it.id,
-                            name = it.name,
-                            creator =
-                                UserIdentifiers(
-                                    id = it.creator.id,
-                                    username = it.creator.username,
-                                    email = it.creator.email,
+                        ChannelOfUser(
+                            channel =
+                                ChannelOutputModel(
+                                    id = it.key.id,
+                                    name = it.key.name,
+                                    creator =
+                                        UserIdentifiers(
+                                            id = it.key.creator.id,
+                                            username = it.key.creator.username,
+                                            email = it.key.creator.email,
+                                        ),
+                                    visibility = it.key.visibility,
                                 ),
-                            visibility = it.visibility,
+                            role = it.value,
                         )
                     }
-                ResponseEntity.status(HttpStatus.OK).body(ChannelList(outputModel.size, outputModel))
+                ResponseEntity.status(HttpStatus.OK).body(ChannelOfUserList(outputModel.size, outputModel))
             }
             is Failure ->
                 handleChannelError(result.value)

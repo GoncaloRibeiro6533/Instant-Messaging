@@ -54,7 +54,7 @@ export class MessageRepo implements MessageRepoInterface {
             timestamp: new Date("2024-11-26T12:33:24Z")
         },
         {
-            id: 2,
+            id: 3,
             sender: {
                 id: 2,
                 username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
@@ -72,7 +72,107 @@ export class MessageRepo implements MessageRepoInterface {
             },
             content: 'H',
             timestamp: new Date("2024-11-26T12:33:24Z")
-        }    
+        },    
+        {
+            id: 3,
+            sender: {
+                id: 2,
+                username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'H',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },    
+        {
+            id: 3,
+            sender: {
+                id: 2,
+                username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'H',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },    
+        {
+            id: 3,
+            sender: {
+                id: 2,
+                username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'H',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },    
+        {
+            id: 3,
+            sender: {
+                id: 2,
+                username: 'Bob',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'Ho mmas askdka aksdasd kasdkad kadskak kasdkask  kasdka kfjdfs jasdja jaf  fsj asjdja djasdjad   adja djjjj ad  asda d ajj ad a djjj as a jajd f g er yte  e   ert w rw rq  e  E Q QR Q RQ R   ESD F SG   k',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },    
+        {
+            id: 3,
+            sender: {
+                id: 2,
+                username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'Ho mmas askdka aksdasd kasdkad kadskak kasdkask  kasdka kfjdfs jasdja jaf  fsj asjdja djasdjad   adja djjjj ad  asda d ajj ad a djjj as a jajd f g er yte  e   ert w rw rq  e  E Q QR Q RQ R   ESD F SG   k',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },    
     ]
 
     createMessage(user: User, channel: Channel, content: string, timestamp: Date): Message {

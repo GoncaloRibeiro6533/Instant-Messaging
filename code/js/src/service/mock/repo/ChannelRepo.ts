@@ -11,16 +11,16 @@ interface ChannelRepoInterface {
     nextId: number;
     createChannel(user: User, name: string, visibility: string): Channel;
     joinChannel(user: User, channelId: number, role: Role): Channel;
-    searchChannelByName(user: User, name: string, limit: number, skip: number): Channel[];
+    searchChannelByName(name: string, limit: number, skip: number): Channel[];
     getChannelMembers(user: User, channelId: number): ChannelMember[];
-    getChannelsOfUser(user: User, userId: number): Channel[];
+    getChannelsOfUser(user: User, userId: number): Map<Channel,Role>;
     updateChannelName(user: User, channelId: number, newName: string): Channel;
     leaveChannel(user: User, channelId: number): Channel;
     getChannelById(channelId: number): Channel;
 }
 
 export class ChannelRepo implements ChannelRepoInterface {
-    nextId: number = 2;
+    nextId: number = 11;
     public channels: Channel[] = [
         {
             id: 1,
@@ -289,7 +289,7 @@ export class ChannelRepo implements ChannelRepoInterface {
         return channel;
     }
 
-    searchChannelByName(user: User, name: string, limit: number, skip: number): Channel[] {
+    searchChannelByName(name: string, limit: number, skip: number): Channel[] {
         return this.channels.filter(channel => channel.name.includes(name)).slice(skip, skip + limit);
     }
 
@@ -298,14 +298,19 @@ export class ChannelRepo implements ChannelRepoInterface {
         return this.channelMembers.get(channel)!;
     }
 
-    getChannelsOfUser(user: User, userId: number): Channel[] {
+    getChannelsOfUser(user: User, userId: number): Map<Channel,Role> {
         const userChannels: Channel[] = [];
         this.channelMembers.forEach((members, channel) => {
             if (members.find(member => member.user.id === userId)) {
                 userChannels.push(channel);
             }
         })
-        return userChannels;
+        const userChannelsWithRole: Map<Channel,Role> = new Map();
+        userChannels.forEach(channel => {
+            const member = this.channelMembers.get(channel)!.find(member => member.user.id === userId);
+            userChannelsWithRole.set(channel, member!.role);
+        });
+        return userChannelsWithRole;
     }
 
     updateChannelName(user: User, channelId: number, newName: string): Channel {

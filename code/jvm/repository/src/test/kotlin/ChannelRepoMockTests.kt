@@ -36,7 +36,7 @@ class ChannelRepoMockTests {
         repoChannels.joinChannel(user, channel2, Role.READ_WRITE)
         val channels = repoChannels.getChannelsOfUser(user)
         assertEquals(2, channels.size)
-        assertEquals(listOf(channel1, channel2), channels)
+        assertEquals(mapOf(channel1 to Role.READ_WRITE, channel2 to Role.READ_WRITE), channels)
     }
 
     @Test
