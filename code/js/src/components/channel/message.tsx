@@ -34,6 +34,7 @@ export function Message(props: { message: MessageType }) {
                 <Paper
                     elevation={2}
                     sx={{
+                        minWidth: 30,
                         padding: 1.5,
                         marginTop: 0.5,
                         wordWrap: "break-word",
@@ -54,7 +55,16 @@ export function Message(props: { message: MessageType }) {
                     fontWeight="bold" 
                     color={isCurrentUser ? "white" : "text.primary"} 
                     align={isCurrentUser ? "right" : "left"} 
-                    sx={{ fontSize: '0.9rem', marginBottom: 0.5 }}
+                    sx={{ 
+                        marginRight: 2,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '300px',
+                        minWidth: '120px',
+                        fontSize: '0.9rem',
+                        marginBottom: 0.5
+                         }}
                 >
                     {props.message.sender.username}
                 </Typography>}

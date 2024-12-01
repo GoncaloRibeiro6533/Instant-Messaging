@@ -5,13 +5,17 @@ import {useChannelList} from './useChannelList';
 import {services} from '../../../App';
 import Logo from "../../../../public/logo.png";
 import {getRandomColor} from '../../utils/channelLogoColor';
-import {Channel as ChannelComponent} from '../channel';
 import {useNavigate} from "react-router-dom";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import {Add} from "@mui/icons-material";
-import {Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField} from '@mui/material';
+import {Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField, ListItem} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import {Visibility} from "../../../domain/Visibility";
+import {useLocation} from "react-router-dom";
+import Typography from '@mui/material/Typography';
+import {Outlet} from 'react-router-dom';
+
+
 
 export function ChannelsList() {
     const { user } = React.useContext(AuthContext);
@@ -20,6 +24,7 @@ export function ChannelsList() {
     const [searchResults, setSearchResults] = React.useState<Channel[]>([]);
     const [selectedChannel, setSelectedChannel] = React.useState<Channel | null>(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     React.useEffect(() => {
         loadChannels();
@@ -51,8 +56,8 @@ export function ChannelsList() {
     const channelsToDisplay = searchChannels ? searchResults : state.channels;
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh' }}>
-            <Box sx={{ width: '250px', borderRight: '1px solid #ddd', padding: '10px' }}>
+        <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+            <Box sx={{ width: '320px', borderRight: '1px solid #ddd', padding: '10px' }}>
                 <ListItemButton onClick={() => navigate('/createChannel')} sx={{ marginBottom: '16px' }}>
                     <ListItemIcon>
                         <Add />
@@ -66,7 +71,7 @@ export function ChannelsList() {
                     value={searchChannels}
                     onChange={handleSearch}
                     sx={{ marginBottom: '16px' }}
-                    InputProps={{ //todo try another way because its deprecated
+                    InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
@@ -74,41 +79,64 @@ export function ChannelsList() {
                         ),
                     }}
                 />
-                <List>
-                    {channelsToDisplay.map((channel: Channel) => (
-                        <React.Fragment key={channel.id}>
-                            <ListItemButton onClick={() => setSelectedChannel(channel)}>
-                                <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
-                                    {channel.name.charAt(0)}
-                                </Avatar>
-                                <ListItemText
-                                    primary={channel.name}
-                                    secondary={
+                {/* Torne a lista rolável com overflowY: 'auto' */}
+                <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+                    <List>
+                        {channelsToDisplay.map((channel: Channel) => (
+                            <React.Fragment key={channel.id}>
+                                <ListItemButton onClick={() => navigate("/channels/channel/" + String(channel.id))}>
+                                    <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
+                                        {channel.name.charAt(0)}
+                                    </Avatar>
+                                    <ListItem sx={{ marginTop: 1 }}>
+                                        <Typography
+                                            variant="body1"
+                                            component="div"
+                                            sx={{
+                                                marginRight: 2,
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                maxWidth: '120px',
+                                                minWidth: '120px',
+                                            }}
+                                        >
+                                            {channel.name}
+                                        </Typography>
                                         <Chip
                                             label={channel.visibility}
                                             size="small"
-                                            color={channel.visibility === Visibility.PUBLIC ? 'primary' : 'secondary'}
-                                            sx={{ marginTop: 1 }}
+                                            sx={{
+                                                marginTop: 1,
+                                                backgroundColor:
+                                                    channel.visibility === Visibility.PUBLIC ? '#32B7A3' : '#E8556D',
+                                            }}
                                         />
-                                    }
-                                    sx={{ marginLeft: 2 }}
-                                />
-                            </ListItemButton>
-                            <Divider />
-                        </React.Fragment>
-                    ))}
-                </List>
-            </Box>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {selectedChannel && <ChannelComponent channel={selectedChannel} onLeave={() => {
-                    setSelectedChannel(null);
-                }} />}
-                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {!selectedChannel && (
-                        <img src={Logo} alt="Logo" width={250} style={{ opacity: 0.5, maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                    )}
+                                    </ListItem>
+                                </ListItemButton>
+                                <Divider />
+                            </React.Fragment>
+                        ))}
+                    </List>
                 </Box>
             </Box>
+            {location.pathname === '/channels' && (
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <img
+                        src={Logo}
+                        alt="Logo"
+                        width={250}
+                        style={{
+                            opacity: 0.5,
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                        }}
+                    />
+                </Box>
+            )}
+            <Outlet />
         </Box>
     );
+    
 }

@@ -40,11 +40,82 @@ export class ChannelRepo implements ChannelRepoInterface {
                 username: 'Alice',
                 email: 'alice@email.com'
             },
-            visibility: Visibility.PUBLIC
+            visibility: Visibility.PRIVATE
         },
         {
             id: 3,
             name: 'Channel 3',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 4,
+            name: 'Channel 4',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+
+        {
+            id: 5,
+            name: 'Channel 5',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 6,
+            name: 'Channel 6',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 7,
+            name: 'Channel 7',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 8,
+            name: 'Channel 8',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 9,
+            name: 'Channel 9',
+            creator: {
+                id: 3,
+                username: 'Charlie',
+                email: 'charl@email.com'
+            },
+            visibility: Visibility.PRIVATE
+        },
+        {
+            id: 10,
+            name: 'Channel 10',
             creator: {
                 id: 3,
                 username: 'Charlie',
@@ -88,7 +159,110 @@ export class ChannelRepo implements ChannelRepoInterface {
                     role: Role.READ_ONLY
                 },
             ]
-        ]]);
+        ], [
+            this.channels[2],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ], [
+            this.channels[3],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[4],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[5],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[6],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[7],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[8],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+        [
+            this.channels[9],
+            [
+                {
+                    user: {
+                        id: 1,
+                        username: 'Bob',
+                        email: 'bob@example.com'
+                    },
+                    role: Role.READ_ONLY
+                },
+            ]
+        ],
+    ]);
 
     createChannel(user: User, name: string, visibility: string): Channel {
         const channel: Channel = {

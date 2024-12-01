@@ -19,6 +19,8 @@ import { AuthRequire } from './components/auth/AuthRequire'
 import {ChannelsList} from "./components/channels/channelsList/channelsList";
 import {ChannelDetails} from "./components/channels/channelDetails";
 import {CreateChannel} from "./components/channels/createChannel";
+import {Profile} from "./components/profile/profile";
+import {Channel} from "./components/channel/channel";
 
 const router = createBrowserRouter(
     [
@@ -51,7 +53,21 @@ const router = createBrowserRouter(
                 <AuthRequire>
                     <MenuAppBar/>
                     <ChannelsList/>
-                </AuthRequire>
+                </AuthRequire>,
+            children: [
+                {
+                    "path": "channel/:channelId",
+                    element: <Channel/>
+                },
+                {
+                    "path": "channel/details/:channelId",
+                    element:
+                        <AuthRequire>
+                            <MenuAppBar/>
+                            <ChannelDetails/>
+                        </AuthRequire>
+                },
+            ]                
         },
         {
             "path": "/profile",
@@ -60,17 +76,8 @@ const router = createBrowserRouter(
             <MenuAppBar/>
                 <Profile />
             </AuthRequire>
-        }
-
-         */
-        {
-            "path": "/channel/:channelId",
-            element:
-                <AuthRequire>
-                    <MenuAppBar/>
-                    <ChannelDetails/>
-                </AuthRequire>
         },
+       
         {
             "path": "/createChannel",
             element:

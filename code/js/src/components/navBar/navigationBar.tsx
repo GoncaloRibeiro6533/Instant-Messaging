@@ -17,7 +17,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-import { Add, Chat, Logout } from "@mui/icons-material";
+import { Add, Chat, Logout, Close } from "@mui/icons-material";
 import { AuthContext } from '../auth/AuthProvider';
 import { LogoutButton } from '../logout/logoutButton';
 
@@ -53,7 +53,6 @@ export default function MenuDrawer() {
         menuItems.push(
             { label: 'Channels List', path: '/channels', icon: <Chat /> },
             { label: 'Create Channel', path: '/createChannel', icon: <Add /> },
-            { label: 'Logout', path: '/logout', icon: <Logout /> } //todo not working here, maybe move to profile Icon
         );
     } else {
         menuItems.push({ label: 'Login', path: '/login', icon: <LoginIcon /> });
@@ -68,7 +67,7 @@ export default function MenuDrawer() {
             <AppBar
                 position="static"
                 sx={{
-                    backgroundColor: '#000000',
+                    backgroundColor: '#13161a',
                     color: '#FFFFFF',
                 }}
             >
@@ -124,8 +123,18 @@ export default function MenuDrawer() {
                     onKeyDown={toggleDrawer(false)}
                     sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}  // Ensure the Box takes up full height
                 >
+                
                     {/* Menu items */}
                     <List sx={{ flexGrow: 1 }}>
+                        <ListItem>
+                            <ListItemButton onClick={toggleDrawer(false)}
+                            sx={{ '&:hover': { backgroundColor: '#333' },}}>
+                                    <ListItemIcon sx={{color: '#FFFFFF'}}>
+                                        <Close />
+                                    </ListItemIcon>
+                                <ListItemText primary="Close" />
+                            </ListItemButton>
+                        </ListItem>
                         {menuItems.map((item, index) => (
                             <ListItem key={index} disablePadding>
                                 <ListItemButton

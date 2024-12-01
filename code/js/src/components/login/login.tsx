@@ -92,7 +92,7 @@ export function Login() {
                             <Button
                                 variant="contained"
                                 sx={{
-                                    backgroundColor: '#100c08',
+                                    backgroundColor: '#141a22',
                                     color: '#ffffff', // Cor do texto
                                     '&:hover': {
                                         backgroundColor: '#2b2925', // Cor ao passar o mouse

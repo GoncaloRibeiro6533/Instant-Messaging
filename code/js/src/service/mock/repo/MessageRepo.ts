@@ -32,7 +32,47 @@ export class MessageRepo implements MessageRepoInterface {
             },
             content: 'Hello',
             timestamp: new Date("2024-11-26T12:33:24Z")
-        } 
+        },
+        {
+            id: 2,
+            sender: {
+                id: 1,
+                username: 'Bob',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'H',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        },
+        {
+            id: 2,
+            sender: {
+                id: 2,
+                username: 'AliceWithVeryLongNameLongerThanTwentyCharacters',
+                email: 'bob@example.com'
+            },
+            channel: {
+                id: 1,
+                name: 'Channel 1',
+                creator: {
+                    id: 1,
+                    username: 'Bob',
+                    email: 'bob@example.com'
+                },
+                visibility: Visibility.PUBLIC
+            },
+            content: 'H',
+            timestamp: new Date("2024-11-26T12:33:24Z")
+        }    
     ]
 
     createMessage(user: User, channel: Channel, content: string, timestamp: Date): Message {

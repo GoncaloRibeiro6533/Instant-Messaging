@@ -1,7 +1,7 @@
 
 
 import * as React from "react";
-import { Box, TextField, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { Message } from "../message";
 import { useState } from "react";
 import { Visibility } from "../../../domain/Visibility";
@@ -10,9 +10,8 @@ import { repo } from "../../../App";
 
 
 export function ChatBox() {
-    const [messages, setMessages] = useState(repo.messageRepo.messages);
-    const [newMessage, setNewMessage] = useState("");     
-
+    const [messages] = useState(repo.messageRepo.messages);
+    //TODO
     return (
         <Box
             sx={{
@@ -39,7 +38,7 @@ export function ChatBox() {
                 ))}
             </Box>
             <ChatTextField/>
-           
+
         </Box>
     );
 }

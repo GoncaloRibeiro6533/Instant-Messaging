@@ -3,6 +3,7 @@ import {Channel} from '../../domain/Channel';
 import {Role} from '../../domain/Role';
 import {ChannelMember} from '../../domain/ChannelMember';
 import {Repo} from '../../App';
+import { delay } from './utils';
 
 export class ChannelServiceMock implements ChannelService {
     repo: Repo;
@@ -93,6 +94,7 @@ export class ChannelServiceMock implements ChannelService {
 
     async getChannelById(token: string, channelId: number): Promise<Channel> {
         const user = this.repo.userRepo.getUserByToken(token)
+        await delay(3000)
         if (!user) {
             throw new Error("Invalid token");
         }
