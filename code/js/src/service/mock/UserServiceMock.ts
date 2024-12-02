@@ -39,8 +39,7 @@ export class UserServiceMock implements UserService {
             throw new Error("Username already in use");
         }
         //TODO check if invitationId is valid
-        const user = this.repo.userRepo.createUser(username, email, password);
-        return user;
+        return this.repo.userRepo.createUser(username, email, password);
     }
 
     async logOut(token: string): Promise<void> {
