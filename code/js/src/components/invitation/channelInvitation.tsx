@@ -1,32 +1,33 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, TextField, InputAdornment, List, ListItem, ListItemText, Paper, ButtonBase, Typography } from '@mui/material';
 import { useState, useContext } from 'react';
-import { services } from "../../App";
+import { useLocation, useNavigate } from 'react-router-dom';
 import SearchIcon from "@mui/icons-material/Search";
-import { AuthContext } from '../auth/AuthProvider';
 import { User } from '../../domain/User';
+import { Role } from '../../domain/Role';
+import { services } from "../../App";
+import {AuthContext} from "../auth/AuthProvider";
 
 export function ChannelInvitation() {
-    const { user } = React.useContext(AuthContext);
+    const { user } = useContext(AuthContext);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { channel } = location.state;
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [hoveredUserId, setHoveredUserId] = useState<number | null>(null);
-    const [selectedRole, setSelectedRole] = useState<string>('No role selected');
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const [showPermissionError, setShowPermissionError] = useState(false);
 
     const handleSearch = async (term: string) => {
         setSearchTerm(term);
-        console.log('Search term:', term);
-        console.log('User token:', user.token);
         if (term && user.token) {
             try {
                 const results = await services.userService.searchByUsername(user.token, term);
-                console.log('Search results:', results);
                 if (results) {
-                    const filteredResults = results.filter(result => result.id !== user.user.id);
+                    const filteredResults = results.filter((result: { id: any; }) => result.id !== user.user.id);
                     setSearchResults(filteredResults);
-                } else {
-                    console.error('No results returned from searchByUsername');
                 }
             } catch (e) {
                 console.error('Search error:', e.message);
@@ -38,13 +39,29 @@ export function ChannelInvitation() {
 
     const handleUserClick = (user: User) => {
         setSelectedUser(user);
-        setSearchResults([]); // Clear search results
-        console.log('Selected user:', user);
+        setSearchResults([]);
     };
 
-    const handleRoleClick = (role: string) => {
+    const handleRoleClick = (role: Role) => {
         setSelectedRole(role);
-        console.log('Selected role:', role);
+    };
+
+    const handleAddToChannel = async () => {
+        if (selectedUser && selectedRole) {
+            try {
+                await services.invitationService.createChannelInvitation(user.token, selectedUser.id, channel.id, selectedRole);
+                console.log('Channel invitation created');
+                navigate(`/channel/${channel.id}`, { state: { invitedUser: selectedUser.username } });
+            } catch (e) {
+                console.error('Error creating channel invitation:', e.message);
+            }
+        } else {
+            console.error('User or role not selected');
+            if (!selectedRole) {
+                setShowPermissionError(true);
+                setTimeout(() => setShowPermissionError(false), 3000);
+            }
+        }
     };
 
     return (
@@ -105,31 +122,36 @@ export function ChannelInvitation() {
                                 <span style={{ color: 'black', fontWeight: 'bold' }}>User selected:</span>
                                 <span style={{ color: 'black', fontStyle: 'italic' }}> {selectedUser.username}</span>
                             </>
-                        ) : 'Please select a user by searching its username and the permissions wanted'}
+                        ) : 'Please select a user by searching its username and the role wanted'}
                     </Typography>
                     <Box>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontWeight: 'bold' }}>
                             Permission selected:
                         </Typography>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontStyle: 'italic' }}>
-                            {selectedRole === 'READ-WRITE' ? ' Can send messages' : selectedRole === 'READ-ONLY' ? ' Can only see conversation' : ' No role selected'}
+                            {selectedRole === Role.READ_WRITE ? ' Can send messages' : selectedRole === Role.READ_ONLY ? ' Can only see conversation' : ' No role selected'}
                         </Typography>
                     </Box>
+                    {showPermissionError && (
+                        <Typography variant="body2" sx={{ color: 'red', fontStyle: 'italic' }}>
+                            Role not selected yet
+                        </Typography>
+                    )}
                     {selectedUser && (
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => console.log('Add to channel')}
+                            onClick={handleAddToChannel}
                         >
                             Add to channel
                         </Button>
                     )}
                 </CardActions>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2, gap: 2 }}>
-                    <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick('READ-WRITE')}>
+                    <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
                         Can send messages
                     </Button>
-                    <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick('READ-ONLY')}>
+                    <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_ONLY)}>
                         Can only see conversation
                     </Button>
                 </Box>

@@ -1,19 +1,15 @@
 import * as React from 'react';
-import { Channel } from "../../../domain/Channel";
-import { AuthContext } from "../../auth/AuthProvider";
-import { ChannelRepo } from "../../../service/mock/repo/ChannelRepo";
-import { ChannelMember } from "../../../domain/ChannelMember";
-import { useLeaveChannel } from "./useLeaveChannel";
-import { useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import { getRandomColor } from '../../utils/channelLogoColor';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Box, Button, Typography, TextField, Avatar } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { Edit } from "@mui/icons-material";
+import { AuthContext } from '../../auth/AuthProvider';
+import { Channel } from '../../../domain/Channel';
+import { ChannelMember } from '../../../domain/ChannelMember';
+import { ChannelRepo } from '../../../service/mock/repo/ChannelRepo';
+import { useLeaveChannel } from './useLeaveChannel';
 import { useEditChannelName } from './useEditChannelName';
-import {Edit} from "@mui/icons-material";
+import { getRandomColor } from '../../utils/channelLogoColor';
 
 interface ChannelDetailsProps {
     channel: Channel;
@@ -27,7 +23,9 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
     const [channelMembers, setChannelMembers] = React.useState<ChannelMember[]>([]);
     const [error, setError] = React.useState('');
     const navigate = useNavigate();
+    const location = useLocation();
     const [leaveState, leaveChannel] = useLeaveChannel(user.token);
+    const [invitationMessage, setInvitationMessage] = React.useState<string | null>(null);
 
     const {
         newChannelName,
@@ -52,12 +50,19 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
                 console.error(err);
             }
         };
-        fetchMembers().then(r => r);
+        fetchMembers();
     }, [channel, user.user]);
 
     React.useEffect(() => {
         setNewChannelName(channel.name);
     }, [channel.name, setNewChannelName]);
+
+    React.useEffect(() => {
+        if (location.state?.invitedUser) {
+            setInvitationMessage(`${location.state.invitedUser} invited to channel!`);
+            setTimeout(() => setInvitationMessage(null), 3000);
+        }
+    }, [location.state]);
 
     const handleLeaveChannelClick = async () => {
         try {
@@ -132,12 +137,16 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/invitation', { state: { channel,  token: user.token } })}
-                style={{display: 'block', margin: '10px auto'}}
+                onClick={() => navigate('/invitation', { state: { channel, token: user.token } })}
+                style={{ display: 'block', margin: '10px auto' }}
             >
                 Send Invitation
             </Button>
+            {invitationMessage && (
+                <Typography variant="h5" sx={{ color: 'gray', fontStyle: 'italic', mt: 4 }}>
+                    {invitationMessage}
+                </Typography>
+            )}
         </Box>
-
     );
 }
