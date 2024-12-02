@@ -4,29 +4,29 @@ import { User } from "../../domain/User";
 import { Box, Avatar, Typography, Paper } from '@mui/material';
 import { AuthContext } from "../auth/AuthProvider";
 
-export function Message(props: { message: MessageType }) { 
+export function Message(props: { message: MessageType }) {
     const { user } = React.useContext(AuthContext); // Get current user from context
     const isCurrentUser = user.user.username === props.message.sender.username; // Check if message is from current user
 
     return (
-        <Box 
-            display="flex" 
-            flexDirection="row" 
-            alignItems="flex-start" 
+        <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="flex-start"
             justifyContent={isCurrentUser ? "flex-end" : "flex-start"} // Align message to left or right
             marginBottom={2}
         >
             {/* Avatar of the sender */}
             {props.message.sender.username !== user.user.username &&
-            <Avatar 
-                src="userImg.png"
-                sx={{
-                    marginLeft: isCurrentUser ? 0 : 2, 
-                    marginRight: isCurrentUser ? 2 : 0,
-                    width: 40,
-                    height: 40
-                }} 
-            />
+                <Avatar
+                    src="userImg.png"
+                    sx={{
+                        marginLeft: isCurrentUser ? 0 : 2,
+                        marginRight: isCurrentUser ? 2 : 0,
+                        width: 40,
+                        height: 40
+                    }}
+                />
             }
             {/* Message content */}
             <Box maxWidth="75%">
@@ -49,41 +49,41 @@ export function Message(props: { message: MessageType }) {
                         paddingBottom: "24px", // Add some bottom padding to ensure space for timestamp
                     }}
                 >
-                      {/* Sender Username */}
-                 {props.message.sender.username !== user.user.username && <Typography 
-                    variant="body2" 
-                    fontWeight="bold" 
-                    color={isCurrentUser ? "white" : "text.primary"} 
-                    align={isCurrentUser ? "right" : "left"} 
-                    sx={{ 
-                        marginRight: 2,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxWidth: '300px',
-                        minWidth: '120px',
-                        fontSize: '0.9rem',
-                        marginBottom: 0.5
-                         }}
-                >
-                    {props.message.sender.username}
-                </Typography>}
-                {/* Message Content */}
-                <Typography variant="body1" align={isCurrentUser ? "right" : "left"}>
-                    {props.message.content}
-                </Typography>
+                    {/* Sender Username */}
+                    {props.message.sender.username !== user.user.username && <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color={isCurrentUser ? "white" : "text.primary"}
+                        align={isCurrentUser ? "right" : "left"}
+                        sx={{
+                            marginRight: 2,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '300px',
+                            minWidth: '120px',
+                            fontSize: '0.9rem',
+                            marginBottom: 0.5
+                        }}
+                    >
+                        {props.message.sender.username}
+                    </Typography>}
+                    {/* Message Content */}
+                    <Typography variant="body1" align={isCurrentUser ? "right" : "left"}>
+                        {props.message.content}
+                    </Typography>
 
                     {/* Timestamp positioned at the bottom-right corner */}
-                    <Box 
-                        sx={{ 
+                    <Box
+                        sx={{
                             position: "absolute", // Position timestamp absolutely within Paper
                             bottom: 4, // Distance from the bottom of the Paper
                             right: 8,  // Distance from the right side of the Paper
                         }}
                     >
-                        <Typography 
-                            variant="caption" 
-                            color="textSecondary" 
+                        <Typography
+                            variant="caption"
+                            color="textSecondary"
                             sx={{ fontSize: '0.8rem'}}
                         >
                             {String(props.message.timestamp.getHours()).padStart(2, "0")}:
