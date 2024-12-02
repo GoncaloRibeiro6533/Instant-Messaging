@@ -1,20 +1,25 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { services } from '../../App';
-import { AuthContext } from '../auth/AuthProvider';
+import { AuthContext, useAuth } from '../auth/AuthProvider';
 import { TextField, Button, MenuItem, Box, Typography } from '@mui/material';
 import { Visibility } from '../../domain/Visibility';
+import { useData } from '../data/DataProvider';
+import { Role } from '../../domain/Role';
 
 export function CreateChannel() {
-    const { user } = React.useContext(AuthContext);
+    const [user] = useAuth();
+    const { addChannel } = useData()
     const [name, setName] = React.useState('');
     const [visibility, setVisibility] = React.useState(Visibility.PUBLIC);
     const navigate = useNavigate();
 
+    //TODO 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         try {
-            await services.channelService.createChannel(user.token, name, visibility);
+            const result = await services.channelService.createChannel(user.token, name, visibility);
+            addChannel(result, Role.READ_WRITE);
             navigate('/channels');
         } catch (error) {
             console.error('Failed to create channel:', error);

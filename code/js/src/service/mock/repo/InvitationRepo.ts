@@ -21,65 +21,41 @@ export class InvitationRepo implements InvitationRepoInterface {
     public registerInvitations = [
         {
             id: 1,
-            sender: {
-                id: 1,
-                username: 'Bob',
-                email: 'bob@example.com',
-            },
+            sender: new User(1, 'Bob', 'bob@example.com'),
             email: 'david@example.com',
-            channel: {
-                id: 1,
-                name: 'Channel 1',
-                creator: {
-                    id: 1,
-                    username: 'Bob',
-                    email: 'bob@example.com'
-                },
-                visibility: Visibility.PUBLIC
-            },
+            channel: new Channel(
+                1,
+                'Channel 1',
+                new User(1, 'Bob', 'bob@example.com'),
+                Visibility.PUBLIC
+            ),
             role: Role.READ_ONLY,
             isUsed: false,
             timestamp: new Date()
         },
         {
             id: 2,
-            sender: {
-                id: 1,
-                username: 'Bob',
-                email: 'bob@example.com',
-            },
+            sender: new User(1, 'Bob', 'bob@example.com'),
             email: 'eva@example.com',
-            channel: {
-                id: 1,
-                name: 'Channel 1',
-                creator: {
-                    id: 1,
-                    username: 'Bob',
-                    email: 'bob@example.com'
-                },
-                visibility: Visibility.PUBLIC
-            },
+            channel:new Channel(
+                    1,
+                'Channel 1',
+                new User(1, 'Bob', 'bob@example.com'),
+                Visibility.PUBLIC
+            ),
             role: Role.READ_WRITE,
             isUsed: false,
             timestamp: new Date()
         },
         {
             id: 3,
-            sender: {
-                id: 1,
-                username: 'alice',
-                email: 'alice@example.com',
-            },
-            channel: {
-                id: 2,
-                name: 'Channel 2',
-                creator: {
-                    id: 2,
-                    username: 'Alice',
-                    email: 'alice@email.com'
-                },
-                visibility: Visibility.PRIVATE
-            },
+            sender: new User(2, 'Alice', 'alice@example.com'),
+            channel: new Channel(
+                2,
+            'Channel 2',
+            new User(2, 'Alice', 'alice@example.com'),
+            Visibility.PRIVATE
+        ),
             email: 'filipe@example.com',
             role: Role.READ_WRITE,
             isUsed: false,
@@ -91,26 +67,14 @@ export class InvitationRepo implements InvitationRepoInterface {
     public channelInvitations = [
         {
             id: 1,
-            sender: {
-                id: 1,
-                username: 'Bob',
-                email: 'bob@example.com',
-            },
-            receiver: {
-                id: 2,
-                username: 'Filipe',
-                email: 'filipe@example.com',
-            },
-            channel: {
-                id: 1,
-                name: 'Channel 1',
-                creator: {
-                    id: 1,
-                    username: 'Bob',
-                    email: 'bob@example.com',
-                },
-                visibility: Visibility.PUBLIC
-            },
+            sender: new User(1, 'Bob', 'bob@example.com'),
+            receiver: new User(2, 'Filipe', 'filipe@example.com'),
+            channel: new Channel(
+                1,
+            'Channel 1',
+            new User(1, 'Bob', 'bob@example.com'),
+            Visibility.PRIVATE
+        ),
             role: Role.READ_ONLY,
             isUsed: false,
             timestamp: new Date()
@@ -133,11 +97,7 @@ export class InvitationRepo implements InvitationRepoInterface {
     async createRegisterInvitation(user: User, email: string, channel: Channel, role: Role,): Promise<RegisterInvitation> {
         const invitation = {
             id: this.registerInvitations.length + 1,
-            sender: {
-                id: user.id,
-                username: user.username,
-                email: user.email
-            },
+            sender: user,
             email: email,
             channel: channel,
             role: role,

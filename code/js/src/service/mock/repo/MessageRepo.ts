@@ -13,23 +13,24 @@ export interface MessageRepoInterface {
 
 export class MessageRepo implements MessageRepoInterface {
     public messages: Message[] = [
-        {
-            id: 1,
-            sender: new User(1, 'Bob', 'bob@example.com'),
-            channel: new Channel( 1, 'Channel 1', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
-            content: 'Hello',
-            timestamp: new Date("2024-11-26T12:33:24Z")
-        },
+        new Message(
+            1,
+            new User(1, 'Bob', 'bob@example.com'),
+            new Channel( 1, 'Channel 1', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
+            'Hello',
+            new Date("2024-11-26T12:33:24Z")
+        )
+        ,
     ]
 
     createMessage(user: User, channel: Channel, content: string, timestamp: Date): Message {
-        const message: Message = {
-            id: this.messages.length + 1,
-            sender: user,
+        const message: Message = new Message(
+            this.messages.length + 1,
+            user,
             channel,
             content,
             timestamp
-        };
+        );
         this.messages.push(message);
         return message;
     }

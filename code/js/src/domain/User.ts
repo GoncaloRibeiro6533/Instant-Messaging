@@ -20,4 +20,17 @@ export class User {
     public equals(other: User): boolean {
         return this.id === other.id && this.username === other.username && this.email === other.email;
     }
+
+
+    public static fromRaw(raw: any): User {
+        return new User(raw.id, raw.username, raw.email);
+    }
+
+    public toRaw(): any {
+        return {
+            id: this.id,
+            username: this.username,
+            email: this.email,
+        };
+    }
 }

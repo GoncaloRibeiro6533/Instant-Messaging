@@ -16,6 +16,7 @@ type Action =
     | { type: 'error'; message: string };
 
 function reduce(state: State, action: Action): State {
+    const { messages } = useData();
     switch (state.name) {
         case 'idle':
         case 'error':
@@ -33,6 +34,8 @@ function reduce(state: State, action: Action): State {
                 return { name: 'loaded', channel: action.channel };
             } else if (action.type === 'error') {
                 return { name: 'error', message: action.message };
+            } else if (action.type === 'success' && action.channel.id !== state.channelId && messages.get(action.channel.id) !== undefined) {
+                return { name: 'loaded', channel: action.channel };
             }
             return state;
         case 'loaded':
@@ -67,14 +70,16 @@ export function useChannel(): [
             dispatch({ type: 'error', message: 'Channel not found' });
             return;
         }        
-        if(state.name == 'loaded' && state.channel.id != parsedId && messages.get(channel) !== undefined){
+        const a  = messages
+        const mg = messages.get(channel.id)
+        if(messages.get(channel.id) !== undefined){
             dispatch({ type: 'success', channel: channel });
             return
         }
-        if(state.name == 'idle' && messages.get(channel) !== undefined){
+        /*if(state.name == 'idle' && messages.get(channel) !== undefined){
             dispatch({ type: 'success', channel: channel });
             return
-        }
+        }*/
         dispatch({ type: 'load', channelId: parsedId });
         try {
             const messages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0);

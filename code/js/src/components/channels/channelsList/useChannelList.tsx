@@ -41,7 +41,7 @@ function reduce(state: State, action: Action): State {
 export function useChannelList(): [State, onChange: () => void] {
     const { user } = React.useContext(AuthContext);
     const [state, dispatch] = React.useReducer(reduce, { name: "loading" });
-    const { setChannels, channels } = useData();
+    const { setChannels, channels, messages } = useData();
     async function loadChannels() {
         if(channels.size > 0){
             dispatch({ type: "success", channels });
@@ -59,7 +59,7 @@ export function useChannelList(): [State, onChange: () => void] {
 
     React.useEffect(() => {
         loadChannels().then(r => r);
-    }, [user.user.id]);
+    }, [user.user.id, messages]);
 
     return [state, loadChannels];
 }

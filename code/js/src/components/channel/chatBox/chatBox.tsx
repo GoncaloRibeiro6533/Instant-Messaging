@@ -30,7 +30,7 @@ export function ChatBox(props : {channel: Channel}) {
                     flexDirection: "column-reverse", // Coloca a última mensagem no fundo
                 }}
             >
-                {messages.get(props.channel).map((message, index) => (
+                {messages.get(props.channel.id).map((message, index) => (
                     <Message key={index} message={message} />
                 ))}
             </Box>

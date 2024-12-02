@@ -29,7 +29,6 @@ export function ChannelsList() {
     React.useEffect(() => {
         loadChannels();
     }, [user.user.id]);
-
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchChannels(term);
