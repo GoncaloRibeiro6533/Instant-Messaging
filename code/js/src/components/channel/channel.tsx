@@ -16,10 +16,6 @@ export function Channel() {
     const navigate = useNavigate();
     React.useEffect(() => {
         loadChannel(channelId);
-        return () => { 
-            //ignore previous request
-
-        }
     }, [channelId]);
     const handleClick = () => {
         if (state.name === 'loaded') {
@@ -56,7 +52,7 @@ export function Channel() {
                         {state.channel.name}
                     </Typography>
                 </ListItemButton>
-                <ChatBox /></Box>
+                <ChatBox channel={state.channel} /></Box>
             )} </Box>
     );
 }

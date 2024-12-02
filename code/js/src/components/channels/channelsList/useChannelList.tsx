@@ -4,6 +4,7 @@ import { services } from "../../../App";
 import { Channel } from "../../../domain/Channel";
 import {AuthContext} from "../../auth/AuthProvider";
 import {Role} from "../../../domain/Role";
+import {useData} from "../../data/DataProvider";
 
 type State =
     | { name: "loading" }
@@ -40,11 +41,16 @@ function reduce(state: State, action: Action): State {
 export function useChannelList(): [State, onChange: () => void] {
     const { user } = React.useContext(AuthContext);
     const [state, dispatch] = React.useReducer(reduce, { name: "loading" });
-
+    const { setChannels, channels } = useData();
     async function loadChannels() {
+        if(channels.size > 0){
+            dispatch({ type: "success", channels });
+            return;
+        }
         dispatch({ type: "load" });
         try {
             const channels = await services.channelService.getChannelsOfUser(user.token,user.user.id);
+            setChannels(channels);
             dispatch({ type: "success", channels });
         } catch (e) {
             dispatch({ type: "error", message: e.message });

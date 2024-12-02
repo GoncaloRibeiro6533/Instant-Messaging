@@ -52,7 +52,8 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.channelRepo.getChannelsOfUser(user, userId);
+        const channels = this.repo.channelRepo.getChannelsOfUser(user, userId);
+        return channels;
     }
 
     async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
@@ -60,7 +61,8 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.channelRepo.updateChannelName(user, channelId, newName);
+        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
+        return 
     }
 
     async leaveChannel(token: string, channelId: number): Promise<Channel> {

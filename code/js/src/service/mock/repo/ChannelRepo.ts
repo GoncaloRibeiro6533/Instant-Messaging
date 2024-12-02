@@ -22,255 +22,38 @@ interface ChannelRepoInterface {
 export class ChannelRepo implements ChannelRepoInterface {
     nextId: number = 11;
     public channels: Channel[] = [
-        {
-            id: 1,
-            name: 'Channel 1',
-            creator: {
-                id: 1,
-                username: 'Bob',
-                email: 'bob@example.com'
-            },
-            visibility: Visibility.PUBLIC
-        },
-        {
-            id: 2,
-            name: 'Channel 2',
-            creator: {
-                id: 2,
-                username: 'Alice',
-                email: 'alice@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 3,
-            name: 'Channel 3',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 4,
-            name: 'Channel 4',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-
-        {
-            id: 5,
-            name: 'Channel 5',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 6,
-            name: 'Channel 6',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 7,
-            name: 'Channel 7',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 8,
-            name: 'Channel 8',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 9,
-            name: 'Channel 9',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-        {
-            id: 10,
-            name: 'Channel 10',
-            creator: {
-                id: 3,
-                username: 'Charlie',
-                email: 'charl@email.com'
-            },
-            visibility: Visibility.PRIVATE
-        },
-    ]
+        new Channel(1, 'Channel 1', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
+        new Channel(2, 'Channel 2', new User(1, 'Bob', 'bob@example.com'), Visibility.PRIVATE),
+        new Channel(3, 'Channel 3', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
+    ];
 
     public channelMembers: Map<Channel, Array<ChannelMember>> = new Map([
-        [
-            this.channels[0],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_WRITE
-                },
-                {
-                    user: {
-                        id: 2,
-                        username: 'Alice',
-                        email: 'alice@email.com'
-                    },
-                    role: Role.READ_WRITE
-                },
-            ]
-        ],
-        [
-            this.channels[1],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
+        [this.channels[0], [
+            {
+                user: new User(1, 'Bob', 'bob@example.com'),
+                role: Role.READ_WRITE
+            }
+        ]],
+        [this.channels[1], [
+            {
+                user: new User(1, 'Bob', 'bob@example.com'),
+                role: Role.READ_WRITE
+            }
+        ]],
+        [this.channels[2], [
+            {
+                    user: new User(1, 'Bob', 'bob@example.com'),
                     role: Role.READ_ONLY
-                },
-            ]
-        ], [
-            this.channels[2],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ], [
-            this.channels[3],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[4],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[5],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[6],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[7],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[8],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-        [
-            this.channels[9],
-            [
-                {
-                    user: {
-                        id: 1,
-                        username: 'Bob',
-                        email: 'bob@example.com'
-                    },
-                    role: Role.READ_ONLY
-                },
-            ]
-        ],
-    ]);
+                }
+        ]]
+    ])
 
     createChannel(user: User, name: string, visibility: string): Channel {
-        const channel: Channel = {
-            id: this.nextId++,
+        const channel: Channel = new Channel( this.nextId++,
             name,
-            creator: user,
-            visibility: Visibility[visibility as keyof typeof Visibility]
-        };
+            user,
+            Visibility[visibility as keyof typeof Visibility]
+        );
         this.channels.push(channel);
         this.channelMembers.set(channel, [{
             user,

@@ -1,16 +1,14 @@
 
-
 import * as React from "react";
 import { Box } from "@mui/material";
 import { Message } from "../message";
-import { useState } from "react";
 import { ChatTextField } from "../chatTextField/chatTextfield";
-import { repo } from "../../../App";
+import { useData } from "../../data/DataProvider";
+import { Channel } from "../../../domain/Channel";
 
-
-export function ChatBox() {
-    const [messages] = useState(repo.messageRepo.messages);
-    //TODO
+export function ChatBox(props : {channel: Channel}) {
+    
+    const {messages} = useData();
     return (
         <Box
             sx={{
@@ -32,11 +30,11 @@ export function ChatBox() {
                     flexDirection: "column-reverse", // Coloca a última mensagem no fundo
                 }}
             >
-                {messages.map((message, index) => (
+                {messages.get(props.channel).map((message, index) => (
                     <Message key={index} message={message} />
                 ))}
             </Box>
-            <ChatTextField/>
+            <ChatTextField channel={props.channel}/>
 
         </Box>
     );

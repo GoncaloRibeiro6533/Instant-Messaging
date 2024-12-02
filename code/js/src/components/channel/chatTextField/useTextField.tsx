@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useAuth } from "../../auth/AuthProvider"
 import { services } from "../../../App"
+import { Channel } from "../../../domain/Channel"
+import { useData } from "../../data/DataProvider"
 
 type State = 
     { name: "editing", error?: string, content: string} 
@@ -9,7 +11,7 @@ type State =
 
 type Action = 
     { type: "edit", value: string }     
-    | { type: "send" }
+    | { type: "send", channel: Channel }
     | { type: "success" }
     | { type: "error", message: string }
 
@@ -45,7 +47,7 @@ function reduce(state: State, action: Action): State {
 
 
 export function useTextField() : [State, { 
-    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
+    onSubmit: (ev: React.FormEvent<HTMLFormElement>, channel: Channel) => Promise<void>, 
     onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
 }] {
     
@@ -54,16 +56,17 @@ export function useTextField() : [State, {
             name: "idle",
         })
     const [userAuth, setUser] = useAuth()
-    async function onSubmit(ev: React.FormEvent<HTMLFormElement>) {
+    const { addMessages } = useData();
+    async function onSubmit(ev: React.FormEvent<HTMLFormElement>, channel: Channel) {
         ev.preventDefault()
         if (state.name !== "editing") {
             return
         } 
-        dispatch({ type: "send" })
-        const message = state.content
+        dispatch({ type: "send", channel: channel })
         try {
-            await services.messageService
-            .sendMessage(userAuth.token, 1, state.content)
+            const message = await services.messageService
+            .sendMessage(userAuth.token, channel.id, state.content)
+            addMessages(channel, [message])
             dispatch({ type: "success" })
         } catch (e) {
             dispatch({ type: "error", message: e.message })

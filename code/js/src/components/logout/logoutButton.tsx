@@ -3,12 +3,15 @@ import * as React from "react"
 
 import { useAuth } from "../auth/AuthProvider"
 import { Button } from "@mui/material"
+import { useData } from "../data/DataProvider"
 
 export function LogoutButton() {
     const [user, setUser] = useAuth()
+    const { clear } = useData()
     function logoutHandler() {
         localStorage.clear()
         setUser(undefined)
+        clear()
     }
     return (
         <Button

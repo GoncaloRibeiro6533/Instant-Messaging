@@ -36,16 +36,8 @@ export class UserRepo implements UserRepoInterface {
         [[1, ["123"]]]
     );
     public users: Array<User> = [
-        {
-            id: 1,
-            username: 'Bob',
-            email: 'bob@example.com'
-        },
-        {
-            id: 2,
-            username: 'Alice',
-            email: 'alice@example.com'
-        }
+        new User(1, 'Bob', 'bob@example.com'),
+        new User(2, 'Alice', 'alice@example.com')
     ];
     public usersPassword: Map<number, string> = new Map([
         [1, '123'],
@@ -64,11 +56,10 @@ export class UserRepo implements UserRepoInterface {
         }
     }
     createUser(username: string, email: string, password: string): User {
-        const user = {
-            id: this.nextId++,
-            username,
-            email
-        };
+        const user = 
+        new User(this.nextId++,
+                username,
+                email)
         this.users.push(user);
         this.usersPassword.set(user.id, password);
         return user;

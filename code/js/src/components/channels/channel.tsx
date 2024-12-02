@@ -12,7 +12,7 @@ interface ChannelProps {
     handleLeaveChannel: (channelId: number) => void;
 }
 
-export function Channel({ channel, onLeave, loadChannels, handleLeaveChannel }: ChannelProps) {
+export function ChannelComponent({ channel, onLeave, loadChannels, handleLeaveChannel }: ChannelProps) {
     const navigate = useNavigate();
 
     const handleClick = () => {
