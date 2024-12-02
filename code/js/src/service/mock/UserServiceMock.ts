@@ -81,13 +81,9 @@ export class UserServiceMock implements UserService {
         if (!userVerify) {
             throw new Error("Invalid token");
         }
-        return new Promise<User[]>((resolve, reject) => {
+        return new Promise<User[]>((resolve) => {
             const users = this.repo.userRepo.getUserByUsername(username);
-            if (!users) {
-                reject("User not found");
-            }
-            // @ts-ignore
-            resolve(users);
+            resolve(Array.isArray(users) ? users : [users].filter(Boolean));
         });
     }
 }

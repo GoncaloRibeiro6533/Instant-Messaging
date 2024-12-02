@@ -8,7 +8,8 @@ export interface UserRepoInterface {
 
     createUser(username: string, email: string, password: string): User;
     getUserById(id: number): User | undefined;
-    getUserByUsername(username: string): User | undefined;
+
+    getUserByUsername(username: string): User[];
     getUserByEmail(email: string): User | undefined;
     getUserByToken(token: string): User | undefined;
     updateUser(user: User): void;
@@ -78,8 +79,8 @@ export class UserRepo implements UserRepoInterface {
         return this.users.find(user => user.id === id);
     }
 
-    getUserByUsername(username: string): User | undefined {
-        return this.users.find(user => user.username === username);
+    getUserByUsername(username: string): User[] {
+        return this.users.filter(user => user.username.includes(username));
     }
 
     getUserByEmail(email: string): User | undefined {
