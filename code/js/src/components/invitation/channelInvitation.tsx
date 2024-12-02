@@ -6,7 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { User } from '../../domain/User';
 import { Role } from '../../domain/Role';
 import { services } from "../../App";
-import {AuthContext} from "../auth/AuthProvider";
+import { AuthContext } from "../auth/AuthProvider";
 
 export function ChannelInvitation() {
     const { user } = useContext(AuthContext);
@@ -126,7 +126,7 @@ export function ChannelInvitation() {
                     </Typography>
                     <Box>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontWeight: 'bold' }}>
-                            Permission selected:
+                            Role selected:
                         </Typography>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontStyle: 'italic' }}>
                             {selectedRole === Role.READ_WRITE ? ' Can send messages' : selectedRole === Role.READ_ONLY ? ' Can only see conversation' : ' No role selected'}
@@ -142,6 +142,7 @@ export function ChannelInvitation() {
                             variant="contained"
                             color="primary"
                             onClick={handleAddToChannel}
+                            disabled={!selectedRole}
                         >
                             Add to channel
                         </Button>

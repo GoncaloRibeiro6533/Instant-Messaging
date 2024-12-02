@@ -7,15 +7,15 @@ export function InvitationOptions() {
     const { channel, token } = location.state;
     const navigate = useNavigate();
 
-    const handleInviteExistingUser = () => {
+    const handleInvitationExistingUser = () => {
         console.log('Invite existing user', { channel, token });
         navigate('/invitation/channel', { state: { channel, token } })
 
     };
 
-    const handleInviteNewUser = () => {
+    const handleInvitationNewUser = () => {
         console.log('Invite new user', { channel, token });
-        // Adicione aqui a lógica para convidar um novo usuário
+        navigate('/invitation/register', { state: { channel, token } });
     };
 
     return (
@@ -38,14 +38,14 @@ export function InvitationOptions() {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleInviteExistingUser}
+                        onClick={handleInvitationExistingUser}
                     >
                         Invite existing user
                     </Button>
                     <Button
                         variant="contained"
                         color="secondary"
-                        onClick={handleInviteNewUser}
+                        onClick={handleInvitationNewUser}
                     >
                         Invite new user
                     </Button>

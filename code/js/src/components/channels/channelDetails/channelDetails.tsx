@@ -63,6 +63,10 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
             setInvitationMessage(`${location.state.invitedUser} invited to channel!`);
             setOpenSnackbar(true);
             setTimeout(() => setOpenSnackbar(false), 3000);
+        } else if (location.state?.invitedEmail) {
+            setInvitationMessage(`Invitation sent to: ${location.state.invitedEmail}`);
+            setOpenSnackbar(true);
+            setTimeout(() => setOpenSnackbar(false), 3000);
         }
     }, [location.state]);
 
