@@ -145,6 +145,14 @@ export class ChannelRepo implements ChannelRepoInterface {
                     },
                     role: Role.READ_WRITE
                 },
+                {
+                    user: {
+                        id: 3,
+                        username: 'Charlie',
+                        email: 'charl@email.com'
+                    },
+                    role: Role.READ_ONLY
+                }
             ]
         ],
         [

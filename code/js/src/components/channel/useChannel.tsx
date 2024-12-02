@@ -43,7 +43,7 @@ function reduce(state: State, action: Action): State {
 
 export function useChannel(): [
     State,
-    (channelId: string) => void 
+    (channelId: string) => void
 ] {
     const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
     const [auth] = useAuth();
@@ -65,6 +65,5 @@ export function useChannel(): [
             dispatch({ type: 'error', message: errorMessage });
         }
     }
-
     return [state, loadChannel];
 }

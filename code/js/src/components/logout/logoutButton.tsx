@@ -1,8 +1,9 @@
 
 import * as React from "react"
-
 import { useAuth } from "../auth/AuthProvider"
 import { Button } from "@mui/material"
+import LogoutIcon from '@mui/icons-material/Logout';
+
 
 export function LogoutButton() {
     const [user, setUser] = useAuth()
@@ -28,6 +29,7 @@ export function LogoutButton() {
             },
           }}
         >
+            <LogoutIcon sx={{ marginRight: 1 }} />
           Log Out
         </Button>
       );
