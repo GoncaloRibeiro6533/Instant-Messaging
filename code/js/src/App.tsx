@@ -19,6 +19,11 @@ import {CreateChannel} from "./components/channels/createChannel";
 import {Channel} from "./components/channel/channel";
 import {Profile} from "./components/profile/profile";
 import { useNavigate, useParams } from 'react-router-dom';
+import {InvitationOptions} from "./components/invitation/invitationOptions";
+import {ChannelInvitation} from "./components/invitation/channelInvitation";
+import {RegisterInvitation} from "./components/invitation/registerInvitation";
+import {InvitationRepo} from "./service/mock/repo/InvitationRepo";
+import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
 
 
 //TODO
@@ -115,29 +120,60 @@ const router = createBrowserRouter(
                 </AuthRequire>
             ),
         },
+        {
+            path: "/invitation",
+            element: (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <InvitationOptions />
+                </AuthRequire>
+            ),
+        },
+        {
+            "path": "invitation/channel",
+            "element": (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <ChannelInvitation />
+                </AuthRequire>
+            )
+        },
+        {
+            "path": "invitation/register",
+            "element": (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <RegisterInvitation />
+                </AuthRequire>
+            )
+        }
     ]
 );
 
 export const userRepoMock = new UserRepo()
 export const channelRepoMock = new ChannelRepo()
 export const messageRepoMock = new MessageRepo()
+export const invitationRepoMock = new InvitationRepo()
 
 export type Repo = {
     userRepo: UserRepo
     channelRepo: ChannelRepo
     messageRepo: MessageRepo
+    invitationRepo: InvitationRepo;
 }
 
 export const repo: Repo = {
     userRepo: userRepoMock,
     channelRepo: channelRepoMock,
     messageRepo: messageRepoMock,
+    invitationRepo: invitationRepoMock
 }
 
 export const mockService: Service = {
     userService: new UserServiceMock(repo),
     channelService: new ChannelServiceMock(repo),
     messageService: new MessageServiceMock(repo),
+    invitationService: new InvitationServiceMock(repo)
 }
 
 export const services: Service = mockService;

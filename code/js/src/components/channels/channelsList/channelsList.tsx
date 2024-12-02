@@ -23,7 +23,6 @@ export function ChannelsList() {
     const [state, loadChannels] = useChannelList();
     const [searchChannels, setSearchChannels] = React.useState('');
     const [searchResults, setSearchResults] = React.useState<Channel[]>([]);
-    const [selectedChannel, setSelectedChannel] = React.useState<Channel | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -45,23 +44,6 @@ export function ChannelsList() {
             setSearchResults([]);
         }
     };
-
-    const handleLeaveChannel = async (channelId: number) => {
-        try {
-            await services.channelService.leaveChannel(user.token, channelId);
-
-            loadChannels();
-
-            if (selectedChannel && selectedChannel.id === channelId) {
-                setSelectedChannel(null);
-            }
-
-            console.log(`Channel ${channelId} deleted`);
-        } catch (error) {
-            console.error("Error deleting channel:", error.message);
-        }
-    };
-
     if (state.name === 'loading') {
         return <div>Loading...</div>;
     }
@@ -70,7 +52,7 @@ export function ChannelsList() {
         return <div>Error: {state.message}</div>;
     }
 
-    const channelsToDisplay = searchChannels ? searchResults : state.channels;
+    const channelsToDisplay = searchChannels.trim() ? searchResults : state.channels
 
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -99,7 +81,7 @@ export function ChannelsList() {
                 {/* Torne a lista rolável com overflowY: 'auto' */}
                 <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <List>
-                    {[...channelsToDisplay.entries()].map(([channel, role]: [Channel, Role]) => (
+                        {[...channelsToDisplay.entries()].map(([channel, role]: [Channel, Role]) => (
                             <React.Fragment key={channel.id}>
                                 <ListItemButton onClick={() => navigate("/channels/channel/" + String(channel.id))}>
                                     <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
@@ -129,11 +111,11 @@ export function ChannelsList() {
                                                     channel.visibility === Visibility.PUBLIC ? '#32B7A3' : '#E8556D',
                                             }}
                                         />
-                                </ListItem>
+                                    </ListItem>
                                 </ListItemButton>
                                 <Divider />
                             </React.Fragment>
-                        ))} 
+                        ))}
                     </List>
                 </Box>
             </Box>

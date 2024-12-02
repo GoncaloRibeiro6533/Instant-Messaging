@@ -3,6 +3,8 @@ import * as React from "react"
 
 import { useAuth } from "../auth/AuthProvider"
 import { Button } from "@mui/material"
+import LogoutIcon from '@mui/icons-material/Logout';
+
 import { useData } from "../data/DataProvider"
 
 export function LogoutButton() {
@@ -31,6 +33,7 @@ export function LogoutButton() {
             },
           }}
         >
+            <LogoutIcon sx={{ marginRight: 1 }} />
           Log Out
         </Button>
       );

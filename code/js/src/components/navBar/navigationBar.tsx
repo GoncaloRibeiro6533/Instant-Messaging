@@ -17,7 +17,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-import { Add, Chat, Logout, Close } from "@mui/icons-material";
+import { Add, Chat, Close } from "@mui/icons-material";
 import { AuthContext } from '../auth/AuthProvider';
 import { LogoutButton } from '../logout/logoutButton';
 

@@ -97,7 +97,7 @@ export class ChannelServiceMock implements ChannelService {
 
     async getChannelById(token: string, channelId: number): Promise<Channel> {
         const user = this.repo.userRepo.getUserByToken(token)
-        await delay(3000)
+        await delay(500)
         if (!user) {
             throw new Error("Invalid token");
         }

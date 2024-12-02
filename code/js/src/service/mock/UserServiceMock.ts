@@ -1,8 +1,8 @@
-import { AuthenticatedUser } from "../../domain/AuthenticatedUser";
-import { User } from "../../domain/User";
-import { UserService } from "../interfaces/UserService";
-import { delay } from "./utils";
-import { Repo } from "../../App";
+import {AuthenticatedUser} from "../../domain/AuthenticatedUser";
+import {User} from "../../domain/User";
+import {UserService} from "../interfaces/UserService";
+import {delay} from "./utils";
+import {Repo} from "../../App";
 
 export class UserServiceMock implements UserService {
     repo: Repo;
@@ -39,8 +39,7 @@ export class UserServiceMock implements UserService {
             throw new Error("Username already in use");
         }
         //TODO check if invitationId is valid
-        const user = this.repo.userRepo.createUser(username, email, password);
-        return user;
+        return this.repo.userRepo.createUser(username, email, password);
     }
 
     async logOut(token: string): Promise<void> {
@@ -75,5 +74,16 @@ export class UserServiceMock implements UserService {
         return user;
     }
 
+    async searchByUsername(token: string, username: string): Promise<User[]> {
+        await delay(500);
+        const userVerify = this.repo.userRepo.getUserByToken(token);
+        if (!userVerify) {
+            throw new Error("Invalid token");
+        }
+        return new Promise<User[]>((resolve) => {
+            const users = this.repo.userRepo.getUserByUsername(username);
+            resolve(Array.isArray(users) ? users : [users].filter(Boolean));
+        });
+    }
 }
 
