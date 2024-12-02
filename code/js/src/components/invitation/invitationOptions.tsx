@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export function InvitationOptions() {
     const location = useLocation();
     const { channel, token } = location.state;
+    const navigate = useNavigate();
 
     const handleInviteExistingUser = () => {
         console.log('Invite existing user', { channel, token });
-        // Adicione aqui a lógica para convidar um usuário existente
+        navigate('/invitation/channel', { state: { channel, token } })
+
     };
 
     const handleInviteNewUser = () => {
