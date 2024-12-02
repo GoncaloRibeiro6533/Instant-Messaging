@@ -9,15 +9,11 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { getRandomColor } from '../../utils/channelLogoColor';
-import { Role } from "../../../domain/Role";
-import { services } from "../../../App";
-import { Edit } from '@mui/icons-material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useEditChannelName } from './useEditChannelName';
+import {Edit} from "@mui/icons-material";
 
 interface ChannelDetailsProps {
     channel: Channel;
