@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Button, Typography, TextField, Avatar } from '@mui/material';
+import { Box, Button, Typography, TextField, Avatar, Snackbar } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Edit } from "@mui/icons-material";
 import { AuthContext } from '../../auth/AuthProvider';
@@ -26,6 +26,7 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
     const location = useLocation();
     const [leaveState, leaveChannel] = useLeaveChannel(user.token);
     const [invitationMessage, setInvitationMessage] = React.useState<string | null>(null);
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
     const {
         newChannelName,
@@ -60,7 +61,8 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
     React.useEffect(() => {
         if (location.state?.invitedUser) {
             setInvitationMessage(`${location.state.invitedUser} invited to channel!`);
-            setTimeout(() => setInvitationMessage(null), 3000);
+            setOpenSnackbar(true);
+            setTimeout(() => setOpenSnackbar(false), 3000);
         }
     }, [location.state]);
 
@@ -142,11 +144,13 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
             >
                 Send Invitation
             </Button>
-            {invitationMessage && (
-                <Typography variant="h5" sx={{ color: 'gray', fontStyle: 'italic', mt: 4 }}>
-                    {invitationMessage}
-                </Typography>
-            )}
+            <Snackbar
+                open={openSnackbar}
+                message={invitationMessage}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnackbar(false)}
+            />
         </Box>
     );
 }
