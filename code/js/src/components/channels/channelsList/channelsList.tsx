@@ -53,7 +53,7 @@ export function ChannelsList() {
         return <div>Error: {state.message}</div>;
     }
 
-    const channelsToDisplay = searchChannels ? searchResults : state.channels;
+    const channelsToDisplay = searchChannels.trim() ? searchResults : state.channels
 
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
