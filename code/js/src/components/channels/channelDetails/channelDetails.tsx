@@ -115,27 +115,13 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
             <Typography variant="body2" mt={1}>Number of members: {channelMembers.length}</Typography>
             <Typography variant="h6" mt={2}>Channel Members</Typography>
             {channelMembers.length > 0 ? (
-                <Grid container direction="column" alignItems="center" spacing={2} mt={2}>
+                <ul>
                     {channelMembers.map((member) => (
-                        <Grid item key={member.user.id} xs={12} container alignItems="center" justifyContent="center">
-                            <Grid item xs={4}>
-                                <Box p={1} border={1} borderRadius={2} display="flex" alignItems="center" justifyContent="space-between" bgcolor="#f0f0f0">
-                                    <Typography variant="body1">{member.user.username}</Typography>
-                                    <Chip
-                                        label={member.role}
-                                        size="small"
-                                        sx={{
-                                            backgroundColor: member.role === Role.READ_WRITE ? 'green' : '#2f2f2f',
-                                            color: 'white'
-                                        }}
-                                    />
-                                </Box>
-                            </Grid>
-                        </Grid>
+                        <li key={member.user.id}>{member.user.username}</li>
                     ))}
-                </Grid>
+                </ul>
             ) : (
-                <Typography variant="body1" mt={2}>No members found in this channel.</Typography>
+                <p>No members found in this channel.</p>
             )}
             <Button
                 variant="contained"
@@ -147,6 +133,15 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
                 <ExitToAppIcon sx={{ mr: 1 }} />
                 {leaveState.name === 'leaving' ? 'Leaving...' : 'Leave Channel'}
             </Button>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/invitation', { state: { channel,  token: user.token } })}
+                style={{display: 'block', margin: '10px auto'}}
+            >
+                Send Invitation
+            </Button>
         </Box>
+
     );
 }
