@@ -21,6 +21,7 @@ import {Profile} from "./components/profile/profile";
 import { useNavigate, useParams } from 'react-router-dom';
 import {InvitationOptions} from "./components/invitation/invitationOptions";
 import {ChannelInvitation} from "./components/invitation/channelInvitation";
+import {RegisterInvitation} from "./components/invitation/registerInvitation";
 import {InvitationRepo} from "./service/mock/repo/InvitationRepo";
 import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
 
@@ -134,6 +135,15 @@ const router = createBrowserRouter(
                 <AuthRequire>
                     <MenuAppBar />
                     <ChannelInvitation />
+                </AuthRequire>
+            )
+        },
+        {
+            "path": "invitation/register",
+            "element": (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <RegisterInvitation />
                 </AuthRequire>
             )
         }
