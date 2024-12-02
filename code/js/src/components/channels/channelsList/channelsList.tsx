@@ -23,7 +23,6 @@ export function ChannelsList() {
     const [state, loadChannels] = useChannelList();
     const [searchChannels, setSearchChannels] = React.useState('');
     const [searchResults, setSearchResults] = React.useState<Channel[]>([]);
-    const [selectedChannel, setSelectedChannel] = React.useState<Channel | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
