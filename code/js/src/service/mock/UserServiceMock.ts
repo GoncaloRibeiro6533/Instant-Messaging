@@ -1,8 +1,8 @@
-import { AuthenticatedUser } from "../../domain/AuthenticatedUser";
-import { User } from "../../domain/User";
-import { UserService } from "../interfaces/UserService";
-import { delay } from "./utils";
-import { Repo } from "../../App";
+import {AuthenticatedUser} from "../../domain/AuthenticatedUser";
+import {User} from "../../domain/User";
+import {UserService} from "../interfaces/UserService";
+import {delay} from "./utils";
+import {Repo} from "../../App";
 
 export class UserServiceMock implements UserService {
     repo: Repo;
@@ -75,5 +75,20 @@ export class UserServiceMock implements UserService {
         return user;
     }
 
+    async searchByUsername(token: string, username: string): Promise<User[]> {
+        await delay(500);
+        const userVerify = this.repo.userRepo.getUserByToken(token);
+        if (!userVerify) {
+            throw new Error("Invalid token");
+        }
+        return new Promise<User[]>((resolve, reject) => {
+            const users = this.repo.userRepo.getUserByUsername(username);
+            if (!users) {
+                reject("User not found");
+            }
+            // @ts-ignore
+            resolve(users);
+        });
+    }
 }
 
