@@ -1,4 +1,4 @@
-import { repo, Repo } from "../../App";
+import {  Repo } from "../../App";
 import { InvitationService } from "../interfaces/InvitationService";
 import { Channel } from "../../domain/Channel";
 import { Role } from "../../domain/Role";
