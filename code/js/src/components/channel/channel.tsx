@@ -8,20 +8,25 @@ import { getRandomColor } from '../utils/channelLogoColor';
 import { CircularProgress } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
-
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useRef } from 'react';
 
 export function Channel() {
     const { channelId } = useParams(); 
     const [state, loadChannel] = useChannel();
     const navigate = useNavigate();
-    React.useEffect(() => {
-        loadChannel(channelId);
+
+
+    useEffect(() => {
+         loadChannel(channelId);
     }, [channelId]);
+
     const handleClick = () => {
         if (state.name === 'loaded') {
             navigate(`/channel/${state.channel.id}`);
         }
-    };
+    }
     return (
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                  {state.name === 'loading' && (

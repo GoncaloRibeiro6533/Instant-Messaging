@@ -41,6 +41,7 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
     React.useEffect(() => {
         const fetchMembers = async () => {
             try {
+                //TODO
                 const repo = new ChannelRepo();
                 const members = repo.getChannelMembers(user.user, channel.id);
                 if (!members) {

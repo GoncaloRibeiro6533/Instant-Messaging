@@ -24,6 +24,7 @@ import {ChannelInvitation} from "./components/invitation/channelInvitation";
 import {RegisterInvitation} from "./components/invitation/registerInvitation";
 import {InvitationRepo} from "./service/mock/repo/InvitationRepo";
 import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
+import { UserServiceHttp } from './service/http/UserServiceHttp'
 
 
 //TODO
@@ -170,7 +171,8 @@ export const repo: Repo = {
 }
 
 export const mockService: Service = {
-    userService: new UserServiceMock(repo),
+    userService: new UserServiceHttp(),
+    //userService: new UserServiceMock(repo),
     channelService: new ChannelServiceMock(repo),
     messageService: new MessageServiceMock(repo),
     invitationService: new InvitationServiceMock(repo)
