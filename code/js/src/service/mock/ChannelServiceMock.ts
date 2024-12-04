@@ -3,7 +3,7 @@ import {Channel} from '../../domain/Channel';
 import {Role} from '../../domain/Role';
 import {ChannelMember} from '../../domain/ChannelMember';
 import {Repo} from '../../App';
-import { delay } from './utils';
+import {delay} from './utils';
 
 export class ChannelServiceMock implements ChannelService {
     repo: Repo;
@@ -52,8 +52,7 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        const channels = this.repo.channelRepo.getChannelsOfUser(user, userId);
-        return channels;
+        return this.repo.channelRepo.getChannelsOfUser(user, userId);
     }
 
     async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
@@ -61,8 +60,7 @@ export class ChannelServiceMock implements ChannelService {
         if (!user) {
             throw new Error("Invalid token");
         }
-        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
-        return 
+        return this.repo.channelRepo.channels.find(channel => channel.id === channelId)
     }
 
     async leaveChannel(token: string, channelId: number): Promise<Channel> {

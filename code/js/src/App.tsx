@@ -97,7 +97,7 @@ const router = createBrowserRouter(
         },
         {
             path: "/createChannel",
-            element: 
+            element:
                 <AuthRequire>
                     <MenuAppBar />
                     <CreateChannel />
@@ -106,10 +106,10 @@ const router = createBrowserRouter(
         {
             "path": "/profile",
             element:
-            <AuthRequire>
-            <MenuAppBar/>
-                <Profile />
-            </AuthRequire>
+                <AuthRequire>
+                    <MenuAppBar/>
+                    <Profile />
+                </AuthRequire>
         },
 
         {
@@ -171,8 +171,8 @@ export const repo: Repo = {
 }
 
 export const mockService: Service = {
-    userService: new UserServiceHttp(),
-    //userService: new UserServiceMock(repo),
+    //userService: new UserServiceHttp(),
+    userService: new UserServiceMock(repo),
     channelService: new ChannelServiceMock(repo),
     messageService: new MessageServiceMock(repo),
     invitationService: new InvitationServiceMock(repo)
@@ -182,6 +182,6 @@ export const services: Service = mockService;
 
 export function App() {
     return (
-            <RouterProvider router={router} future={{ v7_startTransition: true }}/>
+        <RouterProvider router={router} future={{ v7_startTransition: true }}/>
     );
-  }
+}

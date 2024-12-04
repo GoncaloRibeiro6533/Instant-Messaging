@@ -1,8 +1,8 @@
 import { AuthenticatedUser } from '../../domain/AuthenticatedUser';
 import { User } from '../../domain/User';
-import { UserService } from '../../service/interfaces/UserService';
+import { UserService } from '../interfaces/UserService';
 
-export class  UserServiceHttp implements UserService {
+export class UserServiceHttp implements UserService {
     logOut(token: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
@@ -18,33 +18,33 @@ export class  UserServiceHttp implements UserService {
 
     async login(username: string, password: string): Promise<AuthenticatedUser> {
         try {
-        const response = await fetch('http://localhost:8080/api/user/login', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json,  application/problem+json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-            ,
-            body: JSON.stringify({ 
-                username: username, 
-                password: password }),
-        });
-        const json = await response.json(); // Usando await para aguardar o JSON
-        const user: User = new User(
-            json.user.id,
-            json.user.username,
-            json.user.email
-        )
-        const authUser: AuthenticatedUser = {
-            token: json.token,
-            user: user
-        };
-        return authUser;
-    } catch (error) {
+            const response = await fetch('http://localhost:8080/api/user/login', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json,  application/problem+json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+                ,
+                body: JSON.stringify({
+                    username: username,
+                    password: password }),
+            });
+            const json = await response.json(); // Usando await para aguardar o JSON
+            const user: User = new User(
+                json.user.id,
+                json.user.username,
+                json.user.email
+            )
+            const authUser: AuthenticatedUser = {
+                token: json.token,
+                user: user
+            };
+            return authUser;
+        } catch (error) {
 
-    }
-        
+        }
+
     }
     async register(username: string, password: string): Promise<User> {
         const response = await fetch('http://localhost:8080/api/user/pdm/register', {

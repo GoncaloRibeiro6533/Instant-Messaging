@@ -32,6 +32,14 @@ export class ChannelRepo implements ChannelRepoInterface {
             {
                 user: new User(1, 'Bob', 'bob@example.com'),
                 role: Role.READ_WRITE
+            },
+            {
+                user: new User(2, 'Alice', 'alice@email.com'),
+                role: Role.READ_ONLY
+            },
+            {
+                user: new User(3, 'Charles', 'charles@email.com'),
+                role: Role.READ_WRITE
             }
         ]],
         [this.channels[1], [

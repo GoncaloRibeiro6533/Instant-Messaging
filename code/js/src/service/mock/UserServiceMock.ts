@@ -12,7 +12,7 @@ export class UserServiceMock implements UserService {
     }
 
     async login(username: string, password: string): Promise<AuthenticatedUser | undefined> {
-        await delay(1000);
+        await delay(500);
         const user = this.repo.userRepo.users.find(user => user.username === username);
         if (!user) {
             return undefined;

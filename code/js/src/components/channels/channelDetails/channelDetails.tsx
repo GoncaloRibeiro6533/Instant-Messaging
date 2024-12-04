@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {Box, Button, Typography, TextField, Avatar, Snackbar, Chip} from '@mui/material';
+import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Edit } from "@mui/icons-material";
 import { AuthContext } from '../../auth/AuthProvider';
@@ -10,8 +10,7 @@ import { ChannelRepo } from '../../../service/mock/repo/ChannelRepo';
 import { useLeaveChannel } from './useLeaveChannel';
 import { useEditChannelName } from './useEditChannelName';
 import { getRandomColor } from '../../utils/channelLogoColor';
-import Grid from '@mui/material/Grid';
-import {Role} from "../../../domain/Role";
+import { Role } from "../../../domain/Role";
 
 interface ChannelDetailsProps {
     channel: Channel;

@@ -11,7 +11,7 @@ export class MessageServiceMock implements MessageService {
   }
     
         async sendMessage(token: string, channelId: number, content: string): Promise<Message> {
-            await delay(1500)
+            await delay(500)
             const user = this.repo.userRepo.getUserByToken(token)
             if (!user) {
                 throw new Error("Invalid token");
@@ -35,7 +35,7 @@ export class MessageServiceMock implements MessageService {
         }
     
         async getMessages(token: string, channelId: number, limit: number, skip: number): Promise<Message[]> {
-            await delay(1500)
+            await delay(500)
             const user = this.repo.userRepo.getUserByToken(token)
             if (!user) {
                 throw new Error("Invalid token");
