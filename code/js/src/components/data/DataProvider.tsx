@@ -1,8 +1,9 @@
-import { Channel } from "../../domain/Channel"
-import { Role } from "../../domain/Role"
-import { Message } from "../../domain/Message"
-import { ChannelInvitation } from "../../domain/ChannelInvitation"
+import {Channel} from "../../domain/Channel"
+import {Role} from "../../domain/Role"
+import {Message} from "../../domain/Message"
+import {ChannelInvitation} from "../../domain/ChannelInvitation"
 import * as React from "react"
+import {ChannelMember} from "../../domain/ChannelMember";
 
 const CHANNELS_KEY = 'channels';
 const MESSAGES_KEY = 'messages';
@@ -21,6 +22,9 @@ type DataContextType = {
     addMessages: (channel : Channel, messages : Message[]) => void,
     addInvitation: (invitation : ChannelInvitation) => void,
     removeInvitation: (invitation : ChannelInvitation) => void,
+    channelMembers: Map<Number, ChannelMember[]> // <channelId, User>
+    addChannelMember: (channelId : Number, user : ChannelMember[]) => void,
+    removeChannelMember: (channelId : Number, user:ChannelMember) => void,
     clear : () => void
 }
 
@@ -37,6 +41,9 @@ export const DataContext = React.createContext<DataContextType>({
     addMessages: () => {},
     addInvitation: () => {},
     removeInvitation: () => {},
+    channelMembers: new Map(),
+    addChannelMember: () => {},
+    removeChannelMember: () => {},
     clear : () => {}
 })
 
@@ -46,10 +53,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     const initialChannels = new Map();
     const initialMessages =  new Map();
     const initialInvitations: ChannelInvitation[] = []
+    const initialChannelMembers = new Map<Number, ChannelMember[]>();
     //Hooks
     const [channels, setChannels] = React.useState<Map<Channel,Role>>(initialChannels);
     const [messages, setMessages] = React.useState<Map<Number,Message[]>>(initialMessages);
     const [invitations, setInvitations] = React.useState<Array<ChannelInvitation>>(initialInvitations);
+    const [channelMembers, setChannelMembers] = React.useState<Map<Number, ChannelMember[]>>(initialChannelMembers);
 
     const addChannel = (channel : Channel, role : Role) => {
         setChannels((prevChannels) => {
@@ -64,7 +73,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             newChannels.delete(channel);
             return newChannels;
         });
-    
+
         setMessages((prevMessages) => {
             const newMessages = new Map(prevMessages);
             newMessages.delete(channel.id);
@@ -84,16 +93,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             const newMessages = new Map(prevMessages)
             const channelMessages = newMessages.get(channel.id) || []
             newMessages.set(channel.id, [...messagesToAdd, ...channelMessages])
-            return newMessages; 
+            return newMessages;
         });
     }
     const addInvitation = (invitation : ChannelInvitation) => {
         setInvitations((prevInvitations) => {
-            const newInvitations = [...prevInvitations,invitation];
-            return newInvitations;
+            return [...prevInvitations, invitation];
         });
     }
-    
+
     const removeInvitation = (invitation : ChannelInvitation) => {
         setInvitations((prevInvitations) => {
             const newInvitations = [...prevInvitations];
@@ -101,6 +109,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             newInvitations.splice(index,1);
             return newInvitations;
         })
+    }
+
+    const addChannelMember = (channelId : Number, user : ChannelMember[]) => {
+        const newChannelMembers = new Map(channelMembers);
+        const users = newChannelMembers.get(channelId) || [];
+        newChannelMembers.set(channelId, [...users, ...user]);
+        setChannelMembers(newChannelMembers)
+    }
+
+    const removeChannelMember = (channelId : Number, user: ChannelMember) => {
+        const newChannelMembers = new Map([...channelMembers]);
+        const users = newChannelMembers.get(channelId) || [];
+        const index = users.indexOf(user);
+        users.splice(index,1);
+        newChannelMembers.set(channelId, users);
+        setChannelMembers(newChannelMembers);
     }
 
 
@@ -127,7 +151,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             addInvitation,
             removeInvitation,
             clear,
-
+            channelMembers,
+            addChannelMember,
+            removeChannelMember,
             }}>
             {children}
         </DataContext.Provider>
@@ -155,6 +181,9 @@ export function useData() {
         addMessages: state.addMessages,
         addInvitation: state.addInvitation,
         removeInvitation: state.removeInvitation,
+        channelMembers: state.channelMembers,
+        addChannelMember: state.addChannelMember,
+        removeChannelMember: state.removeChannelMember,
         clear: state.clear,
     };
 

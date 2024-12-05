@@ -11,8 +11,10 @@ interface InvitationRepoInterface {
     getRegisterInvitationById(user: User,invitationId: number): Promise<RegisterInvitation>;
     createRegisterInvitation(user: User, email: string, channel: Channel, role: Role,): Promise<RegisterInvitation>;
     createChannelInvitation(user: User, receiverId: number, channel: Channel, role: Role): Promise<ChannelInvitation>;
-    acceptChannelInvitation(user: User, invitationId: number, userId: number): Promise<Channel>;
-    declineChannelInvitation(user: User, invitationId: number, userId: number): Promise<Boolean>;
+
+    acceptChannelInvitation(user: User, invitationId: number): Promise<Channel>;
+
+    declineChannelInvitation(user: User, invitationId: number): Promise<Boolean>;
 }
 
 export class InvitationRepo implements InvitationRepoInterface {
@@ -122,18 +124,18 @@ export class InvitationRepo implements InvitationRepoInterface {
         return invitation;
     }
 
-    async acceptChannelInvitation(user: User, invitationId: number, userId: number): Promise<Channel> {
+    async acceptChannelInvitation(user: User, invitationId: number): Promise<Channel> {
         const invitation = this.invitations.find(invitation => invitation.id === invitationId);
-        if (invitation.receiver.id !== userId) {
+        if (invitation.receiver.id !== user.id) {
             throw new Error("Invalid user");
         }
         invitation.isUsed = true;
         return invitation.channel;
     }
 
-    async declineChannelInvitation(user: User, invitationId: number, userId: number): Promise<Boolean> {
+    async declineChannelInvitation(user: User, invitationId: number): Promise<Boolean> {
         const invitation = this.invitations.find(invitation => invitation.id === invitationId);
-        if (invitation.receiver.id !== userId) {
+        if (invitation.receiver.id !== user.id) {
             throw new Error("Invalid user");
         }
         this.invitations = this.invitations.filter(invitation => invitation.id !== invitationId);

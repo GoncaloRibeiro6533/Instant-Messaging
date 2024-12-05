@@ -8,5 +8,5 @@ export interface UserService {
     logOut(token: string): Promise<void>;
     updateUsername(token: string, newUsername: string): Promise<User>;
     getUserById(token: string, userId: number): Promise<User>;
-    searchByUsername(token: string, username: string): Promise<User[]>;
+    searchByUsername(token: string, username: string, limit?: number, skip?: number): Promise<User[]>;
 }

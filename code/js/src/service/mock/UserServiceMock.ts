@@ -74,7 +74,7 @@ export class UserServiceMock implements UserService {
         return user;
     }
 
-    async searchByUsername(token: string, username: string): Promise<User[]> {
+    async searchByUsername(token: string, username: string, limit: number = 10, skip: number = 0): Promise<User[]> {
         await delay(500);
         const userVerify = this.repo.userRepo.getUserByToken(token);
         if (!userVerify) {

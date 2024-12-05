@@ -44,19 +44,19 @@ export class InvitationServiceMock implements InvitationService {
         return this.repo.invitationRepo.createChannelInvitation(user, receiverId, this.repo.channelRepo.channels.find(channel => channel.id === channelId)!, role);
     }
 
-    async acceptChannelInvitation(token: string, invitationId: number, userId: number): Promise<Channel> {
+    async acceptChannelInvitation(token: string, invitationId: number): Promise<Channel> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.invitationRepo.acceptChannelInvitation(user, invitationId, userId);
+        return this.repo.invitationRepo.acceptChannelInvitation(user, invitationId);
     }
 
-    async declineChannelInvitation(token: string, invitationId: number, userId: number): Promise<Boolean> {
+    async declineChannelInvitation(token: string, invitationId: number): Promise<Boolean> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.invitationRepo.declineChannelInvitation(user, invitationId, userId);
+        return this.repo.invitationRepo.declineChannelInvitation(user, invitationId);
     }
 }

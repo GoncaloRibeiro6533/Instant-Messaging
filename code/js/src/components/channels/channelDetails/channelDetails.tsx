@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import {useNavigate, useLocation, useParams} from 'react-router-dom';
 import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Edit } from "@mui/icons-material";
@@ -11,6 +11,8 @@ import { useLeaveChannel } from './useLeaveChannel';
 import { useEditChannelName } from './useEditChannelName';
 import { getRandomColor } from '../../utils/channelLogoColor';
 import { Role } from "../../../domain/Role";
+import {useData} from "../../data/DataProvider";
+import {services} from "../../../App";
 
 interface ChannelDetailsProps {
     channel: Channel;
@@ -40,9 +42,8 @@ export function ChannelDetails({ channel, onLeave, loadChannels }: ChannelDetail
     React.useEffect(() => {
         const fetchMembers = async () => {
             try {
-                //TODO
-                const repo = new ChannelRepo();
-                const members = repo.getChannelMembers(user.user, channel.id);
+                //const actualChannel = await services.channelService.getChannelById(user.token, channel.id);
+                const members = await services.channelService.getChannelMembers(user.token, channel.id);
                 if (!members) {
                     setError('No members found in this channel.');
                     return;

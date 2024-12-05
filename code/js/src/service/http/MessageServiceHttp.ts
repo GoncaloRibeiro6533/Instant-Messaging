@@ -4,13 +4,12 @@ import {handleResponse} from "./responseHandler";
 import {messagesMapper} from "./mappers";
 
 export class MessageServiceHttp implements MessageService {
-    
-    async getMessages(token: string, channelId: number, limit?: number, skip?: number): Promise<Message[]> {
-        const params = new URLSearchParams();
-        limit && params.append('limit', limit.toString());
-        skip && params.append('skip', skip.toString());
-        const response = await fetch('http://localhost:8080/api/messages/history/' + channelId + '?' + params, {
-            method: 'get',
+
+    private baseUrl = 'http://localhost:8080/api/messages';
+
+    async getMessages(token: string, channelId: number, limit: number = 10 , skip: number = 0): Promise<Message[]> {
+        const response = await fetch(`${this.baseUrl}/history/${channelId}?limit=${limit}&skip=${skip}`, {
+            method: 'GET',
             headers: {
                 'Accept': 'application/json,  application/problem+json',
                 'Content-Type': 'application/json',
@@ -35,6 +34,6 @@ export class MessageServiceHttp implements MessageService {
                     content: message
                 }),
         });
-        const json = await handleResponse(response);
+        await handleResponse(response);
     }
 }
