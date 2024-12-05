@@ -38,7 +38,6 @@ class InvitationService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
     private val emitter: UpdatesEmitter,
-    private val emailService: EmailService
 ) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
@@ -80,7 +79,6 @@ class InvitationService(
                     role,
                     LocalDateTime.now(),
                 )
-            emailService.sendInvitationEmail(email, createdInvitation)
             return@run success(createdInvitation)
         }
 

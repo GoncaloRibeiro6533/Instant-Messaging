@@ -472,7 +472,7 @@ class ChannelControllerTests {
                 UserLoginCredentialsInput("nonMember", "NonMember_123dsad"),
             ).body as AuthenticatedUser
 
-        channelController.leaveChannel(channel.id, nonMember.user.id, nonMember)
+        channelController.leaveChannel(channel.id, nonMember)
 
         val result = channelController.updateChannelName(channel.id, "channel123", nonMember)
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
@@ -503,7 +503,7 @@ class ChannelControllerTests {
                 admin,
             ).body as ChannelOutputModel
 
-        val result = channelController.leaveChannel(channel.id, admin.user.id, admin)
+        val result = channelController.leaveChannel(channel.id, admin)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 

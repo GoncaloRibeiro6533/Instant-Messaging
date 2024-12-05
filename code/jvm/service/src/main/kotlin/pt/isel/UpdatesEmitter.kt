@@ -65,7 +65,7 @@ class UpdatesEmitter(
 
     private fun keepAlive() =
         lock.withLock {
-            logger.info("keepAlive, sending to {} listeners", listeners.values.size)
+            //logger.info("keepAlive, sending to {} listeners", listeners.values.size)
             val signal = SseEvent.KeepAlive(Clock.System.now())
             listeners.values.forEach {
                 try {

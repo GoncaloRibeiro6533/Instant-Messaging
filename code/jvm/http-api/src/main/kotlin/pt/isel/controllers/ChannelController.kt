@@ -233,13 +233,12 @@ class ChannelController(
     }
 
     // todo change to removeUserFromChannel
-    @PutMapping("/{channelId}/leave/{userId}")
+    @PutMapping("/{channelId}/leave")
     fun leaveChannel(
         @PathVariable channelId: Int,
-        @PathVariable userId: Int,
         user: AuthenticatedUser,
     ): ResponseEntity<*> {
-        return when (val result = channelService.leaveChannel(userId, channelId)) {
+        return when (val result = channelService.leaveChannel(user.user.id, channelId)) {
             is Success -> {
                 val outputModel =
                     ChannelOutputModel(

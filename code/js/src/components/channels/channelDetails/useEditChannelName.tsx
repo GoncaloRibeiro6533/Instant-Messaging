@@ -19,7 +19,7 @@ export function useEditChannelName(channelId: number, initialName: string, loadC
             const result  = await services.channelService.updateChannelName(user.token, channelId, newChannelName);
             setIsEditing(false);
             loadChannels(); // Recarrega a lista de canais após a atualização
-           // updateChannel(result); // Atualiza o nome do canal na lista de canais
+            updateChannel(result); // Atualiza o nome do canal na lista de canais
         } catch (err) {
             setError('Failed to update channel name.');
             console.error(err);
