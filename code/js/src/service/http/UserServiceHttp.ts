@@ -1,6 +1,7 @@
 import { AuthenticatedUser } from '../../domain/AuthenticatedUser';
 import { User } from '../../domain/User';
 import { UserService } from '../interfaces/UserService';
+import { handleResponse } from './responseHandler';
 
 export class UserServiceHttp implements UserService {
     logOut(token: string): Promise<void> {
@@ -46,19 +47,19 @@ export class UserServiceHttp implements UserService {
         }
 
     }
-    async register(username: string, password: string): Promise<User> {
-        const response = await fetch('http://localhost:8080/api/user/pdm/register', {
+    async register(email: string, username: string, password: string): Promise<User> {
+        const response = await fetch('http://localhost:8080/api/user/register/46', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ 
+                email: email,
+                username: username, 
+                password: password
+             }),
         });
-        if (response.status === 200) {
-            const user = await response.json();
-            return new User(user.id, user.username, user.email);
-        } else {
-            throw new Error('Registration failed');
-        }
+        const json = await handleResponse(response);
+        return new User(json.id, json.username, json.email);
     }
 }

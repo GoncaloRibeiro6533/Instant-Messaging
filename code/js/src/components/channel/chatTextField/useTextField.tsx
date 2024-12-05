@@ -56,7 +56,6 @@ export function useTextField() : [State, {
             name: "idle",
         })
     const [userAuth, setUser] = useAuth()
-    const { addMessages } = useData();
     async function onSubmit(ev: React.FormEvent<HTMLFormElement>, channel: Channel) {
         ev.preventDefault()
         if (state.name !== "editing") {
@@ -66,7 +65,6 @@ export function useTextField() : [State, {
         try {
             const message = await services.messageService
             .sendMessage(userAuth.token, channel.id, state.content)
-            addMessages(channel, [message])
             dispatch({ type: "success" })
         } catch (e) {
             dispatch({ type: "error", message: e.message })

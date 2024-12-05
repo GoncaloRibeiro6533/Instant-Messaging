@@ -1,11 +1,10 @@
 import * as React from "react";
 import { Message as MessageType } from "../../domain/Message";
-import { User } from "../../domain/User";
 import { Box, Avatar, Typography, Paper } from '@mui/material';
-import { AuthContext } from "../auth/AuthProvider";
+import { AuthContext, useAuth } from "../auth/AuthProvider";
 
 export function Message(props: { message: MessageType }) {
-    const { user } = React.useContext(AuthContext); // Get current user from context
+    const [ user] = useAuth() // Get current user from context
     const isCurrentUser = user.user.username === props.message.sender.username; // Check if message is from current user
 
     return (
@@ -19,7 +18,6 @@ export function Message(props: { message: MessageType }) {
             {/* Avatar of the sender */}
             {props.message.sender.username !== user.user.username &&
                 <Avatar
-                    src="userImg.png"
                     sx={{
                         marginLeft: isCurrentUser ? 0 : 2,
                         marginRight: isCurrentUser ? 2 : 0,

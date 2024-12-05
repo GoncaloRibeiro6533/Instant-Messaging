@@ -9,6 +9,7 @@ import { CircularProgress } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
 import { useEffect } from 'react';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useLocation } from 'react-router-dom';
 import { useRef } from 'react';
 
@@ -40,7 +41,8 @@ export function Channel() {
             open= {true}
             message={state.message}
             action={
-                <Button color="secondary" size="small" onClick={() => loadChannel(channelId)}>
+                <Button color='primary' size="large" onClick={() => navigate("/channels")}
+                    variant="contained" sx={{ marginLeft: '16px', textColor:'white' }}>
                     CLOSE
                 </Button>
             }

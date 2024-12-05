@@ -137,18 +137,18 @@ class MessageController(private val messageService: MessageService) {
                     MessageHistoryOutputModel(
                         channel =
                             Channel(
-                                id = result.value[0].channel.id,
-                                name = result.value[0].channel.name,
+                                id = result.value.first.id,
+                                name = result.value.first.name,
                                 creator =
                                     User(
-                                        id = result.value[0].channel.creator.id,
-                                        username = result.value[0].channel.creator.username,
-                                        email = result.value[0].channel.creator.email,
+                                        id = result.value.first.creator.id,
+                                        username = result.value.first.creator.username,
+                                        email = result.value.first.creator.email,
                                     ),
-                                visibility = result.value[0].channel.visibility,
+                                visibility = result.value.first.visibility,
                             ),
                         messages =
-                            result.value.map {
+                            result.value.second.map {
                                 MessageInfoOutputModel(
                                     msgId = it.id,
                                     sender =
@@ -161,7 +161,7 @@ class MessageController(private val messageService: MessageService) {
                                     timestamp = it.timestamp,
                                 )
                             },
-                        nrOfMessages = result.value.size,
+                        nrOfMessages = result.value.second.size,
                     )
                 ResponseEntity.status(HttpStatus.OK).body(outputModel)
             }

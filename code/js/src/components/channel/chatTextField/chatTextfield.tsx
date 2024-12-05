@@ -8,10 +8,11 @@ import { Role } from "../../../domain/Role";
 export function ChatTextField(props: { channel: Channel }) {
   const [state, handlers] = useTextField();
   const { channels } = useData();
-  const role = channels.get(props.channel);
+  const channelContext = Array.from(channels.keys()).find((channel) => channel.id === props.channel.id);
+  const role = channels.get(channelContext);
   return (
     (role === Role.READ_WRITE &&
-   <form onSubmit={(ev) => handlers.onSubmit(ev, props.channel)}>
+   <form onSubmit={(ev) => handlers.onSubmit(ev, props.channel)} name="chatTextField" id="chatTextField">
     <Box
       sx={{
         display: "flex",

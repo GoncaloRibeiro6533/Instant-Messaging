@@ -36,12 +36,8 @@ function reduce(state: State, action: Action): State {
             return state;
         case 'loading':
             if (action.type === 'success') {
-                if (action.previouslyLoaded) {
                     return { name: 'loaded', channel: action.channel };
-                } else if (state.channelId === action.channel.id) {
-                    return { name: 'loaded', channel: action.channel };
-                } else return state
-            }
+                } 
             if (action.type === 'error') {
                 return { name: 'error', message: action.message };
             }
@@ -69,29 +65,37 @@ export function useChannel(): [
     const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
     const [auth] = useAuth();
     const { addMessages, messages, channels } = useData();
+    const selectedChannelIdRef = React.useRef<number | null>(null);
+    /*state.name === 'loading' && console.log('useChannel on loading :' + state.channelId);
+    state.name === 'loaded' && console.log('useChannel on loaded :' + state.channel.id);
+    console.log('useChannel' + state.name);*/
     async function loadChannel(channelId: string) {
-        const parsedId = parseInt(channelId);
-        if (state.name === 'loading' && state.channelId === parsedId) {
-            return;
-        }
-        if (isNaN(parsedId)) {
-            dispatch({ type: 'error', message: 'Invalid channel ID' });
-            return;
-        }
-        const channel = Array.from(channels.keys()).find(channel => channel.id === parsedId);
-        if (!channel) {
-            dispatch({ type: 'error', message: 'Channel not found' });
-            return;
-        }        
-        if(messages.get(channel.id) !== undefined){
-            dispatch({ type: 'success', channel: channel, previouslyLoaded: true });
-            return
-        }
-        dispatch({ type: 'load', channelId: parsedId });
         try {
-            const messages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0);
-            addMessages(channel, messages);
-            dispatch({ type: 'success', channel: channel, previouslyLoaded: false });
+            const parsedId = parseInt(channelId);
+            if (state.name === 'loading' && state.channelId === parsedId) {
+                return;
+            }
+            if (isNaN(parsedId)) {
+                dispatch({ type: 'error', message: 'Invalid channel ID' });
+                return;
+            }
+            selectedChannelIdRef.current = parsedId;
+
+            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null;
+            if (loadedChannel && messages.get(loadedChannel.id)) {
+                if (selectedChannelIdRef.current === parsedId) {
+                    dispatch({ type: 'success', channel: loadedChannel, previouslyLoaded: true });
+                }
+                return;
+            }
+            dispatch({ type: 'load', channelId: parsedId });
+
+            const channel = loadedChannel || await services.channelService.getChannelById(auth.token, parsedId);
+            const retrievedMessages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0);
+            addMessages(channel, retrievedMessages);
+            if (selectedChannelIdRef.current === parsedId) {
+                dispatch({ type: 'success', channel:channel , previouslyLoaded: false });
+            }
         } catch (error: any) {
             const errorMessage = error.message || 'An error occurred';
             dispatch({ type: 'error', message: errorMessage });

@@ -8,7 +8,7 @@ import {getRandomColor} from '../../utils/channelLogoColor';
 import {useNavigate} from "react-router-dom";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import {Add} from "@mui/icons-material";
-import {Avatar, Box, Chip, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField, ListItem} from '@mui/material';
+import {Avatar, Box, Chip, CircularProgress, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField, ListItem} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import {Visibility} from "../../../domain/Visibility";
 import {useLocation} from "react-router-dom";
@@ -43,15 +43,12 @@ export function ChannelsList() {
             setSearchResults([]);
         }
     };
-    if (state.name === 'loading') {
-        return <div>Loading...</div>;
-    }
-
+ 
     if (state.name === 'error') {
         return <div>Error: {state.message}</div>;
     }
 
-    const channelsToDisplay = searchChannels.trim() ? searchResults : state.channels
+    const channelsToDisplay = searchChannels.trim() ? searchResults : (state.name == 'loaded' && state.channels)
 
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -77,7 +74,13 @@ export function ChannelsList() {
                         ),
                     }}
                 />
+                {state.name === 'loading' && 
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                            <CircularProgress size="40px" />
+                        </Box>
+                }
                 {/* Torne a lista rolável com overflowY: 'auto' */}
+                {state.name === 'loaded' && (
                 <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <List>
                         {[...channelsToDisplay.entries()].map(([channel, role]: [Channel, Role]) => (
@@ -116,7 +119,7 @@ export function ChannelsList() {
                             </React.Fragment>
                         ))}
                     </List>
-                </Box>
+                </Box>)}
             </Box>
             {location.pathname === '/channels' && (
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
