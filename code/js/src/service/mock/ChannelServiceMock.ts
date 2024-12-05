@@ -56,11 +56,16 @@ export class ChannelServiceMock implements ChannelService {
     }
 
     async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
-        const user = this.repo.userRepo.getUserByToken(token)
+        const user = this.repo.userRepo.getUserByToken(token);
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.channelRepo.channels.find(channel => channel.id === channelId)
+        const channel = this.repo.channelRepo.channels.find(channel => channel.id === channelId);
+        if (!channel) {
+            throw new Error("Channel not found");
+        }
+        channel.name = newName;
+        return channel;
     }
 
     async leaveChannel(token: string, channelId: number): Promise<Channel> {

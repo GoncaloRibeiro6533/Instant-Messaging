@@ -78,11 +78,41 @@ export class ChannelServiceHttp implements ChannelService {
         return Promise.resolve(undefined);
     }
 
-    searchChannelByName(token: string, name: string, limit: number, skip: number): Promise<Channel[]> {
-        return Promise.resolve([]);
+    async searchChannelByName(token: string, name: string, limit: number, skip: number): Promise<Channel[]> {
+        try {
+            const response = await fetch(`${this.baseUrl}/search/${name}?limit=${limit}&skip=${skip}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) throw new Error('Failed to search channels by name');
+            const data = await response.json();
+            return data.channels.map(
+                (channel: any) => new Channel(channel.id, channel.name, channel.creator, channel.visibility)
+            );
+        } catch (error) {
+            console.error('Error searching channel by name:', error);
+            throw error;
+        }
     }
 
-    updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
-        return Promise.resolve(undefined);
+    async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
+        try {
+            const response = await fetch(`${this.baseUrl}/${channelId}/${newName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) throw new Error('Failed to update channel name');
+            const data = await response.json();
+            return new Channel(data.id, data.name, data.creator, data.visibility);
+        } catch (error) {
+            console.error('Error updating channel name:', error);
+            throw error;
+        }
     }
 }

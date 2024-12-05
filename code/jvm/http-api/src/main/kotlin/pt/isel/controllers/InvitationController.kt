@@ -1,4 +1,5 @@
 @file:Suppress("ktlint")
+
 package pt.isel.controllers
 
 import org.springframework.http.HttpStatus
@@ -112,6 +113,7 @@ class InvitationController(
                         result.value.timestamp,
                     ),
                 )
+
             is Failure ->
                 handleInvitationError(result.value)
         }
@@ -172,7 +174,7 @@ class InvitationController(
                                         it.channel.creator.id,
                                         it.channel.creator.username,
                                         it.channel.creator.email,
-                                        ),
+                                    ),
                                     it.channel.visibility,
                                 ),
                                 it.role,
@@ -181,6 +183,7 @@ class InvitationController(
                         },
                     ),
                 )
+
             is Failure -> handleInvitationError(result.value)
         }
     }
