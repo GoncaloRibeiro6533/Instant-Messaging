@@ -52,44 +52,55 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     const [invitations, setInvitations] = React.useState<Array<ChannelInvitation>>(initialInvitations);
 
     const addChannel = (channel : Channel, role : Role) => {
-        const newChannels = new Map([...channels]);
-        newChannels.set(channel,role);
-        setChannels(newChannels);
+        setChannels((prevChannels) => {
+            const newChannels = new Map(prevChannels);
+            newChannels.set(channel,role);
+            return newChannels;
+        });
     }
     const removeChannel = (channel : Channel) => {
-        const newChannels = new Map([...channels]);
-        newChannels.delete(channel);
-        setChannels(new Map(newChannels));
-        const newMessages = new Map([...messages]);
-        newMessages.delete(channel.id);
-        setMessages(newMessages);
+        setChannels((prevChannels) => {
+            const newChannels = new Map(prevChannels);
+            newChannels.delete(channel);
+            return newChannels;
+        });
+    
+        setMessages((prevMessages) => {
+            const newMessages = new Map(prevMessages);
+            newMessages.delete(channel.id);
+            return newMessages;
+        });
     }
 
     const updateChannel = (channel : Channel) => {
-        const newChannels = new Map([...channels]);
-        const role = newChannels.get(channel);
-        newChannels.delete(channel);
-        newChannels.set(channel,role);
-        setChannels(newChannels);
+        setChannels((prevChannels) => {
+            const newChannels = new Map(prevChannels);
+            newChannels.set(channel,prevChannels.get(channel));
+            return newChannels;
+        });
     }
     const addMessages = (channel : Channel, messagesToAdd : Message[]) => {
-        const newMessages = new Map(messages); 
-        const channelMessages = newMessages.get(channel.id) || []; 
-        newMessages.set(channel.id, [...messagesToAdd, ...channelMessages]); 
-        setMessages(newMessages);
+        setMessages((prevMessages) => {
+            const newMessages = new Map(prevMessages)
+            const channelMessages = newMessages.get(channel.id) || []
+            newMessages.set(channel.id, [...messagesToAdd, ...channelMessages])
+            return newMessages; 
+        });
     }
     const addInvitation = (invitation : ChannelInvitation) => {
-        const newInvitations = [...invitations];
-        newInvitations.push(invitation);
-        setInvitations(newInvitations);
-        localStorage.setItem(INVITATIONS_KEY,JSON.stringify([...newInvitations]));
+        setInvitations((prevInvitations) => {
+            const newInvitations = [...prevInvitations,invitation];
+            return newInvitations;
+        });
     }
+    
     const removeInvitation = (invitation : ChannelInvitation) => {
-        const newInvitations = [...invitations];
-        const index = newInvitations.indexOf(invitation);
-        newInvitations.splice(index,1);
-        setInvitations(newInvitations);
-        localStorage.setItem(INVITATIONS_KEY,JSON.stringify([...newInvitations]));
+        setInvitations((prevInvitations) => {
+            const newInvitations = [...prevInvitations];
+            const index = newInvitations.indexOf(invitation);
+            newInvitations.splice(index,1);
+            return newInvitations;
+        })
     }
 
 
