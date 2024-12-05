@@ -183,6 +183,7 @@ class MessageController(private val messageService: MessageService) {
             is MessageError.InvalidUserId -> Problem.InvalidIdentifier.response(HttpStatus.BAD_REQUEST)
             is MessageError.ChannelNotFound -> Problem.ChannelNotFound.response(HttpStatus.NOT_FOUND)
             is MessageError.UserNotInChannel -> Problem.UserNotInChannel.response(HttpStatus.BAD_REQUEST)
+            is MessageError.MessageTooLong -> Problem.MessageTooLong.response(HttpStatus.BAD_REQUEST)
         }
     }
 }
