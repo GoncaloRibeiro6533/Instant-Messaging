@@ -68,7 +68,7 @@ export class UserServiceHttp implements UserService {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                username: newUsername.trim()
+                newUsername: newUsername.trim()
             })
         })
         const json = await handleResponse(response);

@@ -1,66 +1,61 @@
 
-import * as React from "react";
-import { services } from "../../../App";
-import { Channel } from "../../../domain/Channel";
-import {AuthContext} from "../../auth/AuthProvider";
-import {Role} from "../../../domain/Role";
-import {useData} from "../../data/DataProvider";
+import * as React from "react"
+import { services } from "../../../App"
+import { Channel } from "../../../domain/Channel"
+import {AuthContext} from "../../auth/AuthProvider"
+import {Role} from "../../../domain/Role"
+import {useData} from "../../data/DataProvider"
 
 type State =
     | { name: "loading" }
     | { name: "loaded", channels: Map<Channel,Role> }
-    | { name: "error", message: string };
+    | { name: "error", message: string }
 
 type Action =
     | { type: "load" }
     | { type: "success", channels: Map<Channel,Role> }
-    | { type: "error", message: string };
+    | { type: "error", message: string }
 
 function reduce(state: State, action: Action): State {
     switch (state.name) {
         case "loading":
             if (action.type === "success") {
-                return { name: "loaded", channels: action.channels };
+                return { name: "loaded", channels: action.channels }
             } else if (action.type === "error") {
-                return { name: "error", message: action.message };
+                return { name: "error", message: action.message }
             } else {
-                return state;
+                return state
             }
         case "loaded":
         case "error":
             if (action.type === "load") {
-                return { name: "loading" };
+                return { name: "loading" }
             } else {
-                return state;
+                return state
             }
         default:
-            return state;
+            return state
     }
 }
 
 export function useChannelList(): [State, onChange: () => void] {
-    const { user } = React.useContext(AuthContext);
-    const [state, dispatch] = React.useReducer(reduce, { name: "loading" });
-    const { setChannels, channels, messages } = useData();
+    const { user } = React.useContext(AuthContext)
+    const [state, dispatch] = React.useReducer(reduce, { name: "loading" })
+    const { setChannels, channels } = useData()
     async function loadChannels() {
         if(channels.size > 0){
-            dispatch({ type: "success", channels });
-            return;
+            dispatch({ type: "success", channels })
+            return
         }
-        dispatch({ type: "load" });
+        dispatch({ type: "load" })
         try {
-            const channels = await services.channelService.getChannelsOfUser(user.token,user.user.id);
-            setChannels(channels);
-            dispatch({ type: "success", channels });
+            const channels = await services.channelService.getChannelsOfUser(user.token,user.user.id)
+            setChannels(channels)
+            dispatch({ type: "success", channels })
         } catch (e) {
-            dispatch({ type: "error", message: e.message });
+            dispatch({ type: "error", message: e.message })
         }
     }
-
-    React.useEffect(() => {
-        loadChannels().then(r => r);
-    }, [user.user.id, messages]);
-
-    return [state, loadChannels];
+    return [state, loadChannels]
 }
 

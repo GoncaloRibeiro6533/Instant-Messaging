@@ -1,17 +1,29 @@
 
-import * as React from "react";
-import { Box, Chip } from "@mui/material";
-import { Message } from "../message";
-import { ChatTextField } from "../chatTextField/chatTextfield";
-import { useData } from "../../data/DataProvider";
-import { Channel } from "../../../domain/Channel";
-import { Message as MessageType } from "../../../domain/Message";
-import { Divider } from "@mui/material";
+import * as React from "react"
+import { Box, Chip, CircularProgress } from "@mui/material"
+import { Message } from "../message"
+import { ChatTextField } from "../chatTextField/chatTextfield"
+import { useData } from "../../data/DataProvider"
+import { Channel } from "../../../domain/Channel"
+import { Divider } from "@mui/material"
+import { useChatBox } from "./useChatBox"
+import { useRef } from "react"
 
 export function ChatBox(props : {channel: Channel}) {
-    
-    const {messages} = useData();
-    const channelMessages: MessageType[] = messages.get(props.channel.id) || [];
+    const [state, loadMessagesHandler] = useChatBox(props.channel)  
+    const { messages } = useData()
+    const channelMessages = messages.get(props.channel.id) || []
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const container = e.currentTarget
+        const previousScroll = container.scrollTop
+        const previousScrollHeight = container.scrollHeight
+        if (Math.abs(container.scrollHeight -container.clientHeight - Math.abs(container.scrollTop)) <= 100
+        && state.name === "displaying"){
+            loadMessagesHandler()
+            container.scrollTop = previousScroll - (container.scrollHeight - previousScrollHeight)
+        }
+    }
     return (
         <Box
             sx={{
@@ -25,6 +37,8 @@ export function ChatBox(props : {channel: Channel}) {
         >
             {/* Área de mensagens */}
             <Box
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
                 sx={{
                     flex: 1,
                     overflowY: "auto",
@@ -36,7 +50,7 @@ export function ChatBox(props : {channel: Channel}) {
                 {channelMessages.map((message, index) => {
                     const showChip =
                         index === channelMessages.length - 1|| 
-                       message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay();
+                       message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay()
                     return (
                         <React.Fragment key={index}>
                         <Message message={message} />
@@ -61,12 +75,27 @@ export function ChatBox(props : {channel: Channel}) {
                                 </Divider>       
                             )}
                 </React.Fragment>
-            );
+            )
         })}
-
+              {state.name === 'loading' && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                    <CircularProgress size="30px" />
+                </Box>)}
+              {state.name === 'finished' && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                    <Chip
+                        label="Start of the conversation"
+                        variant="outlined"
+                        sx={{ 
+                            marginTop: 1,  
+                            backgroundColor: '#171E27',
+                            color: '#ffffff', // Cor do texto, 
+                            }}
+                    />
+                </Box>)} 
             </Box>
             <ChatTextField channel={props.channel}/>
 
         </Box>
-    );
+    )
 }

@@ -1,59 +1,31 @@
-import {createBrowserRouter, RouterProvider, useNavigate, useParams,} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import { Home } from './components/home/home'
 import { Login } from './components/login/login'
 import * as React from 'react'
-import { UserServiceMock } from './service/mock/UserServiceMock'
 import Service from './service/Service'
 import { UserRepo } from './service/mock/repo/UserRepo'
 import { ChannelRepo } from './service/mock/repo/ChannelRepo'
 import { MessageRepo } from './service/mock/repo/MessageRepo'
-import { ChannelServiceMock} from './service/mock/ChannelServiceMock'
-import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { About } from './components/about/about'
 import MenuAppBar from './components/navBar/navigationBar'
 import { Register } from './components/register/register'
 import { AuthRequire } from './components/auth/AuthRequire'
-import {ChannelsList} from "./components/channels/channelsList/channelsList";
-import {ChannelDetails} from "./components/channels/channelDetails/channelDetails";
-import {CreateChannel} from "./components/channels/createChannel";
-import {Channel} from "./components/channel/channel";
-import {Profile} from "./components/profile/profile";
-import {InvitationOptions} from "./components/invitation/invitationOptions";
-import {ChannelInvitation} from "./components/invitation/channelInvitation";
-import {RegisterInvitation} from "./components/invitation/registerInvitation";
-import {InvitationRepo} from "./service/mock/repo/InvitationRepo";
-import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
-import {UserServiceHttp} from "./service/http/UserServiceHttp";
-import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp";
-import {MessageServiceHttp} from "./service/http/MessageServiceHttp";
-import {InvitationServiceHttp} from "./service/http/InvitationServiceHttp";
-import {useData} from "./components/data/DataProvider";
-import {useAuth} from "./components/auth/AuthProvider";
+import {ChannelsList} from "./components/channels/channelsList/channelsList"
+import {ChannelDetails} from "./components/channels/channelDetails/channelDetails"
+import {CreateChannel} from "./components/channels/createChannel"
+import {Channel} from "./components/channel/channel"
+import {Profile} from "./components/profile/profile"
+import {InvitationOptions} from "./components/invitation/invitationOptions"
+import {ChannelInvitation} from "./components/invitation/channelInvitation"
+import {RegisterInvitation} from "./components/invitation/registerInvitation"
+import {InvitationRepo} from "./service/mock/repo/InvitationRepo"
+import {InvitationServiceMock} from "./service/mock/InvitationServiceMock"
+import {UserServiceHttp} from "./service/http/UserServiceHttp"
+import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp"
+import {MessageServiceHttp} from "./service/http/MessageServiceHttp"
 
 
-//TODO fix this
-export function ChannelDetailsWrapper() {
-    const { channelId } = useParams();
-    const navigate = useNavigate();
-    const repo = new ChannelRepo();
-    const channel = repo.getChannelById(Number(channelId));
 
-    React.useEffect(() => {
-        if (!channel) {
-            navigate('/channels');
-            return null;
-        }
-    })
-
-    return (
-        <ChannelDetails
-            channel={channel}
-            onLeave={() => console.log('Channel left')}
-            loadChannels={() => console.log('Channels loaded')}
-            handleLeaveChannel={(channelId: number) => console.log('Channel left')}
-        />
-    );
-}
 
 const router = createBrowserRouter(
     [
@@ -99,7 +71,7 @@ const router = createBrowserRouter(
             element: (
                 <AuthRequire>
                     <MenuAppBar />
-                    <ChannelDetailsWrapper />
+                    <ChannelDetails />
                 </AuthRequire>
             ),
         },
@@ -125,7 +97,7 @@ const router = createBrowserRouter(
             element: (
                 <AuthRequire>
                     <MenuAppBar />
-                    <ChannelDetailsWrapper /> //todo fix this
+                    <ChannelDetails />
                 </AuthRequire>
             ),
         },
@@ -157,7 +129,7 @@ const router = createBrowserRouter(
             )
         }
     ]
-);
+)
 
 export const userRepoMock = new UserRepo()
 export const channelRepoMock = new ChannelRepo()
@@ -168,7 +140,7 @@ export type Repo = {
     userRepo: UserRepo
     channelRepo: ChannelRepo
     messageRepo: MessageRepo
-    invitationRepo: InvitationRepo;
+    invitationRepo: InvitationRepo
 }
 
 export const repo: Repo = {
@@ -180,20 +152,18 @@ export const repo: Repo = {
 
 export const mockService: Service = {
     userService: new UserServiceHttp(),
-    channelService: new ChannelServiceHttp(),
-    messageService: new MessageServiceHttp(),
-    invitationService: new InvitationServiceHttp()
-
     //userService: new UserServiceMock(repo),
     //channelService: new ChannelServiceMock(repo),
     //messageService: new MessageServiceMock(repo),
-    //invitationService: new InvitationServiceMock(repo)
+    channelService: new ChannelServiceHttp(),
+    messageService: new MessageServiceHttp(),
+    invitationService: new InvitationServiceMock(repo)
 }
 
-export const services: Service = mockService;
+export const services: Service = mockService
 
 export function App() {
     return (
         <RouterProvider router={router} future={{ v7_startTransition: true }}/>
-    );
+    )
 }

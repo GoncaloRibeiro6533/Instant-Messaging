@@ -88,7 +88,7 @@ export function useProfile(): [State, {
         }
     }
     function onChange(ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { 
-        dispatch({ type: "edit", value: ev.target.value })
+        dispatch({ type: "edit", value: ev.target.value.trim() })
     }
     function onEdit() {
         dispatch({ type: "edit", value: user.user.username })

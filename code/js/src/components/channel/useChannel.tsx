@@ -1,60 +1,59 @@
-import * as React from 'react';
-import { Channel } from '../../domain/Channel';
-import { services } from '../../App';
-import { useAuth } from '../auth/AuthProvider';
-import { useData } from '../data/DataProvider';
-import { useNavigate } from 'react-router-dom';
+import * as React from 'react'
+import { Channel } from '../../domain/Channel'
+import { services } from '../../App'
+import { useAuth } from '../auth/AuthProvider'
+import { useData } from '../data/DataProvider'
 
 type State =
     | { name: 'idle' }
     | { name: 'loading', channelId: number }
-    | { name: 'error'; message: string }
-    | { name: 'loaded'; channel: Channel };
+    | { name: 'error' , message: string }
+    | { name: 'loaded', channel: Channel }
 
 type Action =
-    | { type: 'load'; channelId: number }
-    | { type: 'success'; channel: Channel, previouslyLoaded: boolean }
-    | { type: 'error'; message: string };
+    | { type: 'load' ,channelId: number }
+    | { type: 'success', channel: Channel, previouslyLoaded: boolean }
+    | { type: 'error', message: string }
 
 function reduce(state: State, action: Action): State {
     switch (state.name) {
         case 'idle':
             if (action.type === 'success') {
-                return { name: 'loaded', channel: action.channel };
+                return { name: 'loaded', channel: action.channel }
             }
             if (action.type === 'load') {
-                return { name: 'loading', channelId: action.channelId };
+                return { name: 'loading', channelId: action.channelId }
             }
-            return state;
+            return state
         case 'error':
             if (action.type === 'load') {
-                return { name: 'loading', channelId: action.channelId };
+                return { name: 'loading', channelId: action.channelId }
             }
             if (action.type === 'success') {
-                return { name: 'loaded', channel: action.channel };
+                return { name: 'loaded', channel: action.channel }
             }
-            return state;
+            return state
         case 'loading':
             if (action.type === 'success') {
-                    return { name: 'loaded', channel: action.channel };
+                    return { name: 'loaded', channel: action.channel }
                 } 
             if (action.type === 'error') {
-                return { name: 'error', message: action.message };
+                return { name: 'error', message: action.message }
             }
             if (action.type === 'load') {
-                return { name: 'loading', channelId: action.channelId };
+                return { name: 'loading', channelId: action.channelId }
             }
-            return state;
+            return state
         case 'loaded':
             if (action.type === 'load') {
-                return { name: 'loading', channelId: action.channelId };
+                return { name: 'loading', channelId: action.channelId }
             }
             if (action.type === 'success') {
-                return { name: 'loaded', channel: action.channel };
+                return { name: 'loaded', channel: action.channel }
             }
-            return state;
+            return state
         default:
-            return state;
+            return state
     }
 }
 
@@ -62,45 +61,42 @@ export function useChannel(): [
     State,
     (channelId: String) => void 
 ] {
-    const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
-    const [auth] = useAuth();
-    const { addMessages, messages, channels } = useData();
-    const selectedChannelIdRef = React.useRef<number | null>(null);
-    /*state.name === 'loading' && console.log('useChannel on loading :' + state.channelId);
-    state.name === 'loaded' && console.log('useChannel on loaded :' + state.channel.id);
-    console.log('useChannel' + state.name);*/
+    const [state, dispatch] = React.useReducer(reduce, { name: 'idle' })
+    const [auth] = useAuth()
+    const { addMessages, messages, channels } = useData()
+    const selectedChannelIdRef = React.useRef<number | null>(null)
     async function loadChannel(channelId: string) {
         try {
-            const parsedId = parseInt(channelId);
+            const parsedId = parseInt(channelId)
             if (state.name === 'loading' && state.channelId === parsedId) {
-                return;
+                return
             }
             if (isNaN(parsedId)) {
-                dispatch({ type: 'error', message: 'Invalid channel ID' });
-                return;
+                dispatch({ type: 'error', message: 'Invalid channel ID' })
+                return
             }
-            selectedChannelIdRef.current = parsedId;
+            selectedChannelIdRef.current = parsedId
 
-            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null;
+            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null
             if (loadedChannel && messages.get(loadedChannel.id)) {
                 if (selectedChannelIdRef.current === parsedId) {
-                    dispatch({ type: 'success', channel: loadedChannel, previouslyLoaded: true });
+                    dispatch({ type: 'success', channel: loadedChannel, previouslyLoaded: true })
                 }
-                return;
+                return
             }
-            dispatch({ type: 'load', channelId: parsedId });
+            dispatch({ type: 'load', channelId: parsedId })
 
-            const channel = loadedChannel || await services.channelService.getChannelById(auth.token, parsedId);
-            const retrievedMessages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0);
-            addMessages(channel, retrievedMessages);
+            const channel = loadedChannel || await services.channelService.getChannelById(auth.token, parsedId)
+            const retrievedMessages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0)
+            addMessages(channel, retrievedMessages)
             if (selectedChannelIdRef.current === parsedId) {
-                dispatch({ type: 'success', channel:channel , previouslyLoaded: false });
+                dispatch({ type: 'success', channel:channel , previouslyLoaded: false })
             }
         } catch (error: any) {
-            const errorMessage = error.message || 'An error occurred';
-            dispatch({ type: 'error', message: errorMessage });
+            const errorMessage = error.message || 'An error occurred'
+            dispatch({ type: 'error', message: errorMessage })
         }
     }
 
-    return [state, loadChannel];
+    return [state, loadChannel]
 }

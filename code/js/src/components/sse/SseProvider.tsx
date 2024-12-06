@@ -31,16 +31,24 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
     const [sse, setSse] = useState<EventSource | undefined>(undefined)
     const [notifications, setNotifications] = useState<AppNotification[]>([])
     const [ user ] = useAuth();	
-    const { addMessages} = useData()
+    const { addMessages, updateChannel} = useData()
 
     useEffect(() => {
         if(user === undefined) return
         const eventSource = new EventSource(`http://localhost:8080/api/sse/listen/${user.token}`);
+        
         eventSource.addEventListener('NewChannelMessage', (event) => {
             const data  = JSON.parse(event.data)
             const message = messageMapper(data.message)
             addMessages(message.channel, [message]);
         })
+
+        eventSource.addEventListener('ChannelNameUpdate', (event) => {
+            const data  = JSON.parse(event.data)
+            const channel = channelMapper(data)
+            updateChannel(channel)
+        })
+
         return () => {
             eventSource.close();
         };
@@ -79,4 +87,11 @@ function messageMapper(json: any): Message {
     const date = new Date(json.timestamp);
     const msg = new Message(Number(json.id), user, ch, json.content, date);
     return msg
+}
+
+function channelMapper(json: any): Channel {
+    const creator = new User(Number(json.creator.id), json.creator.username, json.creator.email);
+    const visibility = Visibility[json.visibility as keyof typeof Visibility];
+    const ch = new Channel(Number(json.id), json.name, creator, visibility);
+    return ch
 }

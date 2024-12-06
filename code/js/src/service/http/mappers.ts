@@ -42,7 +42,7 @@ export async function messagesMapper(
         const msg = new Message(Number(message.msgId), user, ch, message.content, date);
         messages.push(msg);
     }
-    return messages.reverse();
+    return messages;
 }
 
 

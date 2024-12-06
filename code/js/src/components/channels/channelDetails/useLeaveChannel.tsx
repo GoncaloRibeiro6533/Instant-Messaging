@@ -1,5 +1,9 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer } from 'react';
 import { services } from '../../../App';
+import { useAuth } from '../../auth/AuthProvider';
+import { useData } from '../../data/DataProvider';
+import { Channel } from '../../../domain/Channel';
+import { useNavigate } from 'react-router-dom';
 
 type LeaveChannelState =
     | { name: 'idle' }
@@ -13,30 +17,51 @@ type LeaveChannelAction =
     | { type: 'error', message: string };
 
 function leaveChannelReducer(state: LeaveChannelState, action: LeaveChannelAction): LeaveChannelState {
-    switch (action.type) {
-        case 'leave':
-            return { name: 'leaving' };
-        case 'success':
-            return { name: 'success' };
-        case 'error':
-            return { name: 'error', message: action.message };
-        default:
+    switch (state.name) {
+        case 'idle': {
+            if (action.type === 'leave') {
+                return { name: 'leaving' };
+            }
             return state;
+        }
+        case 'leaving': {
+            if (action.type === 'success') {
+                return { name: 'success' };
+            }
+            if (action.type === 'error') {
+                return { name: 'error', message: action.message };
+            }
+            return state;
+        }
+        case 'success': return state;
+        case 'error': {
+            if (action.type === 'leave') {
+                return { name: 'leaving' };
+            }
+            return state;
+        }
+        default: return state;
     }
 }
 
-export function useLeaveChannel(token: string) {
+export function useLeaveChannel():[
+    LeaveChannelState,
+    (channel: Channel) => void
+] {
     const [state, dispatch] = useReducer(leaveChannelReducer, { name: 'idle' });
-
-    const leaveChannel = useCallback(async (channelId: number) => {
+    const  [user] = useAuth()
+    const { removeChannel } = useData()
+    const navigate = useNavigate()
+    async function leaveChannel(channel: Channel)  {
         dispatch({ type: 'leave' });
         try {
-            await services.channelService.leaveChannel(token, channelId);
+            await services.channelService.leaveChannel(user.token, channel.id)
+            removeChannel(channel)
+            navigate('/channels')
             dispatch({ type: 'success' });
         } catch (error) {
             dispatch({ type: 'error', message: error.message });
         }
-    }, []);
-
-    return [state, leaveChannel] as const;
+    }
+    return [state, leaveChannel]
 }

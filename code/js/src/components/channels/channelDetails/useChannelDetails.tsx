@@ -1,75 +1,104 @@
-import {Channel} from "../../../domain/Channel";
-import {ChannelMember} from "../../../domain/ChannelMember";
+
+import { useData } from "../../data/DataProvider";
+import { useAuth } from "../../auth/AuthProvider";
+import { Channel } from "../../../domain/Channel";
 import * as React from "react"
+import { ChannelMember } from "../../../domain/ChannelMember";
+import { services } from "../../../App";
 
 
 type State =
-    | { name: "displaying", channel: Channel, members: ChannelMember[] }
-    | { name: "editing", channel: Channel, members: ChannelMember[], newChannelName: string }
-    | { name: "submitting", channel: Channel, members: ChannelMember[], newChannelName: string }
-    | { name: "success", channel: Channel, members: ChannelMember[] }
-    | { name: "error", error: string, channel: Channel, members: ChannelMember[] };
+    | { name: 'idle'}
+    | { name: "displaying", channel: Channel, members: ChannelMember[], previouslyLoaded: boolean }
+    | { name: "loading", channelId: number }
+    | { name: "error", error: string }
 
 type Action =
-    | { type: "edit" }
-    | { type: "changeName", value: string }
-    | { type: "submit" }
-    | { type: "success", newChannel: Channel }
+    | { type: "success", channel: Channel, members: ChannelMember[], previouslyLoaded: boolean }
     | { type: "error", error: string }
-    | { type: "leave" };
+    | { type: "load", channelId: number };
 
 function reduce(state: State, action: Action): State {
     switch (state.name) {
-        case "displaying": {
-            if (action.type === "edit") {
-                return { name: "editing", channel: state.channel, members: state.members, newChannelName: state.channel.name };
-            } else if (action.type === "leave") {
-                return { name: "submitting", channel: state.channel, members: state.members, newChannelName: state.channel.name };
-            } else {
-                return state;
+        case 'idle':
+            if(action.type === "load") {
+                return { name: "loading", channelId: action.channelId }
             }
-        }
-        case "editing": {
-            if (action.type === "changeName") {
-                return { ...state, newChannelName: action.value };
-            } else if (action.type === "submit") {
-                return { name: "submitting", channel: state.channel, members: state.members, newChannelName: state.newChannelName };
-            } else {
-                return state;
+            if(action.type === "success") {
+                return { name: "displaying", channel: action.channel, members: action.members, previouslyLoaded: action.previouslyLoaded}
             }
-        }
-        case "submitting": {
-            if (action.type === "success") {
-                return { name: "success", channel: action.newChannel, members: state.members };
-            } else if (action.type === "error") {
-                return { name: "error", error: action.error, channel: state.channel, members: state.members };
-            } else {
-                return state;
+            return state
+        case 'loading':
+            if(action.type === "success") {
+                return { name: "displaying", channel: action.channel, members: action.members, previouslyLoaded: action.previouslyLoaded}
             }
-        }
-        case "success": {
-            return state;
-        }
-        case "error": {
-            return state;
-        }
+            if(action.type === "error") {
+                return { name: "error", error: action.error}
+            }
+            return state    
+        case 'error':
+            if(action.type === "load") {
+                return { name: "loading", channelId: action.channelId }
+            }
+            return state   
+        case 'displaying':
+            if(action.type === "success") {
+                return { name: "displaying", channel: action.channel, members: action.members, previouslyLoaded: action.previouslyLoaded}
+            }
+            if(action.type === "load") {
+                return { name: "loading", channelId: action.channelId }
+            }
+            return state
         default:
-            return state;
-    }
-}
-/*
-function useChannelDetails {
-    const [state, dispatch] = React.useReducer(reduce, { name: "displaying", channel, members });
+            return state
+        }
 
-    function onChange() {
-        if (state.name === "editing") {
-            dispatch({ type: "submit" });
-        } else if (state.name === "displaying") {
-            dispatch({ type: "edit" });
+}
+
+
+export function useChannnelDetails() : [
+    State,
+    (channelId: string) => void
+]{
+    const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
+    const [auth] = useAuth();
+    const { channels, channelMembers, addChannel, addChannelMember } = useData();
+    const selectedChannelIdRef = React.useRef<number | null>(null);
+    async function loadChannel(channelId: string) {
+        try {
+            const parsedId = parseInt(channelId);
+            if (state.name === 'loading' && state.channelId === parsedId) {
+                return;
+            }
+            if (isNaN(parsedId)) {
+                dispatch({ type: 'error', error: 'Invalid channel ID' });
+                return;
+            }
+            selectedChannelIdRef.current = parsedId;
+
+            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null;
+            const loadedMembers = channelMembers.get(parsedId) || null;
+
+            if (loadedChannel && loadedMembers) {
+                if (selectedChannelIdRef.current === parsedId) {
+                    dispatch({ type: 'success', channel: loadedChannel, members:loadedMembers, previouslyLoaded: true });
+                }
+                return;
+            }
+            const loadedChannels = loadedChannel === null &&  await services.channelService.getChannelsOfUser(auth.token, auth.user.id);
+            const channel = loadedChannel || Array.from(loadedChannels.keys()).find(channel => channel.id === parsedId) || null;
+            const members =loadedMembers === null && await services.channelService.getChannelMembers(auth.token, parsedId) || loadedMembers
+            dispatch({ type: 'load', channelId: parsedId });
+            if(loadedChannel === null) addChannel(channel, members.find(member => member.user.id === auth.user.id).role)
+            if(loadedMembers === null) addChannelMember(parsedId, members)
+            if (selectedChannelIdRef.current === parsedId) {
+                dispatch({ type: 'success', channel:channel , members, previouslyLoaded: false });
+            }
+        } catch (error: any) {
+            const errorMessage = error.message || 'An error occurred';
+            dispatch({ type: 'error', error: errorMessage });
         }
     }
+    return [state, loadChannel]
 
-    return [state, onChange];
 }
-
- */

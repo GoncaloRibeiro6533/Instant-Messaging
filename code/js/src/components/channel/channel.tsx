@@ -1,31 +1,38 @@
-import * as React from 'react';
-import { Box, Avatar, Typography } from '@mui/material';
-import ListItemButton from "@mui/material/ListItemButton";
-import { useNavigate, useParams } from 'react-router-dom';
-import { ChatBox } from './chatBox/chatBox';
-import { useChannel } from './useChannel';
-import { getRandomColor } from '../utils/channelLogoColor';
-import { CircularProgress } from '@mui/material';
-import Snackbar from '@mui/material/Snackbar';
-import Button from '@mui/material/Button';
-import { useEffect } from 'react';
-import ErrorIcon from '@mui/icons-material/Error';
-import { useLocation } from 'react-router-dom';
-import { useRef } from 'react';
+import * as React from 'react'
+import { Box, Avatar, Typography } from '@mui/material'
+import ListItemButton from "@mui/material/ListItemButton"
+import { useNavigate, useParams } from 'react-router-dom'
+import { ChatBox } from './chatBox/chatBox'
+import { useChannel } from './useChannel'
+import { getRandomColor } from '../utils/channelLogoColor'
+import { CircularProgress } from '@mui/material'
+import Snackbar from '@mui/material/Snackbar'
+import Button from '@mui/material/Button'
+import { useEffect } from 'react'
+import { useData } from '../data/DataProvider'
 
 export function Channel() {
-    const { channelId } = useParams(); 
-    const [state, loadChannel] = useChannel();
-    const navigate = useNavigate();
-
+    const { channelId } = useParams() 
+    const [state, loadChannel] = useChannel()
+    const navigate = useNavigate()
+    const { channels } = useData()
 
     useEffect(() => {
-         loadChannel(channelId);
-    }, [channelId]);
+         loadChannel(channelId)
+    }, [channelId, channels])
+
+   /* useEffect(() => {
+        if( state.name === 'loaded' &&
+            Array.from(channels.keys()).find(channel => channel.id === state.channel.id).name 
+            !== state.channel.name
+        ){
+                loadChannel(channelId)
+            }
+   }, [channels])*/
 
     const handleClick = () => {
         if (state.name === 'loaded') {
-            navigate(`/channel/${state.channel.id}`);
+            navigate(`/channel/${state.channel.id}`)
         }
     }
     return (
@@ -61,5 +68,5 @@ export function Channel() {
                 </ListItemButton>
                 <ChatBox channel={state.channel} /></Box>
             )} </Box>
-    );
+    )
 }

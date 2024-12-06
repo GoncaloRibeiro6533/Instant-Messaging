@@ -57,7 +57,7 @@ class JdbiMessageRepository(
             """
             SELECT m.*, u.username, u.email, c.name, c.visibility 
             FROM dbo.MESSAGE m JOIN dbo.USER u ON m.user_id = u.id JOIN dbo.channel c ON m.channel_id = c.id 
-            WHERE m.channel_id = :channelId LIMIT :limit OFFSET :skip;
+            WHERE m.channel_id = :channelId ORDER BY m.creationtime DESC LIMIT :limit OFFSET :skip;
             """,
         ).bind("channelId", channel.id)
             .bind("limit", limit)
