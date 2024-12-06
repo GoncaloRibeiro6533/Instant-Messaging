@@ -25,6 +25,8 @@ sealed class MessageError {
     data object ChannelNotFound : MessageError()
 
     data object UserNotInChannel : MessageError()
+
+    data object MessageTooLong : MessageError()
 }
 
 @Named
@@ -51,6 +53,7 @@ class MessageService(
     ): Either<MessageError, Message> =
         trxManager.run {
             val user = userRepo.findById(userId) ?: return@run failure(MessageError.UserNotFound)
+            if (text.length > Message.MAX_MESSAGE_LENGTH) return@run failure(MessageError.MessageTooLong)
             if (channelId < 0) return@run failure(MessageError.InvalidChannelId)
             if (text.isBlank()) return@run failure(MessageError.InvalidText)
             if (userId < 0) return@run failure(MessageError.InvalidUserId)

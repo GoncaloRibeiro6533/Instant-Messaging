@@ -1,9 +1,10 @@
-import { Box, TextField, Button, Typography } from "@mui/material";
+import { Box, TextField, Button, Typography, Alert } from "@mui/material";
 import * as React from 'react';
 import { useTextField } from "./useTextField";
 import { Channel } from "../../../domain/Channel";
 import { useData } from "../../data/DataProvider";
 import { Role } from "../../../domain/Role";
+
 
 export function ChatTextField(props: { channel: Channel }) {
   const [state, handlers] = useTextField();
@@ -13,6 +14,11 @@ export function ChatTextField(props: { channel: Channel }) {
   return (
     (role === Role.READ_WRITE &&
    <form onSubmit={(ev) => handlers.onSubmit(ev, props.channel)} name="chatTextField" id="chatTextField">
+     {state.name === "editing" && state.error && (
+        <Alert severity="error" sx={{ marginBottom: 2 }}>
+          {state.error}
+        </Alert>
+      )}
     <Box
       sx={{
         display: "flex",
