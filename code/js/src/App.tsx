@@ -27,6 +27,8 @@ import {UserServiceHttp} from "./service/http/UserServiceHttp";
 import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp";
 import {MessageServiceHttp} from "./service/http/MessageServiceHttp";
 import {InvitationServiceHttp} from "./service/http/InvitationServiceHttp";
+import {useData} from "./components/data/DataProvider";
+import {useAuth} from "./components/auth/AuthProvider";
 
 
 //TODO fix this
@@ -123,7 +125,7 @@ const router = createBrowserRouter(
             element: (
                 <AuthRequire>
                     <MenuAppBar />
-                    <ChannelsList />
+                    <ChannelDetailsWrapper /> //todo fix this
                 </AuthRequire>
             ),
         },
@@ -137,7 +139,7 @@ const router = createBrowserRouter(
             ),
         },
         {
-            "path": "invitation/channel",
+            "path": "/invitation/channel",
             "element": (
                 <AuthRequire>
                     <MenuAppBar />
@@ -146,7 +148,7 @@ const router = createBrowserRouter(
             )
         },
         {
-            "path": "invitation/register",
+            "path": "/invitation/register",
             "element": (
                 <AuthRequire>
                     <MenuAppBar />
