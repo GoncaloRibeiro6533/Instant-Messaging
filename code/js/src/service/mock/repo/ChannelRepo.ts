@@ -25,6 +25,8 @@ export class ChannelRepo implements ChannelRepoInterface {
         new Channel(1, 'Channel 1', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
         new Channel(2, 'Channel 2', new User(1, 'Bob', 'bob@example.com'), Visibility.PRIVATE),
         new Channel(3, 'Channel 3', new User(1, 'Bob', 'bob@example.com'), Visibility.PUBLIC),
+        new Channel(4, 'Channel 4', new User(2, 'Alice', 'alice@example.com'), Visibility.PRIVATE),
+        new Channel(5, 'Movies and Books', new User(2, 'Alice', 'alice@example.com'), Visibility.PUBLIC),
     ];
 
     public channelMembers: Map<Channel, Array<ChannelMember>> = new Map([
@@ -116,13 +118,6 @@ export class ChannelRepo implements ChannelRepoInterface {
         this.channelMembers.get(channel)!.splice(channelMemberIndex, 1);
         return channel;
     }
-
-    deleteChannel(user: User, channelId: number): void {
-        const channelIndex = this.channels.findIndex(channel => channel.id === channelId);
-        this.channels.splice(channelIndex, 1);
-        this.channelMembers.delete(this.channels[channelIndex]);
-    }
-
     getChannelById(channelId: number): Channel {
         return this.channels.find(channel => channel.id === channelId)!;
     }

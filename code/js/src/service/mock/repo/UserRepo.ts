@@ -34,7 +34,7 @@ export class UserRepo implements UserRepoInterface {
     }
     public nextId = 2;
     public tokens: Map<number, Array<string>> = new Map(
-        [[1, ["123"]]]
+        [[1, ["123"]], [2, ["456"]]]
     );
     public users: Array<User> = [
         new User(1, 'Bob', 'bob@example.com'),
@@ -42,6 +42,7 @@ export class UserRepo implements UserRepoInterface {
     ];
     public usersPassword: Map<number, string> = new Map([
         [1, '123'],
+        [2, '456']
     ]);
 
     private invitations = new Map<number, string>(

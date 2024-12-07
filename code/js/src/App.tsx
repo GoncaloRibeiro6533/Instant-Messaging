@@ -28,8 +28,7 @@ import { UserServiceMock } from './service/mock/UserServiceMock'
 import { ChannelServiceMock } from './service/mock/ChannelServiceMock'
 import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
-
-
+import {InvitationsList} from "./components/invitation/invitationsList";
 
 
 const router = createBrowserRouter(
@@ -134,6 +133,15 @@ const router = createBrowserRouter(
                 <AuthRequire>
                     <MenuAppBar />
                     <RegisterInvitation />
+                </AuthRequire>
+            )
+        },
+        {
+            "path": "/invitations",
+            "element": (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <InvitationsList />
                 </AuthRequire>
             )
         }

@@ -90,7 +90,7 @@ export class InvitationServiceHttp implements InvitationService {
         });
         const json = await handleResponse(response);
         const invitations: ChannelInvitation[] = [];
-        for (const invitation of json) {
+        for (const invitation of json.invitations) {
             invitations.push(await channelInvitationMapper(invitation));
         }
         return invitations;

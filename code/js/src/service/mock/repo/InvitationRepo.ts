@@ -65,26 +65,27 @@ export class InvitationRepo implements InvitationRepoInterface {
         },
         ]
 
-
-    public channelInvitations = [
-        {
-            id: 1,
-            sender: new User(1, 'Bob', 'bob@example.com'),
-            receiver: new User(2, 'Filipe', 'filipe@example.com'),
-            channel: new Channel(
-                1,
-            'Channel 1',
-            new User(1, 'Bob', 'bob@example.com'),
-            Visibility.PRIVATE
-        ),
-            role: Role.READ_ONLY,
-            isUsed: false,
-            timestamp: new Date()
-        },
-    ]
-
     constructor() {
-        this.invitations = [];
+        this.invitations = [
+            {
+                id: 1,
+                sender: new User(2, 'Alice', 'alice@example.com'),
+                receiver: new User(1, 'Bob', 'bob@example.com'),
+                channel: new Channel(4, 'Channel 4', new User(2, 'Alice', 'alice@example.com'), Visibility.PRIVATE),
+                role: Role.READ_WRITE,
+                isUsed: false,
+                timestamp: new Date()
+            },
+            {
+                id: 2,
+                sender: new User(2, 'Alice', 'alice@example.com'),
+                receiver: new User(1, 'Bob', 'bob@example.com'),
+                channel: new Channel(5, 'Movies and Books', new User(2, 'Alice', 'alice@example.com'), Visibility.PUBLIC),
+                role: Role.READ_ONLY,
+                isUsed: false,
+                timestamp: new Date()
+            }
+        ];
         this.registerInvitations = [];
     }
 

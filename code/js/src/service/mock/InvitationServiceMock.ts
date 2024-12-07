@@ -4,9 +4,11 @@ import { Channel } from "../../domain/Channel";
 import { Role } from "../../domain/Role";
 import { ChannelInvitation } from "../../domain/ChannelInvitation";
 import { RegisterInvitation } from "../../domain/RegisterInvitation";
+import {ChannelRepo} from "./repo/ChannelRepo";
 
 export class InvitationServiceMock implements InvitationService {
     repo: Repo;
+    channelRepo: ChannelRepo;
 
     constructor(repo: Repo) {
         this.repo = repo;
@@ -19,15 +21,6 @@ export class InvitationServiceMock implements InvitationService {
         }
         return this.repo.invitationRepo.getInvitationsOfUser(user);
     }
-
-    async getRegisterInvitationById(token: string, invitationId: number): Promise<RegisterInvitation> {
-        const user = this.repo.userRepo.getUserByToken(token)
-        if (!user) {
-            throw new Error("Invalid token");
-        }
-        return this.repo.invitationRepo.getRegisterInvitationById(user, invitationId);
-    }
-
     async createRegisterInvitation(token: string, email: string, channelId: number, role: Role): Promise<RegisterInvitation> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
@@ -45,11 +38,21 @@ export class InvitationServiceMock implements InvitationService {
     }
 
     async acceptChannelInvitation(token: string, invitationId: number): Promise<Channel> {
-        const user = this.repo.userRepo.getUserByToken(token)
+        const user = this.repo.userRepo.getUserByToken(token);
         if (!user) {
             throw new Error("Invalid token");
         }
-        return this.repo.invitationRepo.acceptChannelInvitation(user, invitationId);
+        const invitation = this.repo.invitationRepo.invitations.find(invitation => invitation.id === invitationId);
+        if (invitation) {
+            const channelMember = {
+                user,
+                role: invitation.role
+            };
+            const channelMembers = this.repo.channelRepo.channelMembers.get(invitation.channel) || [];
+            channelMembers.push(channelMember);
+            this.repo.channelRepo.channelMembers.set(invitation.channel, channelMembers);
+        }
+        return invitation.channel;
     }
 
     async declineChannelInvitation(token: string, invitationId: number): Promise<Boolean> {

@@ -7,8 +7,6 @@ export interface InvitationService {
     getInvitationsOfUser(token: string): Promise<Array<ChannelInvitation>>;
     createRegisterInvitation(token: string, email: string, channelId: number, role: Role,): Promise<RegisterInvitation>;
     createChannelInvitation(token: string, receiverId: number, channelId: number, role: Role): Promise<ChannelInvitation>;
-
     acceptChannelInvitation(token: string, invitationId: number): Promise<Channel>;
-
     declineChannelInvitation(token: string, invitationId: number): Promise<Boolean>;
 }
