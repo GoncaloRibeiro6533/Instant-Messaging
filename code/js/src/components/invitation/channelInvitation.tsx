@@ -7,6 +7,7 @@ import { User } from '../../domain/User';
 import { Role } from '../../domain/Role';
 import { services } from "../../App";
 import { AuthContext } from "../auth/AuthProvider";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export function ChannelInvitation() {
     const { user } = useContext(AuthContext);
@@ -64,6 +65,10 @@ export function ChannelInvitation() {
         }
     };
 
+    const handleBackClick = () => {
+        navigate('/invitation', {state: {channel: channel, token: user.token}});
+    };
+
     return (
         <Box
             display="flex"
@@ -74,9 +79,18 @@ export function ChannelInvitation() {
             bgcolor="#f5f5f5"
             padding={2}
         >
-            <Card sx={{ width: 400, height: 400, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
+                        sx={{ textTransform: 'none', margin: 2 }}>
+                    Back
+                </Button>
+            </Box>
+            <Card sx={{ width: 400, height: 450, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <CardContent>
-                    <Box sx={{ marginBottom: 0 }}>
+                    <Typography variant="body1" sx={{ marginBottom: 2 }}>
+                        Please insert the username of who you want to invite
+                    </Typography>
+                    <Box sx={{ marginBottom: 2 }}>
                         <TextField
                             label="Search for user"
                             variant="outlined"
@@ -122,14 +136,14 @@ export function ChannelInvitation() {
                                 <span style={{ color: 'black', fontWeight: 'bold' }}>User selected:</span>
                                 <span style={{ color: 'black', fontStyle: 'italic' }}> {selectedUser.username}</span>
                             </>
-                        ) : 'Please select a user by searching its username and the role wanted'}
+                        ) : 'Please choose a Role'}
                     </Typography>
                     <Box>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontWeight: 'bold' }}>
                             Role selected:
                         </Typography>
                         <Typography variant="body1" component="span" sx={{ color: 'black', fontStyle: 'italic' }}>
-                            {selectedRole === Role.READ_WRITE ? ' Can send messages' : selectedRole === Role.READ_ONLY ? ' Can only see conversation' : ' No role selected'}
+                            {selectedRole === Role.READ_WRITE ? 'Can send and read messages' : selectedRole === Role.READ_ONLY ? 'Read Only' : 'No role selected'}
                         </Typography>
                     </Box>
                     {showPermissionError && (
@@ -150,10 +164,10 @@ export function ChannelInvitation() {
                 </CardActions>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2, gap: 2 }}>
                     <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
-                        Can send messages
+                        Read Write Role
                     </Button>
                     <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_ONLY)}>
-                        Can only see conversation
+                        Read Only Role
                     </Button>
                 </Box>
             </Card>

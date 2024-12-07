@@ -23,9 +23,10 @@ import {InvitationServiceMock} from "./service/mock/InvitationServiceMock"
 import {UserServiceHttp} from "./service/http/UserServiceHttp"
 import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp"
 import {MessageServiceHttp} from "./service/http/MessageServiceHttp"
-
-
-
+import { InvitationServiceHttp } from './service/http/InvitationServiceHttp'
+import { UserServiceMock } from './service/mock/UserServiceMock'
+import { ChannelServiceMock } from './service/mock/ChannelServiceMock'
+import { MessageServiceMock } from './service/mock/MessageServiceMock'
 
 const router = createBrowserRouter(
     [
@@ -152,12 +153,14 @@ export const repo: Repo = {
 
 export const mockService: Service = {
     userService: new UserServiceHttp(),
+    channelService: new ChannelServiceHttp(),
+    messageService: new MessageServiceHttp(),
+    invitationService: new InvitationServiceHttp(),
+
     //userService: new UserServiceMock(repo),
     //channelService: new ChannelServiceMock(repo),
     //messageService: new MessageServiceMock(repo),
-    channelService: new ChannelServiceHttp(),
-    messageService: new MessageServiceHttp(),
-    invitationService: new InvitationServiceMock(repo)
+    //invitationService: new InvitationServiceMock(repo)
 }
 
 export const services: Service = mockService

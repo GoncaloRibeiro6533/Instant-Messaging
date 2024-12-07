@@ -63,8 +63,7 @@ export function useTextField() : [State, {
         } 
         dispatch({ type: "send", channel: channel })
         try {
-            const message = await services.messageService
-            .sendMessage(userAuth.token, channel.id, state.content)
+            const message = await services.messageService.sendMessage(userAuth.token, channel.id, state.content)
             dispatch({ type: "success" })
         } catch (e) {
             dispatch({ type: "error", message: e.message })

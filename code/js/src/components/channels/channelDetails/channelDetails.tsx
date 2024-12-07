@@ -13,15 +13,16 @@ import { getRandomColor } from '../../utils/channelLogoColor'
 import { Role } from "../../../domain/Role"
 import {useData} from "../../data/DataProvider"
 import {services} from "../../../App"
-import { useChannnelDetails } from './useChannelDetails'
+import { useChannelDetails } from './useChannelDetails'
 import { CircularProgress } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export function ChannelDetails() {
     const [user ] = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const { channelId } = useParams()
-    const [state, loadChannel] = useChannnelDetails()
+    const [state, loadChannel] = useChannelDetails()
     const [editState, {onSubmit, onEdit, onChange, onCancel}] = useEditChannelName()
     const { channels, channelMembers } = useData()
     const [leaveState, leaveChannel] = useLeaveChannel()
@@ -32,10 +33,7 @@ export function ChannelDetails() {
         loadChannel(channelId)
     }, [channels, channelId, channelMembers])
 
-    /*React.useEffect(() => {
-        setNewChannelName(channel.name)
-    }, [channel.name, setNewChannelName])
-
+    /*
     React.useEffect(() => {
         if (location.state?.invitedUser) {
             setInvitationMessage(`${location.state.invitedUser} invited to channel!`)
@@ -48,148 +46,139 @@ export function ChannelDetails() {
         }
     }, [location.state])
 
-    const handleLeaveChannelClick = async () => {
-        try {
-            await leaveChannel(channel.id)
-            onLeave()
-            loadChannels()
-        } catch (err) {
-            setError('Failed to leave channel.')
-            console.error(err)
-        }
-    }
-
-    React.useEffect(() => {
-        if (leaveState.name === 'success') {
-            onLeave()
-            loadChannels()
-            navigate('/channels')
-        }
-    }, [leaveState, onLeave, loadChannels, navigate])
-
-    if (error) {
-        return <Typography variant="h6" color="error" align="center" mt={5}>{error}</Typography>
     }*/
+
+    const handleBackClick = () => {
+        navigate('/channels/channel/' + channelId);
+    };
+
+    //todo fix this, its here to show what this button does
+    const handleSendInvitation = () => {
+        if (state.name !== "error") {
+            if (state.name !== "loading") {
+                if (state.name !== "idle") {
+                    navigate('/invitation', {state: {channel: state.channel, token: user.token}});
+                }
+            }
+        }
+    };
 
     return (
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        { state.name === 'loading' || leaveState.name === 'leaving' && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
-                <CircularProgress size="60px" />
-                {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
-            </Box>)}
-        {state.name === 'displaying' &&  leaveState.name === 'idle' &&
-            (
-            <Box textAlign="center" mt={5}>
-                <Avatar sx={{ bgcolor: getRandomColor(state.channel.id), width: 100, height: 100, margin: '0 auto', fontSize: 50 }}>
-                {state.channel.name.charAt(0)}
-                </Avatar>
-            </Box>)}
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
+                        sx={{ textTransform: 'none', margin: 2 }}>
+                    Back
+                </Button>
+            </Box>
+            { state.name === 'loading' || leaveState.name === 'leaving' && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                    <CircularProgress size="60px" />
+                    {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
+                </Box>)}
+            {state.name === 'displaying' &&  leaveState.name === 'idle' &&
+                (
+                    <Box textAlign="center" mt={5}>
+                        <Avatar sx={{ bgcolor: getRandomColor(state.channel.id), width: 100, height: 100, margin: '0 auto', fontSize: 50 }}>
+                            {state.channel.name.charAt(0)}
+                        </Avatar>
+                    </Box>)}
             {state.name === 'displaying' && (editState.name === 'displaying' || editState.name === 'editing') && (
                 <Box
                     sx={{
-                    position: 'fixed', 
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 10,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 10,
                     }}
                 >
                     <Box
-                    sx={{
-                        backgroundColor: '#ffff', 
-                        padding: 4,
-                        borderRadius: 4,
-                        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', 
-                        width: '90%',
-                        maxWidth: '500px', 
-                        textAlign: 'center',
-                    }}
-                    >
-                    <form
-                        onSubmit={(ev) => {
-                        ev.preventDefault();
-                        onSubmit(ev);
-                        }}
-                    >
-                        <TextField
-                        label="Edit channel name"
-                        variant="outlined"
-                        fullWidth
-                        value={editState.newChannelName}
-                        onChange={(ev) => onChange(state.channel, ev)}
-                        sx={{ marginBottom: 2 }}
-                        />
-                        <Box
                         sx={{
-                            display: 'block',
-                            justifyContent: 'space-between',
+                            backgroundColor: '#ffff',
+                            padding: 4,
+                            borderRadius: 4,
+                            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                            width: '90%',
+                            maxWidth: '500px',
+                            textAlign: 'center',
                         }}
-                        >
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            disabled={editState.newChannelName === state.channel.name || !editState.newChannelName.trim()}
-                            sx={{
-                            backgroundColor: '#28a745',
-                            color: '#fff',
-                            borderRadius: 20,
-                            textTransform: 'none',
-                            marginRight: 1,
-                            '&:hover': {
-                                backgroundColor: '#218838',
-                            },
+                    >
+                        <form
+                            onSubmit={(ev) => {
+                                ev.preventDefault();
+                                onSubmit(ev);
                             }}
                         >
-                            Save
-                        </Button>
-                        <Button
-                            onClick={onCancel}
-                            variant="outlined"
-                            sx={{
-                            borderColor: '#dc3545',
-                            color: '#dc3545',
-                            borderRadius: 20,
-                            textTransform: 'none',
-                            marginLeft: 1,
-                            '&:hover': {
-                                backgroundColor: '#f8d7da',
-                                borderColor: '#dc3545',
-                            },
-                            }}
-                        >
-                            Cancel
-                        </Button>
-                        </Box>
-                    </form>
+                            <TextField label="Edit channel name" variant="outlined" fullWidth
+                                       value={editState.newChannelName}
+                                       onChange={(ev) => onChange(state.channel, ev)}
+                                       sx={{ marginBottom: 2 }}
+                            />
+                            <Box
+                                sx={{
+                                    display: 'block',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Button type="submit" variant="contained"
+                                        disabled={editState.newChannelName === state.channel.name || !editState.newChannelName.trim()}
+                                        sx={{backgroundColor: '#28a745',
+                                            color: '#fff',
+                                            borderRadius: 20,
+                                            textTransform: 'none',
+                                            marginRight: 1,
+                                            '&:hover': {
+                                                backgroundColor: '#218838',
+                                            },
+                                        }}
+                                >
+                                    Save
+                                </Button>
+                                <Button onClick={onCancel} variant="outlined"
+                                        sx={{
+                                            borderColor: '#dc3545',
+                                            color: '#dc3545',
+                                            borderRadius: 20,
+                                            textTransform: 'none',
+                                            marginLeft: 1,
+                                            '&:hover': {
+                                                backgroundColor: '#f8d7da',
+                                                borderColor: '#dc3545',
+                                            },
+                                        }}>
+                                    Cancel
+                                </Button>
+                            </Box>
+                        </form>
                     </Box>
                 </Box>
-                )}
+            )}
 
             {editState.name === 'idle'&& state.name == 'displaying' && leaveState.name === 'idle' && (
                 <Box textAlign="center" mt={5}>
                     <Typography variant="h4" mt={2}>
                         {state.channel.name}
                         {state.channel.creator.id === user.user.id && (
-                        <Button variant="text" color="primary" onClick={() => onEdit(state.channel)} sx={{ ml: 2, textTransform: 'none' }}>
-                            <Edit sx={{ mr: 1 }} />
-                            Edit
-                        </Button>)}
+                            <Button variant="text" color="primary" onClick={() => onEdit(state.channel)} sx={{ ml: 2, textTransform: 'none' }}>
+                                <Edit sx={{ mr: 1 }} />
+                                Edit
+                            </Button>)}
                     </Typography>
-                </Box>    
+                </Box>
             )}
             {state.name === 'displaying' && leaveState.name === 'idle' && (
                 <Box textAlign="center" mt={2}>
                     <Typography variant="body2" mt={1}>Number of members: {state.members.length}</Typography>
                     <Typography variant="h6" mt={2}>Channel Members</Typography>
                     <Grid container direction="column" alignItems="center" spacing={2} mt={2}>
-                            {state.members.map((member) => (
-                                <Grid item key={member.user.id} xs={12} container alignItems="center" justifyContent="center">
+                        {state.members.map((member) => (
+                            <Grid item key={member.user.id} xs={12} container alignItems="center" justifyContent="center">
                                 <Grid item xs={4}>
                                     <Box p={1} border={1} borderRadius={2} display="flex" alignItems="center" justifyContent="space-between" bgcolor="#f0f0f0">
                                         <Typography variant="body1">{member.user.username}</Typography>
@@ -206,24 +195,31 @@ export function ChannelDetails() {
                             </Grid>
                         ))}
                     </Grid>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => leaveChannel(state.channel)}
-                        sx={{ mt: 3, textTransform: 'none' }}
+                    <Button variant="contained" color="error" onClick={() => leaveChannel(state.channel)}
+                            sx={{ mt: 3, textTransform: 'none' }}
                     >
-                        Leave Channel  
+                        Leave Channel
                         <ExitToAppIcon sx={{ mr: 1 }} />
                     </Button>
                 </Box>
             )}
-           
+
+            <Box textAlign="center" mt={2}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSendInvitation}
+                    sx={{ mt: 3, textTransform: 'none' }}
+                >
+                    Send Invitation
+                </Button>
+            </Box>
         </Box>
     )
 }
 
 
- {/*
+{/*
             <Button
                 variant="contained"
                 color="primary"
@@ -239,4 +235,4 @@ export function ChannelDetails() {
                 autoHideDuration={5000}
                 onClose={() => setOpenSnackbar(false)}
             />
-        </Box>*/}
+       */}

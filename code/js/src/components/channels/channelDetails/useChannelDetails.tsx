@@ -35,12 +35,12 @@ function reduce(state: State, action: Action): State {
             if(action.type === "error") {
                 return { name: "error", error: action.error}
             }
-            return state    
+            return state
         case 'error':
             if(action.type === "load") {
                 return { name: "loading", channelId: action.channelId }
             }
-            return state   
+            return state
         case 'displaying':
             if(action.type === "success") {
                 return { name: "displaying", channel: action.channel, members: action.members, previouslyLoaded: action.previouslyLoaded}
@@ -51,12 +51,12 @@ function reduce(state: State, action: Action): State {
             return state
         default:
             return state
-        }
+    }
 
 }
 
 
-export function useChannnelDetails() : [
+export function useChannelDetails() : [
     State,
     (channelId: string) => void
 ]{

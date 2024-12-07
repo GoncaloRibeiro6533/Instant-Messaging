@@ -35,8 +35,8 @@ function reduce(state: State, action: Action): State {
             return state
         case 'loading':
             if (action.type === 'success') {
-                    return { name: 'loaded', channel: action.channel }
-                } 
+                return { name: 'loaded', channel: action.channel }
+            }
             if (action.type === 'error') {
                 return { name: 'error', message: action.message }
             }
@@ -59,7 +59,7 @@ function reduce(state: State, action: Action): State {
 
 export function useChannel(): [
     State,
-    (channelId: String) => void 
+    (channelId: String) => void
 ] {
     const [state, dispatch] = React.useReducer(reduce, { name: 'idle' })
     const [auth] = useAuth()

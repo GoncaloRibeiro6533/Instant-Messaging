@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { Role } from '../../domain/Role';
 import { services } from "../../App";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {useAuth} from "../auth/AuthProvider";
 
 export function RegisterInvitation() {
     const location = useLocation();
@@ -15,6 +17,7 @@ export function RegisterInvitation() {
     const [emailError, setEmailError] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [invitationMessage, setInvitationMessage] = useState('');
+    const [user ] = useAuth()
 
     const handleRoleClick = (role: Role) => {
         setSelectedRole(role);
@@ -48,6 +51,10 @@ export function RegisterInvitation() {
         }
     };
 
+    const handleBackClick = () => {
+        navigate('/invitation', {state: {channel: channel, token: user.token}});
+    };
+
     return (
         <Box
             display="flex"
@@ -58,6 +65,12 @@ export function RegisterInvitation() {
             bgcolor="#f5f5f5"
             padding={2}
         >
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
+                        sx={{ textTransform: 'none', margin: 2 }}>
+                    Back
+                </Button>
+            </Box>
             <Card sx={{ width: 400, height: 350, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <CardContent>
                     <Typography variant="h6" component="div" gutterBottom>
@@ -78,14 +91,14 @@ export function RegisterInvitation() {
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 1 }}>
                         <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
-                            Can send messages
+                            Read Write Role
                         </Button>
                         <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_ONLY)}>
-                            Can only see conversation
+                            Read Only Role
                         </Button>
                     </Box>
                     <Typography variant="body1" component="div" gutterBottom>
-                        <strong>Role selected:</strong> <em>{selectedRole ? (selectedRole === Role.READ_WRITE ? 'Can send messages' : 'Can only see conversation') : 'None'}</em>
+                        <strong>Role selected:</strong> <em>{selectedRole ? (selectedRole === Role.READ_WRITE ? 'Can send and read messages' : 'Read Only') : 'None'}</em>
                     </Typography>
                     {showPermissionError && (
                         <Typography variant="body2" sx={{ color: 'red', fontStyle: 'italic' }}>
