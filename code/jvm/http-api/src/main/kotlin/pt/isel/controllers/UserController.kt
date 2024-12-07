@@ -1,6 +1,8 @@
 package pt.isel.controllers
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import pt.isel.AuthenticatedUser
+import pt.isel.Cookie
 import pt.isel.Either
 import pt.isel.Failure
 import pt.isel.Success
@@ -46,17 +49,17 @@ class UserController(
         }
     }
 
-    @PostMapping("/register/{invitationId}")
+    @PostMapping("/register/{invitationCode}")
     fun register(
         @RequestBody userRegisterInput: UserRegisterInput,
-        @PathVariable invitationId: Int,
+        @PathVariable invitationCode: String,
     ): ResponseEntity<*> {
         val result: Either<UserError, User> =
             userService.createUser(
                 userRegisterInput.username.trim(),
                 userRegisterInput.email.trim(),
                 userRegisterInput.password,
-                invitationId,
+                invitationCode,
             )
         return when (result) {
             is Success -> ResponseEntity.status(HttpStatus.CREATED).body(result.value)
@@ -69,13 +72,24 @@ class UserController(
     fun login(
         @RequestBody userLoginInput: UserLoginCredentialsInput,
     ): ResponseEntity<*> {
-        val result: Either<UserError, AuthenticatedUser> =
+        val result: Either<UserError, Cookie> =
             userService.loginUser(
                 userLoginInput.username.trim(),
                 userLoginInput.password,
             )
         return when (result) {
-            is Success -> ResponseEntity.status(HttpStatus.OK).body(result.value)
+            is Success -> {
+                val cookie =
+                    ResponseCookie.from("token", result.value.token)
+                        .httpOnly(true)
+                        .path("/")
+                        .maxAge(result.value.expireDate.epochSeconds)
+                        .httpOnly(true) // not accessible via JavaScript
+                        .secure(true) // only sent over HTTPS - except for localhost
+                        .path("/") // available in all paths
+                        .build()
+                return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(result.value.user)
+            }
             is Failure ->
                 handleUserError(result.value)
         }

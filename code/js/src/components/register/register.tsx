@@ -8,8 +8,8 @@ import Logo from '../../../public/logo.png';
 
 
 export function Register() {
-    const {id} = useParams();
-    const [state, handlers] = useRegister(parseInt(id));
+    const {code} = useParams();
+    const [state, handlers] = useRegister(code);
     if (state.name === 'redirecting') {
         return <Navigate to={'/login'} replace={true} />;
     }

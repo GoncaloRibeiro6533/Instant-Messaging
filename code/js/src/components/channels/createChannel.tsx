@@ -18,7 +18,7 @@ export function CreateChannel() {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         try {
-            const result = await services.channelService.createChannel(user.token, name, visibility);
+            const result = await services.channelService.createChannel(name, visibility);
             addChannel(result, Role.READ_WRITE);
             navigate('/channels');
         } catch (error) {

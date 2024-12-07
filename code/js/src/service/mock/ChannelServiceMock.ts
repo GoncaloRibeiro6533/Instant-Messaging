@@ -11,8 +11,33 @@ export class ChannelServiceMock implements ChannelService {
     constructor(repo: Repo) {
       this.repo = repo;
     }
+    createChannel(name: string, visibility: string): Promise<Channel> {
+        throw new Error('Method not implemented.');
+    }
+    joinChannel(channelId: number, role: Role): Promise<Channel> {
+        throw new Error('Method not implemented.');
+    }
+    searchChannelByName(name: string, limit: number, skip: number): Promise<Channel[]> {
+        throw new Error('Method not implemented.');
+    }
+    getChannelMembers(channelId: number): Promise<ChannelMember[]> {
+        throw new Error('Method not implemented.');
+    }
+    getChannelsOfUser(userId: number): Promise<Map<Channel, Role>> {
+        throw new Error('Method not implemented.');
+    }
+    updateChannelName(channelId: number, newName: string): Promise<Channel> {
+        throw new Error('Method not implemented.');
+    }
+    getChannelById(channelId: number): Promise<Channel> {
+        throw new Error('Method not implemented.');
+    }
+    leaveChannel(channelId: number): Promise<Channel> {
+        throw new Error('Method not implemented.');
+    }
+}
 
-
+/*
     async createChannel(token: string, name: string, visibility: string): Promise<Channel> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
@@ -114,4 +139,4 @@ export class ChannelServiceMock implements ChannelService {
         }
         return channel
     }
-}
+}*/

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useAuth } from "../auth/AuthProvider"
 import { services } from "../../App"
+import { useError } from "../error/errorProvider"
 
 type State = 
     {name: "editing", error?: string, username: string, password: string, } |
@@ -55,6 +56,7 @@ export function useLogin() : [State, {
             error: undefined
         })
     const [userAuth, setUser] = useAuth()
+    const [error, setError] = useError()
     async function onSubmit(ev: React.FormEvent<HTMLFormElement>) {
         ev.preventDefault()
         if (state.name !== "editing") {
@@ -72,6 +74,7 @@ export function useLogin() : [State, {
                 dispatch({ type: "error", message: "Invalid username or password" })
             }
         } catch (e) {
+            setError(e.message)
             dispatch({ type: "error", message: e.message })
         }
     }    

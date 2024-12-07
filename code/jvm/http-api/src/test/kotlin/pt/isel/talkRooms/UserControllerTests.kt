@@ -22,6 +22,7 @@ import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -99,6 +100,7 @@ class UserControllerTests {
             ),
         ),
         emitter,
+        EmailServiceMock(),
     )
 
     @ParameterizedTest
@@ -179,14 +181,18 @@ class UserControllerTests {
             }
         val login = controllerUser.login(
             UserLoginCredentialsInput("admin", "Admin_123dsad"),
-        ).body as AuthenticatedUser
+        )
+        val user = login.body as User
+        val header= login.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
         val channelToRegister =
             channelController.createChannel(
                 CreateChannelInputModel(
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                login,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
         val emitter = createEmitters(trxManager)
         val invitation =
@@ -197,21 +203,29 @@ class UserControllerTests {
                     channelToRegister.id,
                     Role.READ_ONLY,
                 ),
-                user = login,
+                user = AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(invitation.id)?.code
+        }
+        assertNotNull(code)
         val newUser =
             controllerUser.register(
                 UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-                invitation.id,
+                code,
             )
         assertEquals(HttpStatus.CREATED, newUser.statusCode)
 
         val receiver =
             controllerUser.login(
                 UserLoginCredentialsInput("receiver", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-        assertEquals("receiver", receiver.user.username)
-        assertEquals("receiver@test.com", receiver.user.email)
+            )
+        val receiverUser = receiver.body as User
+        val headerR= receiver.headers["Set-Cookie"].toString()
+        assertNotNull(headerR)
+        val cookieR = header.split(";")[0]
+        assertEquals("receiver", receiverUser.username)
+        assertEquals("receiver@test.com", receiverUser.email)
     }
 
 
@@ -270,9 +284,13 @@ class UserControllerTests {
             UserRegisterInput("admin", "admin@example.com", "Admin_123dsad"))
         val token = controllerUser.login(
             UserLoginCredentialsInput("admin", "Admin_123dsad")
-        ).body as AuthenticatedUser
-        assertIs<AuthenticatedUser>(token)
-        val searchResult = controllerUser.searchUser("admin", 10, 0, token)
+        )
+        val user = token.body as User
+        val header= token.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+        assertIs<AuthenticatedUser>(AuthenticatedUser(user, cookie))
+        val searchResult = controllerUser.searchUser("admin", 10, 0, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, searchResult.statusCode)
         assertEquals(1, (searchResult.body as UserList).users.size)
         assertEquals("admin", (searchResult.body as UserList).users[0].username)

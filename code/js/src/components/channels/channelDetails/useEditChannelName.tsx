@@ -86,7 +86,7 @@ export function useEditChannelName(): [State, {
         if (state.name !== "editing") return
         dispatch({ type: "submit" })
         try {
-            const userUpdated = await services.channelService.updateChannelName(user.token, state.channel.id, state.newChannelName)
+            const userUpdated = await services.channelService.updateChannelName(state.channel.id, state.newChannelName)
             dispatch({ type: "success", newChannel: userUpdated })
         } catch (e) {
             dispatch({ type: "error", error: e.message, channel: state.channel })

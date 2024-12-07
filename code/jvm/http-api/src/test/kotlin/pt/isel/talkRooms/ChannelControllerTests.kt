@@ -22,6 +22,7 @@ import pt.isel.models.invitation.InvitationOutputModelRegister
 import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
+import kotlin.test.assertNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -99,7 +100,8 @@ class ChannelControllerTests {
                     maxTokensPerUser = maxTokensPerUser,
                 ),
             ),
-            emitter = emitter
+            emitter = emitter,
+            emailService = EmailServiceMock(),
         )
 
         private fun  createEmitters(trxManager: TransactionManager) =
@@ -132,7 +134,11 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val result =
             channelController.createChannel(
@@ -140,7 +146,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.CREATED, result.statusCode)
@@ -161,7 +167,12 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+
 
         val channel =
             channelController.createChannel(
@@ -169,10 +180,10 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
-        val result = channelController.getChannelById(channel.id, channelCreator)
+        val result = channelController.getChannelById(channel.id, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
@@ -190,17 +201,20 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
         channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PRIVATE,
             ),
-            channelCreator,
+            AuthenticatedUser(user, cookie),
         ).body as ChannelOutputModel
 
-        val result = channelController.getChannelByName("channel1", channelCreator, 10, 0)
+        val result = channelController.getChannelByName("channel1", AuthenticatedUser(user, cookie), 10, 0)
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
@@ -219,7 +233,11 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -227,7 +245,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         val member1RegisterInvitation =
@@ -237,19 +255,22 @@ class ChannelControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(member1RegisterInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput(
                 "member1",
                 "member1@test.com",
                 "Member_123dsad",
             ),
-            member1RegisterInvitation.id,
+            code,
         ).body as User
 
-        val result = channelController.getChannelMembers(channel.id, channelCreator)
+        val result = channelController.getChannelMembers(channel.id, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, result.statusCode)
 
         val members = result.body as ChannelMembersList
@@ -269,12 +290,13 @@ class ChannelControllerTests {
             UserRegisterInput("admin2", "admin2@mail.com", "Admin_123dsad"),
         ).body as User
 
-        val channelCreator =
-            userController.login(
-                UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-
-        val result = channelController.getChannelMembers(0, channelCreator)
+        val channelCreator =userController.login(
+                UserLoginCredentialsInput("admin2", "Admin_123dsad"))
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+        val result = channelController.getChannelMembers(0, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
     }
 
@@ -293,7 +315,11 @@ class ChannelControllerTests {
         val user1 =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = user1.body as User
+        val header = user1.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel1 =
             channelController.createChannel(
@@ -301,7 +327,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                user1,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         channelController.createChannel(
@@ -309,7 +335,7 @@ class ChannelControllerTests {
                 "channel2",
                 Visibility.PRIVATE,
             ),
-            user1,
+            AuthenticatedUser(user, cookie),
         ).body as ChannelOutputModel
 
         val member1RegisterInvitation =
@@ -319,22 +345,29 @@ class ChannelControllerTests {
                     channel1.id,
                     Role.READ_WRITE,
                 ),
-                user1,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(member1RegisterInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput(
                 "user2",
                 "user2@test.com",
                 "User_123dsad",
             ),
-            member1RegisterInvitation.id,
+            code,
         ).body as User
 
         val user2 =
             userController.login(
                 UserLoginCredentialsInput("user2", "User_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user3 = user2.body as User
+        val header1 = user2.headers["Set-Cookie"].toString()
+        assertNotNull(header1)
+        val cookie1 = header1.split(";")[0]
 
         val channel3 =
             channelController.createChannel(
@@ -342,25 +375,25 @@ class ChannelControllerTests {
                     "channel3",
                     Visibility.PRIVATE,
                 ),
-                user2,
+                AuthenticatedUser(user3, cookie1),
             ).body as ChannelOutputModel
 
         val channelInvitation =
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
-                    user1.user.id,
+                        user.id,
                     channel3.id,
                     Role.READ_WRITE,
                 ),
-                user2,
+                AuthenticatedUser(user3, cookie1),
             ).body as InvitationOutputModelChannel
 
         invitationController.acceptChannelInvitation(
             channelInvitation.id,
-            user1,
+            AuthenticatedUser(user, cookie),
         )
 
-        val result = channelController.getChannelsOfUser(user1.user.id, user1)
+        val result = channelController.getChannelsOfUser(user.id,AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, result.statusCode)
 
         val channels = result.body as ChannelOfUserList
@@ -384,7 +417,11 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -392,13 +429,13 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
-        val result = channelController.updateChannelName(channel.id, "channel123", admin)
+        val result = channelController.updateChannelName(channel.id, "channel123", AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedChannel = channelController.getChannelById(channel.id, admin).body as ChannelOutputModel
+        val updatedChannel = channelController.getChannelById(channel.id, AuthenticatedUser(user, cookie)).body as ChannelOutputModel
         assertEquals("channel123", updatedChannel.name)
     }
 
@@ -416,9 +453,13 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
-        val result = channelController.updateChannelName(0, "channel123", admin)
+        val result = channelController.updateChannelName(0, "channel123", AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
     }
 
@@ -437,7 +478,11 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -445,7 +490,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         val nonMemberRegisterInvitation =
@@ -455,26 +500,33 @@ class ChannelControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(nonMemberRegisterInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput(
                 "nonMember",
                 "nonMember@test.com",
                 "NonMember_123dsad",
             ),
-            nonMemberRegisterInvitation.id,
+            code,
         ).body as User
 
         val nonMember =
             userController.login(
                 UserLoginCredentialsInput("nonMember", "NonMember_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user1 = nonMember.body as User
+        val header1 = nonMember.headers["Set-Cookie"].toString()
+        assertNotNull(header1)
+        val cookie1 = header1.split(";")[0]
 
-        channelController.leaveChannel(channel.id, nonMember)
+        channelController.leaveChannel(channel.id, AuthenticatedUser(user1, cookie1))
 
-        val result = channelController.updateChannelName(channel.id, "channel123", nonMember)
+        val result = channelController.updateChannelName(channel.id, "channel123", AuthenticatedUser(user1, cookie1))
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
     }
 
@@ -492,7 +544,11 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -500,10 +556,10 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
-        val result = channelController.leaveChannel(channel.id, admin)
+        val result = channelController.leaveChannel(channel.id, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
@@ -523,15 +579,18 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
         val channel =
             channelController.createChannel(
                 CreateChannelInputModel(
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         val member1RegisterInvitation =
@@ -541,22 +600,29 @@ class ChannelControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(member1RegisterInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput(
                 "member1",
                 "member1@test.com",
                 "Member_123dsad",
             ),
-            member1RegisterInvitation.id,
+            code,
         ).body as User
 
         val member1 =
             userController.login(
                 UserLoginCredentialsInput("member1", "Member_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user1 = member1.body as User
+        val header1 = member1.headers["Set-Cookie"].toString()
+        assertNotNull(header1)
+        val cookie1 = header1.split(";")[0]
 
         invitationController.createRegisterInvitation(
             InvitationInputModelRegister(
@@ -564,7 +630,7 @@ class ChannelControllerTests {
                 channel.id,
                 Role.READ_WRITE,
             ),
-            admin,
+            AuthenticatedUser(user1, cookie1),
         )
 
         val channel2 =
@@ -573,18 +639,19 @@ class ChannelControllerTests {
                     "channel2",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         val result =
             channelController.joinChannel(
                 channel2.id,
                 Role.READ_WRITE,
-                member1,
+                AuthenticatedUser(user1, cookie1),
             )
         assertEquals(HttpStatus.OK, result.statusCode)
 
-        val members: ChannelMembersList = channelController.getChannelMembers(channel2.id, admin).body as ChannelMembersList
+        val members: ChannelMembersList = channelController.getChannelMembers(channel2.id,
+            AuthenticatedUser(user, cookie)).body as ChannelMembersList
         assertEquals(2, members.nMembers)
     }
 
@@ -603,7 +670,11 @@ class ChannelControllerTests {
         val admin =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = admin.body as User
+        val header = admin.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -611,7 +682,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as ChannelOutputModel
 
         val user2RegisterInvitation =
@@ -621,22 +692,30 @@ class ChannelControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code1 = trxManager.run {
+            invitationRepo.findRegisterInvitationById(user2RegisterInvitation.id)?.code
+        }
+        assertNotNull(code1)
         userController.register(
             UserRegisterInput(
                 "user2",
                 "user2@test.com",
                 "User2_123dsad",
             ),
-            user2RegisterInvitation.id,
+            code1,
         ).body as User
 
         val user2 =
             userController.login(
                 UserLoginCredentialsInput("user2", "User2_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user1 = user2.body as User
+        val header1 = user2.headers["Set-Cookie"].toString()
+        assertNotNull(header1)
+        val cookie1 = header1.split(";")[0]
+
 
         val user3RegisterInvitation =
             invitationController.createRegisterInvitation(
@@ -645,22 +724,29 @@ class ChannelControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                admin,
+                AuthenticatedUser(user, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(user3RegisterInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput(
                 "user3",
                 "user3@test.com",
                 "User3_123dsad",
             ),
-            user3RegisterInvitation.id,
+            code,
         ).body as User
 
         val user3 =
             userController.login(
                 UserLoginCredentialsInput("user3", "User3_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user4 = user3.body as User
+        val header2 = user3.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val channel2 =
             channelController.createChannel(
@@ -668,14 +754,14 @@ class ChannelControllerTests {
                     "channel2",
                     Visibility.PRIVATE,
                 ),
-                user2,
+                AuthenticatedUser(user1, cookie1),
             ).body as ChannelOutputModel
 
         val result =
             channelController.joinChannel(
                 channel2.id,
                 Role.READ_WRITE,
-                user3,
+                AuthenticatedUser(user4, cookie2),
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -695,7 +781,11 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val result =
             channelController.createChannel(
@@ -703,7 +793,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.CREATED, result.statusCode)
@@ -714,7 +804,7 @@ class ChannelControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                channelCreator,
+                AuthenticatedUser(user, cookie),
             )
         assertEquals(HttpStatus.CONFLICT, result2.statusCode)
     }
@@ -733,9 +823,12 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-
-        val result = channelController.getChannelById(-1, channelCreator)
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+        val result = channelController.getChannelById(-1, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
 
@@ -753,8 +846,12 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
-        val result = channelController.getChannelById(-1, channelCreator)
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+        val result = channelController.getChannelById(-1, AuthenticatedUser(user, cookie))
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
 
@@ -772,17 +869,21 @@ class ChannelControllerTests {
         val channelCreator =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = channelCreator.body as User
+        val header = channelCreator.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PRIVATE,
             ),
-            channelCreator,
+            AuthenticatedUser(user, cookie),
         ).body as ChannelOutputModel
 
-        val result = channelController.getChannelByName("channel2", channelCreator, -1, 0)
+        val result = channelController.getChannelByName("channel2", AuthenticatedUser(user, cookie), -1, 0)
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
 

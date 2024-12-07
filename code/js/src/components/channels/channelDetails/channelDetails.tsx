@@ -56,7 +56,7 @@ export function ChannelDetails() {
         if (state.name !== "error") {
             if (state.name !== "loading") {
                 if (state.name !== "idle") {
-                    navigate('/invitation', {state: {channel: state.channel, token: user.token}});
+                    navigate('/invitation', {state: {channel: state.channel}});
                 }
             }
         }
@@ -179,7 +179,7 @@ export function ChannelDetails() {
                 <Box textAlign="center" mt={5}>
                     <Typography variant="h4" mt={2}>
                         {state.channel.name}
-                        {state.channel.creator.id === user.user.id && (
+                        {state.channel.creator.id === user.id && (
                             <Button variant="text" color="primary" onClick={() => onEdit(state.channel)} sx={{ ml: 2, textTransform: 'none' }}>
                                 <Edit sx={{ mr: 1 }} />
                                 Edit

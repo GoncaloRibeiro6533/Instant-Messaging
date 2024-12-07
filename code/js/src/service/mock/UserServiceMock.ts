@@ -10,8 +10,29 @@ export class UserServiceMock implements UserService {
     constructor(repo: Repo) {
         this.repo = repo;
     }
-
-    async login(username: string, password: string): Promise<AuthenticatedUser | undefined> {
+    login(username: string, password: string): Promise<User> {
+        throw new Error("Method not implemented.");
+    }
+    register(email: string, username: string, password: string, code: string): Promise<User> {
+        throw new Error("Method not implemented.");
+    }
+    registerFirstUser(email: string, username: string, password: string): Promise<User> {
+        throw new Error("Method not implemented.");
+    }
+    logOut(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    updateUsername(newUsername: string): Promise<User> {
+        throw new Error("Method not implemented.");
+    }
+    getUserById(userId: number): Promise<User> {
+        throw new Error("Method not implemented.");
+    }
+    searchByUsername(username: string, limit?: number, skip?: number): Promise<User[]> {
+        throw new Error("Method not implemented.");
+    }
+}
+  /*  async login(username: string, password: string): Promise<User | undefined> {
         await delay(500);
         const user = this.repo.userRepo.users.find(user => user.username === username);
         if (!user) {
@@ -23,13 +44,10 @@ export class UserServiceMock implements UserService {
         }
         const token = this.repo.userRepo.createToken(user.id);
         console.log(this.repo.userRepo.tokens);
-        return Promise.resolve({
-            user,
-            token
-        })
+        return Promise.resolve(user)
     }
 
-    async register(email: string, username:string, password: string, invitationId:number): Promise<User> {
+    async register(email: string, username:string, password: string, code:string): Promise<User> {
         await delay(1000);
         //TODO check if email is already in use
         if (this.repo.userRepo.users.find(user => user.email === email)) {
@@ -93,5 +111,5 @@ export class UserServiceMock implements UserService {
         }
         return this.repo.userRepo.createUser(username, email, password);
     }
-}
+}*/
 

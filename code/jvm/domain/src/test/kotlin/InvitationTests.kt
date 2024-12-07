@@ -14,6 +14,7 @@ class InvitationTests {
     private val invitedUser = User(2, "invitedUsername", "invitedEmail@mail.com")
     private val channel = Channel(1, "channel", user, Visibility.PUBLIC)
     private val role = Role.READ_WRITE
+    private val code = "c".repeat(255)
 
     @Test
     fun `should create an Channelinvitation`() {
@@ -34,6 +35,7 @@ class InvitationTests {
                 role,
                 false,
                 LocalDateTime.now(),
+                code,
             )
         assertEquals(1, invitation.id)
         assertEquals(user, invitation.sender)
@@ -50,21 +52,48 @@ class InvitationTests {
     @Test
     fun `should throw exception when id is lower than 0 in RegisterInvitation`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(-1, user, invitedUser.email, channel, role, false, LocalDateTime.now())
+            RegisterInvitation(
+                -1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+                code,
+            )
         }
     }
 
     @Test
     fun `should throw exception when receiver email is empty in RegisterInvitatiton`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(1, user, "", channel, role, false, LocalDateTime.now())
+            RegisterInvitation(
+                1,
+                user,
+                "",
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+                code,
+            )
         }
     }
 
     @Test
     fun `should throw exception when sender email is equal to receiver email`() {
         assertThrows<IllegalArgumentException> {
-            RegisterInvitation(1, user, user.email, channel, role, false, LocalDateTime.now())
+            RegisterInvitation(
+                1,
+                user,
+                user.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+                code,
+            )
         }
     }
 
@@ -85,6 +114,7 @@ class InvitationTests {
                 role,
                 false,
                 LocalDateTime.now(),
+                code,
             )
         assertEquals(false, invitation.isUsed)
     }
@@ -107,6 +137,7 @@ class InvitationTests {
                 role,
                 false,
                 LocalDateTime.now(),
+                code,
             )
         val markedInvitation = invitation.markAsUsed()
         assertEquals(true, markedInvitation.isUsed)
@@ -132,6 +163,7 @@ class InvitationTests {
                 role,
                 false,
                 time,
+                code,
             )
         val otherInvitation =
             RegisterInvitation(
@@ -142,7 +174,48 @@ class InvitationTests {
                 role,
                 false,
                 time,
+                code,
             )
         assertEquals(invitation, otherInvitation)
+    }
+
+    @Test
+    fun `Channel Invitation is not equal to another`() {
+        val time = LocalDateTime.now()
+        val invitation = ChannelInvitation(1, user, invitedUser, channel, Role.READ_WRITE, false, time)
+        val otherInvitation = ChannelInvitation(2, user, invitedUser, channel, Role.READ_WRITE, false, time)
+        assertEquals(false, invitation == otherInvitation)
+    }
+
+    @Test
+    fun `Fail to create Register Invitation with invalid timestamp`() {
+        assertThrows<IllegalArgumentException> {
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now().plusDays(1),
+                code,
+            )
+        }
+    }
+
+    @Test
+    fun `Fail to create Register Invitation with no code`() {
+        assertThrows<IllegalArgumentException> {
+            RegisterInvitation(
+                1,
+                user,
+                invitedUser.email,
+                channel,
+                role,
+                false,
+                LocalDateTime.now(),
+                "",
+            )
+        }
     }
 }

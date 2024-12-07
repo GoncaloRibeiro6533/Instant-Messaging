@@ -21,6 +21,7 @@ import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -105,13 +106,17 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelId =
             (
                 channelController.createChannel(
                     CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
+                     AuthenticatedUser(user, cookie),
                 ).body as ChannelOutputModel
             ).id
 
@@ -120,7 +125,7 @@ class MessageControllerTests {
         val result =
             messageController.sendMessage(
                 messageInputModel,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.CREATED, result.statusCode)
@@ -142,13 +147,17 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelId =
             (
                 channelController.createChannel(
                     CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
+                    AuthenticatedUser(user, cookie),
                 ).body as ChannelOutputModel
             ).id
 
@@ -157,13 +166,13 @@ class MessageControllerTests {
         val message =
             messageController.sendMessage(
                 messageInputModel,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             ).body as MessageOutputModel
 
         val result =
             messageController.getMessageById(
                 message.msgId,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -185,13 +194,17 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelId =
             (
                 channelController.createChannel(
                     CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
+                    AuthenticatedUser(user, cookie),
                 ).body as ChannelOutputModel
             ).id
 
@@ -203,27 +216,27 @@ class MessageControllerTests {
 
         messageController.sendMessage(
             messageInputModel1,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel2,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel3,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel4,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel5,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         val result =
@@ -231,7 +244,7 @@ class MessageControllerTests {
                 channelId,
                 10,
                 0,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -253,13 +266,17 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelId =
             (
                 channelController.createChannel(
                     CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
+                    AuthenticatedUser(user, cookie),
                 ).body as ChannelOutputModel
             ).id
 
@@ -271,27 +288,27 @@ class MessageControllerTests {
 
         messageController.sendMessage(
             messageInputModel1,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel2,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel3,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel4,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         messageController.sendMessage(
             messageInputModel5,
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         val result =
@@ -299,7 +316,7 @@ class MessageControllerTests {
                 channelId,
                 3,
                 2,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -321,11 +338,15 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         channelController.createChannel(
             CreateChannelInputModel("channel", Visibility.PUBLIC),
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         val result =
@@ -333,7 +354,7 @@ class MessageControllerTests {
                 1653,
                 10,
                 0,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
@@ -354,17 +375,21 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         channelController.createChannel(
             CreateChannelInputModel("channel", Visibility.PUBLIC),
-            userLoggedIn,
+            AuthenticatedUser(user, cookie),
         )
 
         val result =
             messageController.getMessageById(
                 1,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
@@ -384,14 +409,18 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val messageInputModel = MessageInputModel(165231, "Hello, World!")
 
         val result =
             messageController.sendMessage(
                 messageInputModel,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
@@ -412,13 +441,17 @@ class MessageControllerTests {
         val userLoggedIn =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val user = userLoggedIn.body as User
+        val header = userLoggedIn.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelId =
             (
                 channelController.createChannel(
                     CreateChannelInputModel("channel", Visibility.PUBLIC),
-                    userLoggedIn,
+                    AuthenticatedUser(user, cookie),
                 ).body as ChannelOutputModel
             ).id
 
@@ -427,7 +460,7 @@ class MessageControllerTests {
         val result =
             messageController.sendMessage(
                 messageInputModel,
-                userLoggedIn,
+                AuthenticatedUser(user, cookie),
             )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)

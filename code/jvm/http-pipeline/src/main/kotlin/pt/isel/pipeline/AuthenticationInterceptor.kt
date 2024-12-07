@@ -22,9 +22,16 @@ class AuthenticationInterceptor(
             }
         ) {
             // enforce authentication
+            val cookies = request.cookies
+            val cookie = request.cookies.find { it.name == NAME_AUTHORIZATION_HEADER }
+            if (cookie == null) {
+                response.status = 401
+                response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+                return false
+            }
             val user =
                 authorizationHeaderProcessor
-                    .processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
+                    .processAuthorizationHeaderValue(cookie.value)
             return if (user == null) {
                 response.status = 401
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
@@ -39,7 +46,7 @@ class AuthenticationInterceptor(
     }
 
     companion object {
-        const val NAME_AUTHORIZATION_HEADER = "Authorization"
+        const val NAME_AUTHORIZATION_HEADER = "token"
         private const val NAME_WWW_AUTHENTICATE_HEADER = "WWW-Authenticate"
     }
 }

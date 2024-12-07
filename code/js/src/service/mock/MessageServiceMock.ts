@@ -9,7 +9,15 @@ export class MessageServiceMock implements MessageService {
   constructor(repo: Repo) {
     this.repo = repo;
   }
-    
+    getMessages(channelId: number, limit?: number, skip?: number): Promise<Message[]> {
+        throw new Error('Method not implemented.');
+    }
+    sendMessage(channelId: number, message: string): Promise<Message> | Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
+}
+   /* 
         async sendMessage(token: string, channelId: number, content: string): Promise<Message> {
             await delay(500)
             const user = this.repo.userRepo.getUserByToken(token)
@@ -50,4 +58,4 @@ export class MessageServiceMock implements MessageService {
             }
             return this.repo.messageRepo.getMessages(ch, limit, skip);
     }
-}
+}*/

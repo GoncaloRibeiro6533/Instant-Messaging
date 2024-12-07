@@ -79,7 +79,7 @@ export function useRegisterInvitation(): [State, {
         if (state.name === "submitting") {
             try {
                 await services.invitationService
-                    .createRegisterInvitation(user.token, registerInv.email, registerInv.channel.id, registerInv.role);
+                    .createRegisterInvitation(registerInv.email, registerInv.channel.id, registerInv.role);
                 dispatch({ type: "success", registerInvitation: registerInv });
             } catch (error) {
                 dispatch({ type: "error", error, registerInvitation: state.registerInvitation });

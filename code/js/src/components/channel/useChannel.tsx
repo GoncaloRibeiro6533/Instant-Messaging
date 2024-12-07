@@ -86,8 +86,8 @@ export function useChannel(): [
             }
             dispatch({ type: 'load', channelId: parsedId })
 
-            const channel = loadedChannel || await services.channelService.getChannelById(auth.token, parsedId)
-            const retrievedMessages = await services.messageService.getMessages(auth.token, parseInt(channelId), 100, 0)
+            const channel = loadedChannel || await services.channelService.getChannelById(parsedId)
+            const retrievedMessages = await services.messageService.getMessages(parseInt(channelId), 30, 0)
             addMessages(channel, retrievedMessages)
             if (selectedChannelIdRef.current === parsedId) {
                 dispatch({ type: 'success', channel:channel , previouslyLoaded: false })

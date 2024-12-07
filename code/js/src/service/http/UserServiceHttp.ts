@@ -7,7 +7,7 @@ export class UserServiceHttp implements UserService {
 
     private baseUrl = 'http://localhost:8080/api/user';
 
-    async login(username: string, password: string): Promise<AuthenticatedUser> {
+    async login(username: string, password: string): Promise<User> {
         const response = await fetch(`${this.baseUrl}/login`, {
             method: 'POST',
             headers: {
@@ -17,21 +17,19 @@ export class UserServiceHttp implements UserService {
             body: JSON.stringify({
                 username: username,
                 password: password }),
+            credentials: "include", // Garante que cookies serão enviados e recebidos
+     
         });
         const json = await handleResponse(response);
         const user: User = new User(
-            json.user.id,
-            json.user.username,
-            json.user.email
+            json.id,
+            json.username,
+            json.email
         )
-        const authUser: AuthenticatedUser = {
-            token: json.token,
-            user: user
-        };
-        return authUser;
+        return user;
     }
-    async register(email: string, username: string, password: string, invitationID:number): Promise<User> {
-        const response = await fetch(`${this.baseUrl}/register/${invitationID}`, {
+    async register(email: string, username: string, password: string, code:string): Promise<User> {
+        const response = await fetch(`${this.baseUrl}/register/${code}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json, application/problem+json',
@@ -47,26 +45,26 @@ export class UserServiceHttp implements UserService {
         return new User(json.id, json.username, json.email);
     }
 
-    async logOut(token: string): Promise<void> {
+    async logOut(): Promise<void> {
         const response = await fetch(`${this.baseUrl}/logout`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
         });
         await handleResponse(response);
     }
 
-    async updateUsername(token: string, newUsername: string): Promise<User> {
+    async updateUsername(newUsername: string): Promise<User> {
         const response = await fetch(`${this.baseUrl}/edit/username`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({
                 newUsername: newUsername.trim()
             })
@@ -75,27 +73,27 @@ export class UserServiceHttp implements UserService {
         return new User(json.id, json.username, json.email);
     }
 
-    async getUserById(token: string, userId: number): Promise<User> {
+    async getUserById(userId: number): Promise<User> {
         const response = await fetch(`${this.baseUrl}/${userId}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include',
         })
         const json = await handleResponse(response);
         return new User(json.id, json.username, json.email);
     }
 
-    async searchByUsername(token: string, username: string, limit: number = 10, skip: number = 0): Promise<User[]> {
+    async searchByUsername(username: string, limit: number = 10, skip: number = 0): Promise<User[]> {
         const response = await fetch(`${this.baseUrl}/search/${username}?limit=${limit}&skip=${skip}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include',
         })
         const json = await handleResponse(response);
         return json.map((user: any) => new User(user.id, user.username, user.email));

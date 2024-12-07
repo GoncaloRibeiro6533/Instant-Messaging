@@ -64,7 +64,7 @@ function reduce(state: State, action: Action): State {
 }
 
 
-export function useRegister(invitationId: number) : [State, { 
+export function useRegister(code: string) : [State, { 
     onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
     onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void 
 }] {
@@ -87,7 +87,7 @@ export function useRegister(invitationId: number) : [State, {
         const username = state.username
         const password = state.password
         try {
-            const user = await services.userService.register(email, username, password, invitationId)
+            const user = await services.userService.register(email, username, password, code)
             if (user !== undefined) {
                 dispatch({ type: "success" })
            } else {

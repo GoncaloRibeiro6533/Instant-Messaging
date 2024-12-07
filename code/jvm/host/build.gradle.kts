@@ -29,6 +29,9 @@ dependencies {
     implementation("org.jdbi:jdbi3-core:3.37.1")
     implementation("org.postgresql:postgresql:42.7.2")
 
+    // Suporte ao envio de emails (Spring Mail)
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.2.4")
+
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")

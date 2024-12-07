@@ -239,6 +239,7 @@ class JdbiInvitationRepositoryTests {
                     channel,
                     Role.READ_WRITE,
                     LocalDateTime.now(),
+                    "code",
                 )
 
             val deleted = JdbiInvitationRepository(handle).deleteRegisterInvitationById(invitation.id)

@@ -74,24 +74,24 @@ export function useProfile(): [State, {
     onCancel: () => void
     }]  {
     const { user } = React.useContext(AuthContext)
-    const [state, dispatch] = React.useReducer(reduce, { name: "displaying", user: user.user })
+    const [state, dispatch] = React.useReducer(reduce, { name: "displaying", user: user })
     const [userAuth, setUserAuth] = useAuth()
     async function onSubmit() {
         if (state.name !== "editing") return
         dispatch({ type: "submit" })
         try {
-            const userUpdated = await services.userService.updateUsername(user.token, state.newUsername)
-            setUserAuth({token: user.token, user: userUpdated})
+            const userUpdated = await services.userService.updateUsername(state.newUsername)
+            //setUserAuth({token: user.token, user: userUpdated}) TODO
             dispatch({ type: "success", newUser: userUpdated })
         } catch (e) {
-            dispatch({ type: "error", error: e.message, user: user.user })
+            dispatch({ type: "error", error: e.message, user: user})
         }
     }
     function onChange(ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { 
         dispatch({ type: "edit", value: ev.target.value.trim() })
     }
     function onEdit() {
-        dispatch({ type: "edit", value: user.user.username })
+        dispatch({ type: "edit", value: user.username })
     }
     function onCancel() {
         dispatch({ type: "cancel" })

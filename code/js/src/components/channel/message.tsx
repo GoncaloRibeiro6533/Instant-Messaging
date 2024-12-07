@@ -5,7 +5,7 @@ import { AuthContext, useAuth } from "../auth/AuthProvider";
 
 export function Message(props: { message: MessageType }) {
     const [ user] = useAuth() // Get current user from context
-    const isCurrentUser = user.user.username === props.message.sender.username; // Check if message is from current user
+    const isCurrentUser = user.username === props.message.sender.username; // Check if message is from current user
 
     return (
         <Box
@@ -16,7 +16,7 @@ export function Message(props: { message: MessageType }) {
             marginBottom={2}
         >
             {/* Avatar of the sender */}
-            {props.message.sender.username !== user.user.username &&
+            {props.message.sender.username !== user.username &&
                 <Avatar
                     sx={{
                         marginLeft: isCurrentUser ? 0 : 2,
@@ -48,7 +48,7 @@ export function Message(props: { message: MessageType }) {
                     }}
                 >
                     {/* Sender Username */}
-                    {props.message.sender.username !== user.user.username && <Typography
+                    {props.message.sender.username !== user.username && <Typography
                         variant="body2"
                         fontWeight="bold"
                         color={isCurrentUser ? "white" : "text.primary"}

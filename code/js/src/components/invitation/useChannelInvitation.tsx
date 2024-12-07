@@ -80,7 +80,7 @@ export function useChannelInvitation(): [State, {
             try {
                 const channelInvitation =
                     await services.invitationService
-                        .createChannelInvitation(user.token, channelInv.receiver.id, channelInv.channel.id, channelInv.role);
+                        .createChannelInvitation(channelInv.receiver.id, channelInv.channel.id, channelInv.role);
                 dispatch({ type: "success", channelInvitation });
             } catch (error) {
                 dispatch({ type: "error", error, ChannelInvitation: state.channelInvitation });

@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import pt.isel.*
 import pt.isel.pipeline.AuthenticatedUserArgumentResolver
 import pt.isel.pipeline.AuthenticationInterceptor
+import java.util.*
 import kotlin.time.Duration.Companion.hours
 
 @Configuration
@@ -42,6 +45,7 @@ class PipelineConfigurer(
             .allowedOrigins("http://localhost:8000", "http://localhost")
     }
 }
+
 
 @SpringBootApplication
 class TalkRoomsApplication {
@@ -75,6 +79,23 @@ class TalkRoomsApplication {
             tokenRollingTtl = 24.hours, // 1.hours,
             maxTokensPerUser = 3,
         )
+
+    @Bean
+    fun mailSender(): JavaMailSender {
+        val mailSender = JavaMailSenderImpl().apply {
+            host = "smtp.gmail.com"
+            port = 587
+            username = "talkroomsapplication@gmail.com"
+            password = "fhro ynch pdrw hutp"
+            javaMailProperties = Properties().apply {
+                put("mail.transport.protocol", "smtp")
+                put("mail.smtp.auth", "true")
+                put("mail.smtp.starttls.enable", "true")
+                put("mail.debug", "true")
+            }
+        }
+        return mailSender
+    }
 }
 
 fun main() {

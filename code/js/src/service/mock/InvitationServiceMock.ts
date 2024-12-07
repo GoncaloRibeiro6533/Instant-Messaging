@@ -11,7 +11,23 @@ export class InvitationServiceMock implements InvitationService {
     constructor(repo: Repo) {
         this.repo = repo;
     }
-
+    getInvitationsOfUser(): Promise<Array<ChannelInvitation>> {
+        throw new Error("Method not implemented.");
+    }
+    createRegisterInvitation(email: string, channelId: number, role: Role): Promise<RegisterInvitation> {
+        throw new Error("Method not implemented.");
+    }
+    createChannelInvitation(receiverId: number, channelId: number, role: Role): Promise<ChannelInvitation> {
+        throw new Error("Method not implemented.");
+    }
+    acceptChannelInvitation(invitationId: number): Promise<Channel> {
+        throw new Error("Method not implemented.");
+    }
+    declineChannelInvitation(invitationId: number): Promise<Boolean> {
+        throw new Error("Method not implemented.");
+    }
+}
+/*
     async getInvitationsOfUser(token: string): Promise<Array<ChannelInvitation>> {
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
@@ -58,5 +74,4 @@ export class InvitationServiceMock implements InvitationService {
             throw new Error("Invalid token");
         }
         return this.repo.invitationRepo.declineChannelInvitation(user, invitationId);
-    }
-}
+}*/

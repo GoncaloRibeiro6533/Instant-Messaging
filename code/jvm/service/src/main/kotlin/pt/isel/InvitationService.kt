@@ -38,6 +38,7 @@ class InvitationService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
     private val emitter: UpdatesEmitter,
+    private val emailService: EmailServiceInterface,
 ) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =
         trxManager.run {
@@ -70,7 +71,7 @@ class InvitationService(
             if (channelId < 0) return@run failure(InvitationError.NegativeIdentifier)
             val channel =
                 channelRepo.findById(channelId) ?: return@run failure(InvitationError.ChannelNotFound)
-            val code = usersDomain.generateTokenValue() // TODO: Generate code for invitation
+            val code = usersDomain.generateTokenValue()
             val createdInvitation =
                 invitationRepo.createRegisterInvitation(
                     user,
@@ -78,7 +79,9 @@ class InvitationService(
                     channel,
                     role,
                     LocalDateTime.now(),
+                    code,
                 )
+            emailService.sendInvitationEmail(email, createdInvitation)
             return@run success(createdInvitation)
         }
 

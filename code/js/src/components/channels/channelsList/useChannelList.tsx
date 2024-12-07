@@ -5,6 +5,7 @@ import { Channel } from "../../../domain/Channel"
 import {AuthContext} from "../../auth/AuthProvider"
 import {Role} from "../../../domain/Role"
 import {useData} from "../../data/DataProvider"
+import { useError } from "../../error/errorProvider"
 
 type State =
     | { name: "idle" }
@@ -71,6 +72,7 @@ export function useChannelList(): [State, onChange: () => void] {
     const { user } = React.useContext(AuthContext)
     const [state, dispatch] = React.useReducer(reduce, { name: "idle" })
     const { setChannels, channels } = useData()
+    const [error, setError] = useError()
     async function loadChannels() {
         if(state.name === "loading") return
         if(channels.size > 0) { 
@@ -79,7 +81,7 @@ export function useChannelList(): [State, onChange: () => void] {
         }
         dispatch({ type: "load" })
         try {
-            const channels = await services.channelService.getChannelsOfUser(user.token,user.user.id)
+            const channels = await services.channelService.getChannelsOfUser(user.id)
             if(channels.size > 0) {
             setChannels(channels)
             dispatch({ type: "success", channels })
@@ -88,6 +90,10 @@ export function useChannelList(): [State, onChange: () => void] {
                 return
             }
         } catch (e) {
+            if(e.message === "Failed to fetch") {
+                setError("Failed to connect to the server")
+                dispatch({ type: "error", message: "Failed to connect to the server" })
+            }
             dispatch({ type: "error", message: e.message })
         }
     }

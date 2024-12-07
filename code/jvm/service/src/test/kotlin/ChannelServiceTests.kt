@@ -56,6 +56,7 @@ class ChannelServiceTests {
             ),
         ),
         emitter,
+        EmailServiceMock(),
     )
 
     @BeforeEach
@@ -138,7 +139,7 @@ class ChannelServiceTests {
         val channel = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
         val logged = userService.loginUser("user", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val invitation =
             invitationService.createRegisterInvitation(
                 user.value.id,
@@ -147,7 +148,9 @@ class ChannelServiceTests {
                 Role.READ_ONLY,
             )
         assertIs<Success<RegisterInvitation>>(invitation)
-        val user2 = userService.createUser("user2", "bob@mail.com", "Strong_Password123", invitation.value.id)
+        val user2 =
+            userService
+                .createUser("user2", "bob@mail.com", "Strong_Password123", invitation.value.code)
         assertIs<Success<User>>(user2)
         val members = channelService.getChannelMembers(channel.value.id)
         assertIs<Success<Map<User, Role>>>(members)

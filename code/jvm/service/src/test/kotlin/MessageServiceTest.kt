@@ -64,7 +64,8 @@ class MessageServiceTest {
                 maxTokensPerUser = maxTokensPerUser,
             ),
         ),
-        emitter
+        emitter,
+        EmailServiceMock(),
     )
 
     @BeforeEach
@@ -82,7 +83,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -107,7 +108,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val result = messageService.sendMessage(-1, user.value.id, "Hello, how are you?")
         assertIs<Failure<MessageError.InvalidChannelId>>(result)
     }
@@ -117,7 +118,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -131,7 +132,7 @@ class MessageServiceTest {
             userService.addFirstUser("user", "bob@mail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -145,7 +146,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val result = messageService.sendMessage(1, user.value.id, "Hello, how are you?")
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
     }
@@ -155,7 +156,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val ch = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(ch)
         val registerInvitation =
@@ -169,10 +170,10 @@ class MessageServiceTest {
 
         val user2 =
             userService
-                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.id)
+                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.code)
         assertIs<Success<User>>(user2)
         val logged2 = userService.loginUser("user2", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged2)
+        assertIs<Success<Cookie>>(logged2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -186,7 +187,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -203,7 +204,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -220,7 +221,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -233,7 +234,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val ch = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(ch)
         val registerInvitation =
@@ -247,9 +248,9 @@ class MessageServiceTest {
 
         val user2 =
             userService
-                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.id)
+                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.code)
         val logged2 = userService.loginUser("user2", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged2)
+        assertIs<Success<Cookie>>(logged2)
         assertIs<Success<User>>(user2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
@@ -267,7 +268,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -287,7 +288,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val result = messageService.getMsgHistory(-1, 2, 0, user.value.id)
         assertIs<Failure<MessageError.InvalidChannelId>>(result)
     }
@@ -297,7 +298,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -318,7 +319,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 
@@ -339,7 +340,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val result = messageService.getMsgHistory(1, 2, 0, user.value.id)
         assertIs<Failure<MessageError.ChannelNotFound>>(result)
     }
@@ -349,7 +350,7 @@ class MessageServiceTest {
         val user = userService.addFirstUser("user1", "email1@gmail.com", "Strong_Password123")
         assertIs<Success<User>>(user)
         val logged = userService.loginUser("user1", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged)
+        assertIs<Success<Cookie>>(logged)
         val ch = channelService.createChannel("channel", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(ch)
         val registerInvitation =
@@ -362,10 +363,10 @@ class MessageServiceTest {
         assertIs<Success<RegisterInvitation>>(registerInvitation)
         val user2 =
             userService
-                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.id)
+                .createUser("user2", "alice@mail.com", "Strong_Password123", registerInvitation.value.code)
         assertIs<Success<User>>(user2)
         val logged2 = userService.loginUser("user2", "Strong_Password123")
-        assertIs<Success<AuthenticatedUser>>(logged2)
+        assertIs<Success<Cookie>>(logged2)
         val channel = channelService.createChannel("channel1", user.value.id, Visibility.PUBLIC)
         assertIs<Success<Channel>>(channel)
 

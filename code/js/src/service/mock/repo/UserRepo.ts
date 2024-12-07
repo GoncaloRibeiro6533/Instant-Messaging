@@ -25,8 +25,8 @@ export class UserRepo implements UserRepoInterface {
         const savedUser = localStorage.getItem("user");
         const initialUser = savedUser ? JSON.parse(savedUser) : undefined;
         if (initialUser) {
-            const id = initialUser.user.id;  
-           this.addToken(initialUser.user.id, initialUser.token);
+            const id = initialUser.id;  
+           this.addToken(initialUser.id, "123");
            // update memo with local storage user
            this.users = this.users.filter(user => user.id !== id);
             this.users.push(initialUser.user);

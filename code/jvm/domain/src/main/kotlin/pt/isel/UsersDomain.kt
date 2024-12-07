@@ -76,5 +76,12 @@ class UsersDomain(
         return token.createdAt <= now && (now - token.createdAt) <= config.tokenTtl && (now - token.lastUsedAt) <= config.tokenRollingTtl
     }
 
+    fun generateCookie(
+        authUser: AuthenticatedUser,
+        createdAt: Instant,
+    ): Cookie {
+        return Cookie(authUser.user, authUser.token, createdAt + config.tokenTtl)
+    }
+
     val maxNumberOfTokensPerUser = config.maxTokensPerUser
 }

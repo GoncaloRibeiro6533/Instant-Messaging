@@ -11,7 +11,6 @@ export class InvitationServiceHttp implements InvitationService {
     private baseUrl = 'http://localhost:8080/api/invitation';
 
     async createRegisterInvitation(
-        token: string,
         email: string,
         channelId: number,
         role: Role
@@ -19,10 +18,10 @@ export class InvitationServiceHttp implements InvitationService {
         const response = await fetch(`${this.baseUrl}/register`, {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ email, channelId, role }),
         });
         const json = await handleResponse(response);
@@ -30,7 +29,6 @@ export class InvitationServiceHttp implements InvitationService {
     }
 
     async createChannelInvitation(
-        token: string,
         receiverId: number,
         channelId: number,
         role: Role
@@ -38,10 +36,10 @@ export class InvitationServiceHttp implements InvitationService {
         const response = await fetch(`${this.baseUrl}/channel`, {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ receiverId, channelId, role }),
         });
         const json = await handleResponse(response);
@@ -49,44 +47,42 @@ export class InvitationServiceHttp implements InvitationService {
     }
 
     async acceptChannelInvitation(
-        token: string,
         invitationId: number
     ): Promise<Channel> {
         const response = await fetch(`${this.baseUrl}/accept/${invitationId}`, {
             method: "PUT",
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
         });
         const json = await handleResponse(response);
         return new Channel(json.id, json.name, json.creator, json.visibility);
     }
 
     async declineChannelInvitation(
-        token: string,
         invitationId: number
     ): Promise<Boolean> {
         const response = await fetch(`${this.baseUrl}/decline/${invitationId}`, {
             method: "PUT",
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
         });
         return response.status == 200;
     }
 
-    async getInvitationsOfUser(token: string): Promise<Array<ChannelInvitation>> {
+    async getInvitationsOfUser(): Promise<Array<ChannelInvitation>> {
         const response = await fetch(`${this.baseUrl}/user/invitations`, {
             method: "GET",
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json, application/problem+json',
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include',
         });
         const json = await handleResponse(response);
         const invitations: ChannelInvitation[] = [];

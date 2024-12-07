@@ -9,6 +9,7 @@ interface InvitationRepository {
         channel: Channel,
         role: Role,
         timestamp: LocalDateTime,
+        code: String,
     ): RegisterInvitation
 
     fun createChannelInvitation(
@@ -32,6 +33,8 @@ interface InvitationRepository {
     fun deleteChannelInvitationById(invitationId: Int): Boolean
 
     fun getInvitationsOfUser(user: User): List<ChannelInvitation>
+
+    fun findRegisterInvitationByCode(code: String): RegisterInvitation?
 
     fun clear()
 }

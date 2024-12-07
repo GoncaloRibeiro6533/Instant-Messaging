@@ -8,7 +8,7 @@ import {getRandomColor} from '../../utils/channelLogoColor';
 import {useNavigate} from "react-router-dom";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import {Add} from "@mui/icons-material";
-import {Avatar, Box, Chip, CircularProgress, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField, ListItem} from '@mui/material';
+import {Avatar, Box, Chip, CircularProgress, Divider, InputAdornment, List, ListItemButton, ListItemText, TextField, ListItem, Alert} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import {Visibility} from "../../../domain/Visibility";
 import {useLocation} from "react-router-dom";
@@ -32,13 +32,13 @@ export function ChannelsList() {
 
     React.useEffect(() => {
         loadChannels()
-    }, [user.user.id, channels]);
+    }, [user.id, channels]);
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchChannels(term);
         if (term) {
             try {
-                const results = await services.channelService.searchChannelByName(user.token, term, 10, 0);
+                const results = await services.channelService.searchChannelByName(term, 10, 0);
                 setSearchResults(results);
             } catch (e) {
                 console.error(e.message);
@@ -48,9 +48,6 @@ export function ChannelsList() {
         }
     };
  
-    if (state.name === 'error') {
-        return <div>Error: {state.message}</div>;
-    }
 
     const [open, setOpen] = useState(false);
     const [selectedChannel, setSelectedChannel] = useState<any>(null);
@@ -73,9 +70,9 @@ export function ChannelsList() {
     };
     async function handlejoinChannel(channel: Channel) {
         try {
-            await services.channelService.joinChannel(user.token, channel.id, Role.READ_WRITE);
+            await services.channelService.joinChannel(channel.id, Role.READ_WRITE);
             addChannel(channel, Role.READ_WRITE);
-            addChannelMember(channel.id, [{user: user.user, role: Role.READ_WRITE}])
+            addChannelMember(channel.id, [{user: user, role: Role.READ_WRITE}])
             navigate(`/channels/channel/${channel.id}`);
         } catch (e) {
             console.error(e.message);
@@ -108,6 +105,11 @@ export function ChannelsList() {
                         ),
                     }}
                 />
+                 { state.name === "error" && (
+                   <Alert severity="error" sx={{ marginBottom: 2 }}>
+                   {state.message}
+               </Alert>)
+                }
                 {state.name === 'loading' && 
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                             <CircularProgress size="40px" />

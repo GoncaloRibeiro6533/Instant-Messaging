@@ -21,6 +21,7 @@ import pt.isel.models.user.UserLoginCredentialsInput
 import pt.isel.models.user.UserRegisterInput
 import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -91,7 +92,8 @@ class InvitationControllerTests {
                     maxTokensPerUser = maxTokensPerUser,
                 ),
             ),
-            emitter
+            emitter,
+            EmailServiceMock(),
         )
 
         private fun createInvitationController(trxManager: TransactionManager, emitter: UpdatesEmitter) =
@@ -123,7 +125,11 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -131,7 +137,7 @@ class InvitationControllerTests {
                     "channel1",
                     Visibility.PUBLIC,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val registerInvitation =
@@ -141,7 +147,7 @@ class InvitationControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             )
         assertEquals(HttpStatus.CREATED, registerInvitation.statusCode)
     }
@@ -161,7 +167,11 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin2", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelToRegister =
             channelController.createChannel(
@@ -169,7 +179,7 @@ class InvitationControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val channel =
@@ -178,7 +188,7 @@ class InvitationControllerTests {
                     "channel2",
                     Visibility.PRIVATE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val registerInvitation =
@@ -188,27 +198,35 @@ class InvitationControllerTests {
                     channelToRegister.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as InvitationOutputModelRegister
 
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-            registerInvitation.id,
+            code,
         )
 
         val receiver =
             userController.login(
                 UserLoginCredentialsInput("receiver", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val receiverU = receiver.body as User
+        val header2 = receiver.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val channelInvitation =
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
-                    receiver.user.id,
+                    receiverU.id,
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             )
 
         assertEquals(HttpStatus.CREATED, channelInvitation.statusCode)
@@ -229,14 +247,18 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel = channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PUBLIC,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val result = invitationController.createRegisterInvitation(
@@ -245,7 +267,7 @@ class InvitationControllerTests {
                 channel.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
@@ -267,14 +289,18 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel = channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PUBLIC,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val regInvitation = invitationController.createRegisterInvitation(
@@ -283,25 +309,32 @@ class InvitationControllerTests {
                 channel.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(regInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-            regInvitation.id,
+            code,
         ).body as User
 
         val receiver = userController.login(
             UserLoginCredentialsInput("receiver", "Admin_123dsad"),
-        ).body as AuthenticatedUser
+        )
+        val receiverU = receiver.body as User
+        val header2 = receiver.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val result = invitationController.createChannelInvitation(
             InvitationInputModelChannel(
-                receiver.user.id,
+                receiverU.id,
                 channel.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         )
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
@@ -322,14 +355,18 @@ class InvitationControllerTests {
 
         val sender = userController.login(
             UserLoginCredentialsInput("admin", "Admin_123dsad"),
-        ).body as? AuthenticatedUser ?: throw AssertionError("User login failed")
+        )
+        val senderU = sender.body as? User ?: throw AssertionError("User login failed")
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelForRegister = channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as? ChannelOutputModel ?: throw AssertionError("Channel creation failed")
 
         val registerInvitation = invitationController.createRegisterInvitation(
@@ -338,12 +375,15 @@ class InvitationControllerTests {
                 channelForRegister.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as? InvitationOutputModelRegister ?: throw AssertionError("Register invitation creation failed")
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-            registerInvitation.id,
+            code,
         )
 
         val channelForInviting = channelController.createChannel(
@@ -351,23 +391,27 @@ class InvitationControllerTests {
                 "channel2",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as? ChannelOutputModel ?: throw AssertionError("Channel creation failed")
 
         val receiver = userController.login(
             UserLoginCredentialsInput("receiver", "Admin_123dsad"),
-        ).body as? AuthenticatedUser ?: throw AssertionError("Receiver login failed")
+        )
+        val receiverU = receiver.body as? User ?: throw AssertionError("User login failed")
+        val header2 = receiver.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val channelInvitation = invitationController.createChannelInvitation(
             InvitationInputModelChannel(
-                receiver.user.id,
+                receiverU.id,
                 channelForInviting.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as? InvitationOutputModelChannel ?: throw AssertionError("Channel invitation creation failed")
 
-        val result = invitationController.acceptChannelInvitation(channelInvitation.id, receiver)
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id, AuthenticatedUser(receiverU, cookie2))
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
@@ -386,14 +430,18 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelForRegister = channelController.createChannel(
             CreateChannelInputModel(
                 "channel1",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val registerInvitation1 = invitationController.createRegisterInvitation(
@@ -402,7 +450,7 @@ class InvitationControllerTests {
                 channelForRegister.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelRegister
 
         val registerInvitation2 = invitationController.createRegisterInvitation(
@@ -411,45 +459,60 @@ class InvitationControllerTests {
                 channelForRegister.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelRegister
-
+        val code1 = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation1.id)?.code
+        }
+        assertNotNull(code1)
         userController.register(
             UserRegisterInput("receiver1", "receiver1@test.com", "Admin_123dsad"),
-            registerInvitation1.id,
+            code1,
         ).body as User
 
         val receiver1 = userController.login(
             UserLoginCredentialsInput("receiver1", "Admin_123dsad"),
-        ).body as AuthenticatedUser
+        )
+        val receiver1U = receiver1.body as User
+        val header2 = receiver1.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation2.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("wrongReceiver", "wr@test.com", "Admin_123dsad"),
-            registerInvitation2.id,
+            code,
         ).body as User
 
         val wrongReceiver = userController.login(
             UserLoginCredentialsInput("wrongReceiver", "Admin_123dsad"),
-        ).body as AuthenticatedUser
+        )
+        val wrongReceiverU = wrongReceiver.body as User
+        val header3 = wrongReceiver.headers["Set-Cookie"].toString()
+        assertNotNull(header3)
+        val cookie3 = header3.split(";")[0]
 
         val channelForInviting = channelController.createChannel(
             CreateChannelInputModel(
                 "channel2",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val channelInvitation = invitationController.createChannelInvitation(
             InvitationInputModelChannel(
-                receiver1.user.id,
+                receiver1U.id,
                 channelForInviting.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelChannel
 
-        val result = invitationController.acceptChannelInvitation(channelInvitation.id, wrongReceiver)
+        val result = invitationController.acceptChannelInvitation(channelInvitation.id, AuthenticatedUser(wrongReceiverU, cookie3))
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
 
     }
@@ -469,7 +532,11 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channelForRegister =
             channelController.createChannel(
@@ -477,7 +544,7 @@ class InvitationControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val registerInvitation =
@@ -487,16 +554,23 @@ class InvitationControllerTests {
                     channelForRegister.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-            registerInvitation.id,
+            code,
         )
 
         val receiver =
-            userController.login(UserLoginCredentialsInput("receiver", "Admin_123dsad")).body as AuthenticatedUser
+            userController.login(UserLoginCredentialsInput("receiver", "Admin_123dsad"))
+        val receiverU = receiver.body as User
+        val header2 = receiver.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val channelForInviting =
             channelController.createChannel(
@@ -504,21 +578,21 @@ class InvitationControllerTests {
                     "channel2",
                     Visibility.PRIVATE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val channelInvitation =
             invitationController.createChannelInvitation(
                 InvitationInputModelChannel(
-                    receiver.user.id,
+                    receiverU.id,
                     channelForInviting.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as InvitationOutputModelChannel
 
 
-        val result = invitationController.declineInvitation(channelInvitation.id, receiver)
+        val result = invitationController.declineInvitation(channelInvitation.id, AuthenticatedUser(receiverU, cookie2))
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 
@@ -537,7 +611,12 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
+
 
 
         val channelForRegister = channelController.createChannel(
@@ -545,7 +624,7 @@ class InvitationControllerTests {
                 "channel1",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val registerInvitation = invitationController.createRegisterInvitation(
@@ -554,36 +633,44 @@ class InvitationControllerTests {
                 channelForRegister.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver1", "receiver1@test.com", "Admin_123dsad"),
-            registerInvitation.id,
+            code,
         ).body as User
 
         val receiver1 = userController.login(
             UserLoginCredentialsInput("receiver1", "Admin_123dsad"),
-        ).body as AuthenticatedUser
+        )
+        val receiver1U = receiver1.body as User
+        val header2 = receiver1.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
+
 
         val channelForInviting = channelController.createChannel(
             CreateChannelInputModel(
                 "channel2",
                 Visibility.PRIVATE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as ChannelOutputModel
 
         val channelInvitation = invitationController.createChannelInvitation(
             InvitationInputModelChannel(
-                receiver1.user.id,
+                receiver1U.id,
                 channelForInviting.id,
                 Role.READ_WRITE,
             ),
-            sender,
+            AuthenticatedUser(senderU, cookie),
         ).body as InvitationOutputModelChannel
 
-        val result = invitationController.declineInvitation(channelInvitation.id, sender)
+        val result = invitationController.declineInvitation(channelInvitation.id, AuthenticatedUser(senderU, cookie))
         assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
 
     }
@@ -602,7 +689,11 @@ class InvitationControllerTests {
         val sender =
             userController.login(
                 UserLoginCredentialsInput("admin", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val senderU = sender.body as User
+        val header = sender.headers["Set-Cookie"].toString()
+        assertNotNull(header)
+        val cookie = header.split(";")[0]
 
         val channel =
             channelController.createChannel(
@@ -610,7 +701,7 @@ class InvitationControllerTests {
                     "channel1",
                     Visibility.PRIVATE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as ChannelOutputModel
 
         val registerInvitation =
@@ -620,18 +711,25 @@ class InvitationControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(senderU, cookie),
             ).body as InvitationOutputModelRegister
-
+        val code = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation.id)?.code
+        }
+        assertNotNull(code)
         userController.register(
             UserRegisterInput("receiver", "receiver@test.com", "Admin_123dsad"),
-            registerInvitation.id,
+            code,
         )
 
         val receiver =
             userController.login(
                 UserLoginCredentialsInput("receiver", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val receiverU = receiver.body as User
+        val header2 = receiver.headers["Set-Cookie"].toString()
+        assertNotNull(header2)
+        val cookie2 = header2.split(";")[0]
 
         val registerInvitation2 =
             invitationController.createRegisterInvitation(
@@ -640,28 +738,37 @@ class InvitationControllerTests {
                     channel.id,
                     Role.READ_WRITE,
                 ),
-                sender,
+                AuthenticatedUser(receiverU, cookie2),
             ).body as InvitationOutputModelRegister
 
+        val code2 = trxManager.run {
+            invitationRepo.findRegisterInvitationById(registerInvitation2.id)?.code
+        }
+        assertNotNull(code2)
         userController.register(
             UserRegisterInput("sender", "sender@test.com", "Admin_123dsad"),
-            registerInvitation2.id,
+            code2,
         )
 
         val sender2 =
             userController.login(
                 UserLoginCredentialsInput("sender", "Admin_123dsad"),
-            ).body as AuthenticatedUser
+            )
+        val sender2U = sender2.body as User
+        val header3 = sender2.headers["Set-Cookie"].toString()
+        assertNotNull(header3)
+        val cookie3 = header3.split(";")[0]
+
 
         channelController.createChannel(
             CreateChannelInputModel(
                 "channel2",
                 Visibility.PUBLIC,
             ),
-            sender2,
+            AuthenticatedUser(sender2U, cookie3),
         ).body as ChannelOutputModel
 
-        val result = invitationController.getInvitations(receiver)
+        val result = invitationController.getInvitations(AuthenticatedUser(receiverU, cookie2))
         assertEquals(HttpStatus.OK, result.statusCode)
     }
 }

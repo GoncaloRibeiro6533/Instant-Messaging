@@ -21,7 +21,6 @@ data class ChannelList(
     val channels: List<ChannelOutputModel>,
 )
 
-
 data class ChannelMember(
     val user: UserIdentifiers,
     val role: Role,

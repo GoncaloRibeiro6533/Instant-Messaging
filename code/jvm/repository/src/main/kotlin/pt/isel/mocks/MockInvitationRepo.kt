@@ -21,6 +21,7 @@ class MockInvitationRepo : InvitationRepository {
         channel: Channel,
         role: Role,
         timestamp: LocalDateTime,
+        code: String,
     ): RegisterInvitation {
         val invitation =
             RegisterInvitation(
@@ -31,6 +32,7 @@ class MockInvitationRepo : InvitationRepository {
                 role,
                 false,
                 timestamp,
+                code,
             )
         registerInvitations.add(invitation)
         return invitation
@@ -95,6 +97,10 @@ class MockInvitationRepo : InvitationRepository {
 
     override fun getInvitationsOfUser(user: User): List<ChannelInvitation> {
         return channelInvitations.filter { it.receiver.id == user.id }
+    }
+
+    override fun findRegisterInvitationByCode(code: String): RegisterInvitation? {
+        return registerInvitations.firstOrNull { it.code == code }
     }
 
     override fun clear() {

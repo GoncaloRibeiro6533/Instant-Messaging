@@ -85,10 +85,10 @@ export function useChannelDetails() : [
                 }
                 return;
             }
-            const loadedChannels = loadedChannel === null &&  await services.channelService.getChannelsOfUser(auth.token, auth.user.id);
+            const loadedChannels = loadedChannel === null &&  await services.channelService.getChannelsOfUser(auth.id);
 
             const channel = loadedChannel || Array.from(loadedChannels.keys()).find(channel => channel.id === parsedId) || null;
-            const members =loadedMembers === null && await services.channelService.getChannelMembers(auth.token, parsedId) || loadedMembers
+            const members =loadedMembers === null && await services.channelService.getChannelMembers(parsedId) || loadedMembers
             dispatch({ type: 'load', channelId: parsedId });
             if(loadedChannel === null)  setChannels(loadedChannels)
             if(loadedMembers === null) setChannelMembers(new Map([[parsedId, members]]))

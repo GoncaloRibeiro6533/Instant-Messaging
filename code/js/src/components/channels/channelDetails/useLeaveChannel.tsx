@@ -55,9 +55,9 @@ export function useLeaveChannel():[
     async function leaveChannel(channel: Channel)  {
         dispatch({ type: 'leave' });
         try {
-            await services.channelService.leaveChannel(user.token, channel.id)
+            await services.channelService.leaveChannel(channel.id)
             removeChannel(channel)
-            removeChannelMember(channel.id, user.user)
+            removeChannelMember(channel.id, user)
             navigate('/channels')
             dispatch({ type: 'success' });
         } catch (error) {

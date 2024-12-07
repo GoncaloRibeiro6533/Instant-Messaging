@@ -57,7 +57,9 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
 
     useEffect(() => {
         if(user === undefined) return
-        const eventSource = new EventSource(`http://localhost:8080/api/sse/listen/${user.token}`);
+        const eventSource = new EventSource(`http://localhost:8080/api/sse/listen`,{
+            withCredentials: true, 
+        });
         
         eventSource.addEventListener('NewChannelMessage', (event) => {
             const data  = JSON.parse(event.data)
@@ -97,6 +99,7 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
             const data  = JSON.parse(event.data)
             const invitation = invitationMapper(data)
             addInvitation(invitation)
+            addNotification(data.id, `You have been invited to join channel ${invitation.channel.name}`)
         })
 
         eventSource.onerror = () => {
@@ -178,6 +181,6 @@ function invitationMapper(json: any): ChannelInvitation {
         role,
         isUsed: json.isUsed,
         timestamp
-    }
+    } as const
     
 }

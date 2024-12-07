@@ -33,18 +33,34 @@ class InvitationRepoMockTests {
         }
     private val repoInvitations =
         MockInvitationRepo().also {
-            registerInvitation = it.createRegisterInvitation(user, "some@mail.com", channel, Role.READ_WRITE, LocalDateTime.now())
+            registerInvitation =
+                it.createRegisterInvitation(
+                    user,
+                    "some@mail.com",
+                    channel,
+                    Role.READ_WRITE,
+                    LocalDateTime.now(),
+                    "code",
+                )
             channelInvitation = it.createChannelInvitation(user, user2, channel, Role.READ_WRITE, LocalDateTime.now())
         }
 
     @Test
     fun `Test create register invitation`() {
         val invitation =
-            repoInvitations.createRegisterInvitation(user, "alice@mail.com", channel, Role.READ_WRITE, LocalDateTime.now())
+            repoInvitations.createRegisterInvitation(
+                user,
+                "alice@mail.com",
+                channel,
+                Role.READ_WRITE,
+                LocalDateTime.now(),
+                "code",
+            )
         assertEquals(user, invitation.sender)
         assertEquals("alice@mail.com", invitation.email)
         assertEquals(channel, invitation.channel)
         assertEquals(Role.READ_WRITE, invitation.role)
+        assertEquals("code", invitation.code)
     }
 
     @Test

@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    id("org.springframework.boot")
 }
 
 group = "pt.isel"
@@ -24,6 +25,8 @@ dependencies {
 
     // To use SLF4J -> Logger
     implementation("org.slf4j:slf4j-api:2.0.16")
+
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.2.4")
 }
 
 tasks.test {

@@ -41,7 +41,7 @@ export function RegisterInvitation() {
             setShowPermissionError(true);
         } else {
             try {
-                await services.invitationService.createRegisterInvitation(token, email, channel, selectedRole);
+                await services.invitationService.createRegisterInvitation(email, channel.id, selectedRole);
                 setInvitationMessage(`Invitation sent to: ${email}`);
                 setOpenSnackbar(true);
                 navigate(`/channel/${channel.id}`, { state: { invitedEmail: email } });
@@ -52,7 +52,7 @@ export function RegisterInvitation() {
     };
 
     const handleBackClick = () => {
-        navigate('/invitation', {state: {channel: channel, token: user.token}});
+        navigate('/invitation', {state: {channel: channel}});
     };
 
     return (

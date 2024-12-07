@@ -23,11 +23,11 @@ export function ChannelInvitation() {
 
     const handleSearch = async (term: string) => {
         setSearchTerm(term);
-        if (term && user.token) {
+        if (term && user) {
             try {
-                const results = await services.userService.searchByUsername(user.token, term);
+                const results = await services.userService.searchByUsername(term);
                 if (results) {
-                    const filteredResults = results.filter((result: { id: any; }) => result.id !== user.user.id);
+                    const filteredResults = results.filter((result: { id: any; }) => result.id !== user.id);
                     setSearchResults(filteredResults);
                 }
             } catch (e) {
@@ -50,7 +50,7 @@ export function ChannelInvitation() {
     const handleAddToChannel = async () => {
         if (selectedUser && selectedRole) {
             try {
-                await services.invitationService.createChannelInvitation(user.token, selectedUser.id, channel.id, selectedRole);
+                await services.invitationService.createChannelInvitation(selectedUser.id, channel.id, selectedRole);
                 console.log('Channel invitation created');
                 navigate(`/channel/${channel.id}`, { state: { invitedUser: selectedUser.username } });
             } catch (e) {
@@ -66,7 +66,7 @@ export function ChannelInvitation() {
     };
 
     const handleBackClick = () => {
-        navigate('/invitation', {state: {channel: channel, token: user.token}});
+        navigate('/invitation', {state: {channel: channel}});
     };
 
     return (

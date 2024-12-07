@@ -70,12 +70,12 @@ class UserService(
         username: String,
         email: String,
         password: String,
-        inviteId: Int,
+        inviteCode: String,
     ): Either<UserError, User> =
         trxManager.run {
-            if (inviteId < 0) return@run failure(UserError.NegativeIdentifier)
+            if (inviteCode.isEmpty()) return@run failure(UserError.InvitationNotFound)
             var invitation =
-                invitationRepo.findRegisterInvitationById(inviteId)
+                invitationRepo.findRegisterInvitationByCode(inviteCode)
                     ?: return@run failure(UserError.InvitationNotFound)
             if (invitation.isUsed) return@run failure(UserError.InvitationAlreadyUsed)
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
@@ -99,7 +99,7 @@ class UserService(
     fun loginUser(
         username: String,
         password: String,
-    ): Either<UserError, AuthenticatedUser> =
+    ): Either<UserError, Cookie> =
         trxManager.run {
             if (password.isBlank()) return@run failure(UserError.PasswordCannotBeBlank)
             if (username.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
@@ -119,7 +119,7 @@ class UserService(
                     lastUsedAt = now,
                 )
             sessionRepo.createSession(user, newToken, usersDomain.maxNumberOfTokensPerUser)
-            return@run success(AuthenticatedUser(user, newToken.token.validationInfo))
+            return@run success(usersDomain.generateCookie(AuthenticatedUser(user, newToken.token.validationInfo), now))
         }
 
     fun logoutUser(token: String) =

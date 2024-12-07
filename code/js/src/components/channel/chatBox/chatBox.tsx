@@ -47,7 +47,7 @@ export function ChatBox(props : {channel: Channel}) {
                     flexDirection: "column-reverse", // Coloca a última mensagem no fundo
                 }}
             >
-                {channelMessages.map((message, index) => {
+                {(state.name === 'displaying' || state.name === 'finished')&& (channelMessages.map((message, index) => {
                     const showChip =
                         index === channelMessages.length - 1||
                         message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay()
@@ -76,7 +76,7 @@ export function ChatBox(props : {channel: Channel}) {
                             )}
                         </React.Fragment>
                     )
-                })}
+                }))}
                 {state.name === 'loading' && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                         <CircularProgress size="30px" />

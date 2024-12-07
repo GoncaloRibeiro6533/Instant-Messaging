@@ -13,12 +13,14 @@ class JdbiInvitationRepository(
         channel: Channel,
         role: Role,
         timestamp: LocalDateTime,
+        code: String,
     ): RegisterInvitation {
         val id =
             handle.createUpdate(
                 """
-                INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id, timestamp)
-                VALUES (:role, :used, :channel_id, :email, :sender_id, :timestamp)
+                INSERT INTO dbo.REGISTER_INVITATION (role_name, used, channel_id, invited_email, inviter_id, timestamp
+                , code)
+                VALUES (:role, :used, :channel_id, :email, :sender_id, :timestamp, :code)
                 """.trimIndent(),
             )
                 .bind("sender_id", sender.id)
@@ -27,6 +29,7 @@ class JdbiInvitationRepository(
                 .bind("used", false)
                 .bind("role", role)
                 .bind("timestamp", timestamp)
+                .bind("code", code)
                 .executeAndReturnGeneratedKeys().mapTo(Int::class.java).one()
 
         return RegisterInvitation(
@@ -37,6 +40,7 @@ class JdbiInvitationRepository(
             role,
             false,
             timestamp,
+            code,
         )
     }
 
@@ -83,6 +87,7 @@ class JdbiInvitationRepository(
                 ri.invited_email,
                 ri.inviter_id,
                 ri.timestamp,
+                ri.code,
                 inviter.username AS inviter_username,
                 inviter.email AS inviter_email,
                 ch.name AS channel_name,
@@ -224,6 +229,38 @@ class JdbiInvitationRepository(
             .list()
     }
 
+    override fun findRegisterInvitationByCode(code: String): RegisterInvitation? {
+        return handle.createQuery(
+            """
+            SELECT 
+                ri.id,
+                ri.role_name,
+                ri.used,
+                ri.channel_id,
+                ri.invited_email,
+                ri.inviter_id,
+                ri.timestamp,
+                ri.code,
+                inviter.username AS inviter_username,
+                inviter.email AS inviter_email,
+                ch.name AS channel_name,
+                ch.visibility,
+                ch.creator_id,
+                creator.username AS creator_username,
+                creator.email AS creator_email
+            FROM dbo.REGISTER_INVITATION ri
+            JOIN dbo.USER inviter ON inviter.id = ri.inviter_id
+            LEFT JOIN dbo.CHANNEL ch ON ch.id = ri.channel_id
+            LEFT JOIN dbo.USER creator ON creator.id = ch.creator_id
+            WHERE ri.code = :code;
+            """.trimIndent(),
+        )
+            .bind("code", code)
+            .map { rs, _ -> mapRowToRegisterInvitation(rs) }
+            .findFirst()
+            .orElse(null)
+    }
+
     override fun clear() {
         handle.createUpdate("DELETE FROM dbo.REGISTER_INVITATION")
             .execute()
@@ -296,6 +333,7 @@ class JdbiInvitationRepository(
             role = Role.valueOf(rs.getString("role_name")),
             isUsed = rs.getBoolean("used"),
             timestamp = rs.getTimestamp("timestamp").toLocalDateTime(),
+            code = rs.getString("code"),
         )
     }
 }
