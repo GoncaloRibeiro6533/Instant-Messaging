@@ -28,7 +28,7 @@ import { UserServiceMock } from './service/mock/UserServiceMock'
 import { ChannelServiceMock } from './service/mock/ChannelServiceMock'
 import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
-
+import { Error } from './components/error/error'
 
 
 
@@ -37,11 +37,11 @@ const router = createBrowserRouter(
         {
             "path": "/",
             element:
-                <><MenuAppBar /><Home /></>,
+                <><MenuAppBar /><Error/><Home /></>,
             "children": []
         },
         {
-            "path": "/register/:id",
+            "path": "/register/:code",
             element: <Register/>
         },
         {
@@ -51,7 +51,10 @@ const router = createBrowserRouter(
         {
             "path": "/login",
             element:
+                <>
+                <Error/>
                 <Login />
+                </>
         },
         {
             "path": "/about",
@@ -66,6 +69,7 @@ const router = createBrowserRouter(
             element:
                 <AuthRequire>
                     <MenuAppBar/>
+                    <Error/>
                     <ChannelsList/>
                 </AuthRequire>,
             children: [
