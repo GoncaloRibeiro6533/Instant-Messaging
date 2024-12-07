@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {useNavigate, useLocation, useParams} from 'react-router-dom'
-import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid } from '@mui/material'
+import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid, Alert } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import { Edit } from "@mui/icons-material"
 import { AuthContext, useAuth } from '../../auth/AuthProvider'
@@ -70,9 +70,22 @@ export function ChannelDetails() {
     if (error) {
         return <Typography variant="h6" color="error" align="center" mt={5}>{error}</Typography>
     }*/
-
     return (
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {(state.name === 'error' || leaveState.name === 'error' || editState.name === 'error' || editState.name === 'editing' && editState.error !== undefined) &&(
+            <Alert severity="error" sx={{ 
+                mb: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 30,
+                }}>
+                {state.name === 'error' && state.error}
+                {leaveState.name === 'error' && leaveState.message}
+                {editState.name === 'error' && editState.error}
+                {editState.name === 'editing' && editState.error}
+            </Alert>
+        )}    
         { state.name === 'loading' || leaveState.name === 'leaving' && (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                 <CircularProgress size="60px" />
@@ -193,14 +206,26 @@ export function ChannelDetails() {
                                 <Grid item xs={4}>
                                     <Box p={1} border={1} borderRadius={2} display="flex" alignItems="center" justifyContent="space-between" bgcolor="#f0f0f0">
                                         <Typography variant="body1">{member.user.username}</Typography>
-                                        <Chip
-                                            label={member.role}
-                                            size="small"
-                                            sx={{
-                                                backgroundColor: member.role === Role.READ_WRITE ? 'green' : '#2f2f2f',
-                                                color: 'white'
-                                            }}
-                                        />
+                                        <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+                                            {member.user.id === state.channel.creator.id && (
+                                                <Chip
+                                                    label="Creator"
+                                                    size="small"
+                                                    sx={{
+                                                        backgroundColor: 'blue',
+                                                        color: 'white'
+                                                    }}
+                                                />
+                                            )}
+                                            <Chip
+                                                label={member.role}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: member.role === Role.READ_WRITE ? 'green' : '#2f2f2f',
+                                                    color: 'white'
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
                                 </Grid>
                             </Grid>

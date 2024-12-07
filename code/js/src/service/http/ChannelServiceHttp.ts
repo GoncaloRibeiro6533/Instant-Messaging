@@ -5,7 +5,7 @@ import {ChannelMember} from "../../domain/ChannelMember";
 import {Role} from "../../domain/Role";
 import { handleResponse} from "./responseHandler";
 import { User } from "../../domain/User";
-import { channelMembersMapper, channelsListMapper } from "./mappers";
+import { channelMembersMapper, channelsListMapper, channelsMapper } from "./mappers";
 import { Visibility } from "../../domain/Visibility";
 
 
@@ -107,9 +107,8 @@ export class ChannelServiceHttp implements ChannelService {
             }
         });
         const json = await handleResponse(response);
-        return json.map((channel: any) =>
-            new Channel(channel.id, channel.name, new User(channel.creator.id, channel.creator.username, channel.creator.email), channel.visibility));
-    }
+        return channelsMapper(json);
+        }
 
     async updateChannelName(token: string, channelId: number, newName: string): Promise<Channel> {
         const response = await fetch(`${this.baseUrl}/${channelId}/${newName}`, {

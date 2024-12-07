@@ -50,13 +50,14 @@ export function useLeaveChannel():[
 ] {
     const [state, dispatch] = useReducer(leaveChannelReducer, { name: 'idle' });
     const  [user] = useAuth()
-    const { removeChannel } = useData()
+    const { removeChannel, removeChannelMember } = useData()
     const navigate = useNavigate()
     async function leaveChannel(channel: Channel)  {
         dispatch({ type: 'leave' });
         try {
             await services.channelService.leaveChannel(user.token, channel.id)
             removeChannel(channel)
+            removeChannelMember(channel.id, user.user)
             navigate('/channels')
             dispatch({ type: 'success' });
         } catch (error) {

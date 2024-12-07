@@ -15,6 +15,9 @@ import {useLocation} from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import {Outlet} from 'react-router-dom';
 import {Role} from '../../../domain/Role';
+import {ChannelMember} from '../../../domain/ChannelMember';
+import { useData } from '../../data/DataProvider';
+import { useState } from 'react';
 
 
 
@@ -25,10 +28,11 @@ export function ChannelsList() {
     const [searchResults, setSearchResults] = React.useState<Channel[]>([]);
     const navigate = useNavigate();
     const location = useLocation();
+    const { channels, addChannel, addChannelMember } = useData()
 
     React.useEffect(() => {
-        loadChannels();
-    }, [user.user.id]);
+        loadChannels()
+    }, [user.user.id, channels]);
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchChannels(term);
@@ -48,8 +52,38 @@ export function ChannelsList() {
         return <div>Error: {state.message}</div>;
     }
 
-    const channelsToDisplay = searchChannels.trim() ? searchResults : (state.name == 'loaded' && state.channels)
+    const [open, setOpen] = useState(false);
+    const [selectedChannel, setSelectedChannel] = useState<any>(null);
 
+    const handleOpenDialog = (channel: any) => {
+        setSelectedChannel(channel);
+        setOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpen(false);
+        setSelectedChannel(null);
+    };
+
+    const handleConfirmJoin = () => {
+        if (selectedChannel) {
+            handlejoinChannel(selectedChannel);
+        }
+        setOpen(false);
+    };
+    async function handlejoinChannel(channel: Channel) {
+        try {
+            await services.channelService.joinChannel(user.token, channel.id, Role.READ_WRITE);
+            addChannel(channel, Role.READ_WRITE);
+            addChannelMember(channel.id, [{user: user.user, role: Role.READ_WRITE}])
+            navigate(`/channels/channel/${channel.id}`);
+        } catch (e) {
+            console.error(e.message);
+        }
+    }
+
+    
+    const channelsToDisplay = searchChannels.trim() ? searchResults : (state.name == 'loaded' && Array.from(channels.keys()))
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
             <Box sx={{ width: '320px', borderRight: '1px solid #ddd', padding: '10px' }}>
@@ -79,13 +113,20 @@ export function ChannelsList() {
                             <CircularProgress size="40px" />
                         </Box>
                 }
+                { state.name === 'stopped' && ( <Typography variant="h6" sx={{ textAlign: 'center' }}>You don't have any channels</Typography>)}
                 {/* Torne a lista rolável com overflowY: 'auto' */}
                 {state.name === 'loaded' && (
                 <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <List>
-                        {[...channelsToDisplay.entries()].map(([channel, role]: [Channel, Role]) => (
+                        {channelsToDisplay.map((channel) => (
                             <React.Fragment key={channel.id}>
-                                <ListItemButton onClick={() => navigate("/channels/channel/" + String(channel.id))}>
+                                <ListItemButton onClick={() => {
+                                    if (Array.from(channels.keys()).find((c) => c.id === channel.id)) {
+                                        navigate("/channels/channel/" + String(channel.id));
+                                    } else {
+                                        handleOpenDialog(channel)
+                                    }
+                                }}>
                                     <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
                                         {channel.name.charAt(0)}
                                     </Avatar>

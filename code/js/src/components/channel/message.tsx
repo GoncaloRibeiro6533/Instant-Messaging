@@ -67,7 +67,13 @@ export function Message(props: { message: MessageType }) {
                         {props.message.sender.username}
                     </Typography>}
                     {/* Message Content */}
-                    <Typography variant="body1" align={isCurrentUser ? "right" : "left"}>
+                    <Typography variant="body1" align={isCurrentUser ? "right" : "left"}
+                         sx={{ 
+                            wordWrap: "break-word", 
+                            overflowWrap: "break-word", 
+                            maxWidth: "700px" 
+                        }}
+                    >
                         {props.message.content}
                     </Typography>
 

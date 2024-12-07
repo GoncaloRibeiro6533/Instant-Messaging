@@ -23,6 +23,7 @@ import {InvitationServiceMock} from "./service/mock/InvitationServiceMock"
 import {UserServiceHttp} from "./service/http/UserServiceHttp"
 import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp"
 import {MessageServiceHttp} from "./service/http/MessageServiceHttp"
+import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
 
 
 
@@ -38,6 +39,10 @@ const router = createBrowserRouter(
         {
             "path": "/register/:id",
             element: <Register/>
+        },
+        {
+            "path": "/register",
+            element: <RegisterFirstUser/>
         },
         {
             "path": "/login",

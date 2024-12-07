@@ -85,5 +85,13 @@ export class UserServiceMock implements UserService {
             resolve(Array.isArray(users) ? users : [users].filter(Boolean));
         });
     }
+
+    async registerFirstUser(email: string, username: string, password: string): Promise<User> {
+        await delay(1000);
+        if (this.repo.userRepo.users.length > 0) {
+            throw new Error("Users already exist");
+        }
+        return this.repo.userRepo.createUser(username, email, password);
+    }
 }
 

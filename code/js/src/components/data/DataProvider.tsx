@@ -1,6 +1,7 @@
 import {Channel} from "../../domain/Channel"
 import {Role} from "../../domain/Role"
 import {Message} from "../../domain/Message"
+import {User} from "../../domain/User"
 import {ChannelInvitation} from "../../domain/ChannelInvitation"
 import * as React from "react"
 import {ChannelMember} from "../../domain/ChannelMember"
@@ -25,7 +26,7 @@ type DataContextType = {
     removeInvitation: (invitation : ChannelInvitation) => void,
     channelMembers: Map<Number, ChannelMember[]> // <channelId, User>
     addChannelMember: (channelId : Number, user : ChannelMember[]) => void,
-    removeChannelMember: (channelId : Number, user:ChannelMember) => void,
+    removeChannelMember: (channelId : Number, user:User) => void,
     setChannelMembers: (channelMembers : Map<Number, ChannelMember[]>) => void,
     clear : () => void
 }
@@ -91,7 +92,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             const newChannels = new Map(prevChannels)
             const oldChannel = Array.from(newChannels.keys()).find((c) => c.id === channel.id)
             newChannels.delete(oldChannel)
-            const role = prevChannels.get(channel)
+            const role = prevChannels.get(oldChannel)
             newChannels.set(channel,role)
             return newChannels
         })
@@ -116,7 +117,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     }
     const addInvitation = (invitation : ChannelInvitation) => {
         setInvitations((prevInvitations) => {
-            return [...prevInvitations, invitation]
+            const newInvitations = [...prevInvitations, invitation]
+            return newInvitations
         })
     }
 
@@ -130,19 +132,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     }
 
     const addChannelMember = (channelId : Number, user : ChannelMember[]) => {
-        const newChannelMembers = new Map(channelMembers)
-        const users = newChannelMembers.get(channelId) || []
-        newChannelMembers.set(channelId, [...users, ...user])
-        setChannelMembers(newChannelMembers)
+        setChannelMembers((prevChannelMembers) => {
+            const newChannelMembers = new Map(prevChannelMembers)
+            const users = newChannelMembers.get(channelId) || []
+            newChannelMembers.set(channelId, [...users, ...user])
+            return newChannelMembers
+        })
     }
 
-    const removeChannelMember = (channelId : Number, user: ChannelMember) => {
-        const newChannelMembers = new Map([...channelMembers])
-        const users = newChannelMembers.get(channelId) || []
-        const index = users.indexOf(user)
-        users.splice(index,1)
-        newChannelMembers.set(channelId, users)
-        setChannelMembers(newChannelMembers)
+    const removeChannelMember = (channelId : Number, user: User) => {
+        setChannelMembers((prevChannelMembers) => {
+            const newChannelMembers = new Map(prevChannelMembers)
+            const users = newChannelMembers.get(channelId) || []
+            const index = users.findIndex((u) => u.user.id === user.id)
+            users.splice(index,1)
+            newChannelMembers.set(channelId, users)
+            return newChannelMembers
+        })
     }
 
 

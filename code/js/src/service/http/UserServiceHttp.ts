@@ -100,4 +100,21 @@ export class UserServiceHttp implements UserService {
         const json = await handleResponse(response);
         return json.map((user: any) => new User(user.id, user.username, user.email));
     }
+
+    async registerFirstUser(email: string, username: string, password: string): Promise<User> {
+        const response = await fetch(`${this.baseUrl}/register`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, application/problem+json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                username: username,
+                password: password
+            }),
+        });
+        const json = await handleResponse(response);
+        return new User(json.id, json.username, json.email);
+    }
 }

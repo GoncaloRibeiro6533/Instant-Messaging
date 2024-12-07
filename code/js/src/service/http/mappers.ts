@@ -29,6 +29,23 @@ export async function channelsListMapper(json: any): Promise<Map<Channel, Role>>
     return channels;
 }
 
+
+export async function channelMapper(json: any): Promise<Channel> {
+    const creator = new User(Number(json.creator.id), json.creator.username, json.creator.email);
+    const visibility = Visibility[json.visibility as keyof typeof Visibility];
+    return new Channel(Number(json.id), json.name, creator, visibility);
+}
+
+export async function channelsMapper(json: any): Promise<Channel[]> {
+    const channels: Channel[] = [];
+    for (const channel of json.channels) {
+        const ch = await channelMapper(channel);
+        channels.push(ch);
+    }
+    return channels;
+}
+
+
 export async function messagesMapper(
     json: any
 ): Promise<Message[]> {

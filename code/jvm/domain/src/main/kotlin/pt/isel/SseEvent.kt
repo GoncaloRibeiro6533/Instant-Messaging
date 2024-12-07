@@ -27,12 +27,12 @@ sealed interface SseEvent {
 
     data class NewInvitationUpdate(
         val id: Long, // SSE Event identifier
-        val invitation: Invitation, // New invitation
+        val invitation: ChannelInvitation, // New invitation
     ) : SseEvent
 
     data class InvitationAcceptedUpdate(
         val id: Long, // SSE Event identifier
-        val invitation: Invitation, // Accepted invitation
+        val invitation: ChannelInvitation, // Accepted invitation
     ) : SseEvent
 
     data class KeepAlive(
