@@ -3,16 +3,12 @@ import {useNavigate, useLocation, useParams} from 'react-router-dom'
 import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid, Alert } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import { Edit } from "@mui/icons-material"
-import { AuthContext, useAuth } from '../../auth/AuthProvider'
-import { Channel } from '../../../domain/Channel'
-import { ChannelMember } from '../../../domain/ChannelMember'
-import { ChannelRepo } from '../../../service/mock/repo/ChannelRepo'
+import {useAuth } from '../../auth/AuthProvider'
 import { useLeaveChannel } from './useLeaveChannel'
 import { useEditChannelName } from './useEditChannelName'
 import { getRandomColor } from '../../utils/channelLogoColor'
 import { Role } from "../../../domain/Role"
 import {useData} from "../../data/DataProvider"
-import {services} from "../../../App"
 import { useChannelDetails } from './useChannelDetails'
 import { CircularProgress } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -82,36 +78,26 @@ export function ChannelDetails() {
                 {editState.name === 'editing' && editState.error}
             </Alert>
         )}
+         {state.name === 'displaying' &&  leaveState.name === 'idle' &&
+                (
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
+                        sx={{ textTransform: 'none', margin: 2 }}>
+                    Back
+                </Button>
+            </Box>)}  
         { state.name === 'loading' || leaveState.name === 'leaving' && (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                 <CircularProgress size="60px" />
                 {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
             </Box>)}
-        {state.name === 'displaying' &&  leaveState.name === 'idle' &&
-            (
-            <Box textAlign="center" mt={5}>
-                <Avatar sx={{ bgcolor: getRandomColor(state.channel.id), width: 100, height: 100, margin: '0 auto', fontSize: 50 }}>
-                {state.channel.name.charAt(0)}
-                </Avatar>
-            </Box>)}
-            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
-                        sx={{ textTransform: 'none', margin: 2 }}>
-                    Back
-                </Button>
-            </Box>
-            { state.name === 'loading' || leaveState.name === 'leaving' && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
-                    <CircularProgress size="60px" />
-                    {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
-                </Box>)}
             {state.name === 'displaying' &&  leaveState.name === 'idle' &&
                 (
                     <Box textAlign="center" mt={5}>
                         <Avatar sx={{ bgcolor: getRandomColor(state.channel.id), width: 100, height: 100, margin: '0 auto', fontSize: 50 }}>
                             {state.channel.name.charAt(0)}
                         </Avatar>
-                    </Box>)}
+                    </Box>)}      
             {state.name === 'displaying' && (editState.name === 'displaying' || editState.name === 'editing') && (
                 <Box
                     sx={{
@@ -236,25 +222,26 @@ export function ChannelDetails() {
                             </Grid>
                         ))}
                     </Grid>
-                    <Button variant="contained" color="error" onClick={() => leaveChannel(state.channel)}
+                    <Box textAlign="center" mt={2} display="inline-grid" flexDirection="column">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSendInvitation}
                             sx={{ mt: 3, textTransform: 'none' }}
-                    >
-                        Leave Channel
-                        <ExitToAppIcon sx={{ mr: 1 }} />
-                    </Button>
-                </Box>
+                        >
+                            Send Invitation
+                        </Button>
+                        <Button variant="contained" color="error" onClick={() => leaveChannel(state.channel)}
+                                sx={{ mt: 3, textTransform: 'none' }}
+                        >
+                            Leave Channel
+                            <ExitToAppIcon sx={{ ml: 1 }} />
+                        </Button>
+                    </Box>
+            </Box>
             )}
 
-            <Box textAlign="center" mt={2}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSendInvitation}
-                    sx={{ mt: 3, textTransform: 'none' }}
-                >
-                    Send Invitation
-                </Button>
-            </Box>
+            
         </Box>
     )
 }

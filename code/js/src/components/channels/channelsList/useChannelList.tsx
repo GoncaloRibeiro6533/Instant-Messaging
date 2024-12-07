@@ -73,7 +73,7 @@ export function useChannelList(): [State, onChange: () => void] {
     const { setChannels, channels } = useData()
     async function loadChannels() {
         if(state.name === "loading") return
-        if(channels.size > 0){
+        if(channels.size > 0) { 
             dispatch({ type: "success", channels })
             return
         }

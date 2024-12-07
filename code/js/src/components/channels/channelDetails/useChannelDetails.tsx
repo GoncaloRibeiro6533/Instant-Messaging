@@ -62,7 +62,7 @@ export function useChannelDetails() : [
 ]{
     const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
     const [auth] = useAuth();
-    const { channels, channelMembers, addChannel, addChannelMember } = useData();
+    const { channels, channelMembers, setChannelMembers, setChannels } = useData();
     const selectedChannelIdRef = React.useRef<number | null>(null);
     async function loadChannel(channelId: string) {
         try {
@@ -86,11 +86,12 @@ export function useChannelDetails() : [
                 return;
             }
             const loadedChannels = loadedChannel === null &&  await services.channelService.getChannelsOfUser(auth.token, auth.user.id);
+
             const channel = loadedChannel || Array.from(loadedChannels.keys()).find(channel => channel.id === parsedId) || null;
             const members =loadedMembers === null && await services.channelService.getChannelMembers(auth.token, parsedId) || loadedMembers
             dispatch({ type: 'load', channelId: parsedId });
-            if(loadedChannel === null) addChannel(channel, members.find(member => member.user.id === auth.user.id).role)
-            if(loadedMembers === null) addChannelMember(parsedId, members)
+            if(loadedChannel === null)  setChannels(loadedChannels)
+            if(loadedMembers === null) setChannelMembers(new Map([[parsedId, members]]))
             if (selectedChannelIdRef.current === parsedId) {
                 dispatch({ type: 'success', channel:channel , members, previouslyLoaded: false });
             }
