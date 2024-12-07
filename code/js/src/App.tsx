@@ -30,6 +30,7 @@ import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
 import { Error } from './components/error/error'
 
+import {InvitationsList} from "./components/invitation/invitationsList";
 
 
 const router = createBrowserRouter(
@@ -138,6 +139,15 @@ const router = createBrowserRouter(
                 <AuthRequire>
                     <MenuAppBar />
                     <RegisterInvitation />
+                </AuthRequire>
+            )
+        },
+        {
+            "path": "/invitations",
+            "element": (
+                <AuthRequire>
+                    <MenuAppBar />
+                    <InvitationsList />
                 </AuthRequire>
             )
         }

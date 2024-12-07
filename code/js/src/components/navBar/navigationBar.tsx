@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/Inbox';
 import LoginIcon from '@mui/icons-material/Login';
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
@@ -20,12 +19,15 @@ import { useNavigate } from 'react-router-dom';
 import { Add, Chat, Close } from "@mui/icons-material";
 import { AuthContext } from '../auth/AuthProvider';
 import { LogoutButton } from '../logout/logoutButton';
-import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
+import { useData } from '../data/DataProvider';
 
 export default function MenuDrawer() {
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const navigate = useNavigate();
     const { user } = React.useContext(AuthContext);
+    const { invitations } = useData();
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -47,21 +49,28 @@ export default function MenuDrawer() {
         menuItems.push(
             { label: 'Channels List', path: '/channels', icon: <Chat /> },
             { label: 'Create Channel', path: '/createChannel', icon: <Add /> },
-            { label: 'My Channel Invitations', path: '/invitations', icon: <NotificationAddIcon /> }
+            {
+                label: 'My Channel Invitations',
+                path: '/invitations',
+                icon: (
+                    <Badge badgeContent={invitations.length} color="error">
+                        <NotificationsIcon />
+                    </Badge>
+                ),
+            }
         );
     } else {
         menuItems.push({ label: 'Login', path: '/login', icon: <LoginIcon /> });
     }
 
     return (
-        <Box sx={{flexGrow: 1, margin: 0, padding: 0 }}>
+        <Box sx={{ flexGrow: 1, margin: 0, padding: 0 }}>
             <AppBar position="static"
                     sx={{
                         backgroundColor: '#13161a',
                         color: '#FFFFFF',
                     }}>
                 <Toolbar>
-                    {/* Menu Icon to toggle Drawer */}
                     <IconButton
                         size="large"
                         edge="start"
@@ -72,12 +81,9 @@ export default function MenuDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    {/* Title */}
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         ChImp
                     </Typography>
-
-                    {/* Account Circle */}
                     <IconButton
                         size="large"
                         aria-label="account of current user"
@@ -88,8 +94,6 @@ export default function MenuDrawer() {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-
-            {/* Drawer Component */}
             <Drawer
                 anchor="left"
                 open={isDrawerOpen}
@@ -99,10 +103,10 @@ export default function MenuDrawer() {
                         width: 250,
                         backgroundColor: '#242424',
                         color: '#FFFFFF',
-                        margin: 0, // Remove margens
-                        padding: 0, // Remove preenchimentos
-                        boxSizing: 'border-box', // Garante alinhamento
-                        height: '100vh', // Ocupa altura total
+                        margin: 0,
+                        padding: 0,
+                        boxSizing: 'border-box',
+                        height: '100vh',
                     },
                 }}
             >
@@ -110,15 +114,13 @@ export default function MenuDrawer() {
                     role="presentation"
                     onClick={toggleDrawer(false)}
                     onKeyDown={toggleDrawer(false)}
-                    sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}  // Ensure the Box takes up full height
+                    sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
                 >
-
-                    {/* Menu items */}
                     <List sx={{ flexGrow: 1 }}>
                         <ListItem>
                             <ListItemButton onClick={toggleDrawer(false)}
-                                            sx={{ '&:hover': { backgroundColor: '#333' },}}>
-                                <ListItemIcon sx={{color: '#FFFFFF'}}>
+                                            sx={{ '&:hover': { backgroundColor: '#333' }, }}>
+                                <ListItemIcon sx={{ color: '#FFFFFF' }}>
                                     <Close />
                                 </ListItemIcon>
                                 <ListItemText primary="Close" />
@@ -132,7 +134,7 @@ export default function MenuDrawer() {
                                         '&:hover': { backgroundColor: '#333' },
                                     }}
                                 >
-                                    <ListItemIcon sx={{color: '#FFFFFF'}}>
+                                    <ListItemIcon sx={{ color: '#FFFFFF' }}>
                                         {item.icon}
                                     </ListItemIcon>
                                     <ListItemText primary={item.label} />
@@ -140,8 +142,6 @@ export default function MenuDrawer() {
                             </ListItem>
                         ))}
                     </List>
-
-                    {/* Logout Button */}
                     <ListItem sx={{
                         marginTop: 'auto',
                         marginBottom: '60px',
