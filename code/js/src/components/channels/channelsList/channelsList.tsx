@@ -52,22 +52,6 @@ export function ChannelsList() {
     const [open, setOpen] = useState(false);
     const [selectedChannel, setSelectedChannel] = useState<any>(null);
 
-    const handleOpenDialog = (channel: any) => {
-        setSelectedChannel(channel);
-        setOpen(true);
-    };
-
-    const handleCloseDialog = () => {
-        setOpen(false);
-        setSelectedChannel(null);
-    };
-
-    const handleConfirmJoin = () => {
-        if (selectedChannel) {
-            handlejoinChannel(selectedChannel);
-        }
-        setOpen(false);
-    };
     async function handlejoinChannel(channel: Channel) {
         try {
             await services.channelService.joinChannel(channel.id, Role.READ_WRITE);
@@ -126,7 +110,8 @@ export function ChannelsList() {
                                     if (Array.from(channels.keys()).find((c) => c.id === channel.id)) {
                                         navigate("/channels/channel/" + String(channel.id));
                                     } else {
-                                        handleOpenDialog(channel)
+                                        <Typography variant="h6" sx={{ textAlign: 'center' }}>Click to join channel</Typography>
+                                       handlejoinChannel(channel);
                                     }
                                 }}>
                                     <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>

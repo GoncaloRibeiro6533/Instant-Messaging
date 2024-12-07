@@ -12,9 +12,9 @@ export function InvitationsList() {
 
     React.useEffect(() => {
         const fetchInvitations = async () => {
-            if (user.token) {
+            if (user) {
                 try {
-                    const fetchedInvitations = await services.invitationService.getInvitationsOfUser(user.token);
+                    const fetchedInvitations = await services.invitationService.getInvitationsOfUser();
                     setInvitations(fetchedInvitations);
                 } catch (error) {
                     console.error('Error fetching invitations:', error);
@@ -22,11 +22,11 @@ export function InvitationsList() {
             }
         };
         fetchInvitations();
-    }, [user.token]);
+    }, [user]);
 
     const handleAccept = async (invitationId: number) => {
         try {
-            await services.invitationService.acceptChannelInvitation(user.token, invitationId);
+            await services.invitationService.acceptChannelInvitation(invitationId);
             setInvitations(invitations.filter(invitation => invitation.id !== invitationId));
         } catch (error) {
             console.error('Error accepting invitation:', error);
@@ -35,7 +35,7 @@ export function InvitationsList() {
 
     const handleDecline = async (invitationId: number) => {
         try {
-            await services.invitationService.declineChannelInvitation(user.token, invitationId);
+            await services.invitationService.declineChannelInvitation(invitationId);
             setInvitations(invitations.filter(invitation => invitation.id !== invitationId));
         } catch (error) {
             console.error('Error declining invitation:', error);
