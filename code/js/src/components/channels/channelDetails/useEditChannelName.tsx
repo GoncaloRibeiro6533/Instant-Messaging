@@ -6,8 +6,8 @@ import { Channel } from "../../../domain/Channel";
 type State =
     { name: "idle" }
     | { name: "displaying", channel: Channel, newChannelName: string }
-    | { name: "editing", error?: string, channel: Channel, newChannelName: string } 
-    | { name: "submitting", channel: Channel, newChannelName: string }	
+    | { name: "editing", error?: string, channel: Channel, newChannelName: string }
+    | { name: "submitting", channel: Channel, newChannelName: string }
     | { name: "success", channel: Channel }
     | { name: "error", error: string, channel: Channel };
 
@@ -74,12 +74,12 @@ function reduce(state: State, action: Action): State {
     }
 }
 
-export function useEditChannelName(): [State, { 
-    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
-    onChange: (channel: Channel, ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void, 
+export function useEditChannelName(): [State, {
+    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>,
+    onChange: (channel: Channel, ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
     onEdit: (channel: Channel) => void,
     onCancel: () => void
-    }]  {
+}]  {
     const [state, dispatch] = React.useReducer(reduce, { name: "idle"})
     const [user, setUserAuth] = useAuth()
     async function onSubmit() {
@@ -92,9 +92,9 @@ export function useEditChannelName(): [State, {
             dispatch({ type: "error", error: e.message, channel: state.channel })
         }
     }
-    function onChange(channel: Channel, ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { 
+    function onChange(channel: Channel, ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         dispatch({ type: "edit", channel: channel,value: ev.target.value.trim() })
-    } 
+    }
     function onEdit(channel: Channel) {
         dispatch({ type: "edit", channel: channel, value: channel.name })
     }

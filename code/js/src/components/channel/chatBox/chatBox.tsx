@@ -10,7 +10,7 @@ import { useChatBox } from "./useChatBox"
 import { useRef } from "react"
 
 export function ChatBox(props : {channel: Channel}) {
-    const [state, loadMessagesHandler] = useChatBox(props.channel)  
+    const [state, loadMessagesHandler] = useChatBox(props.channel)
     const { messages } = useData()
     const channelMessages = messages.get(props.channel.id) || []
     const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -19,7 +19,7 @@ export function ChatBox(props : {channel: Channel}) {
         const previousScroll = container.scrollTop
         const previousScrollHeight = container.scrollHeight
         if (Math.abs(container.scrollHeight -container.clientHeight - Math.abs(container.scrollTop)) <= 100
-        && state.name === "displaying"){
+            && state.name === "displaying"){
             loadMessagesHandler()
             container.scrollTop = previousScroll - (container.scrollHeight - previousScrollHeight)
         }
@@ -49,12 +49,12 @@ export function ChatBox(props : {channel: Channel}) {
             >
                 {channelMessages.map((message, index) => {
                     const showChip =
-                        index === channelMessages.length - 1|| 
-                       message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay()
+                        index === channelMessages.length - 1||
+                        message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay()
                     return (
                         <React.Fragment key={index}>
-                        <Message message={message} />
-                        {showChip && (
+                            <Message message={message} />
+                            {showChip && (
                                 <Divider>
                                     <Chip
                                         label={new Intl.DateTimeFormat(['ban', 'id']).format(message.timestamp)}
@@ -63,7 +63,7 @@ export function ChatBox(props : {channel: Channel}) {
                                             marginTop: 1,
                                             width: '100px',
                                             height: '30px',
-                                            display: 'block', 
+                                            display: 'block',
                                             marginLeft: 'auto',
                                             marginRight: 'auto',
                                             textAlign: 'center',
@@ -72,27 +72,27 @@ export function ChatBox(props : {channel: Channel}) {
                                             alignContent: 'center',
                                         }}
                                     />
-                                </Divider>       
+                                </Divider>
                             )}
-                </React.Fragment>
-            )
-        })}
-              {state.name === 'loading' && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
-                    <CircularProgress size="30px" />
-                </Box>)}
-              {state.name === 'finished' && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
-                    <Chip
-                        label="Start of the conversation"
-                        variant="outlined"
-                        sx={{ 
-                            marginTop: 1,  
-                            backgroundColor: '#171E27',
-                            color: '#ffffff', // Cor do texto, 
+                        </React.Fragment>
+                    )
+                })}
+                {state.name === 'loading' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                        <CircularProgress size="30px" />
+                    </Box>)}
+                {state.name === 'finished' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                        <Chip
+                            label="Start of the conversation"
+                            variant="outlined"
+                            sx={{
+                                marginTop: 1,
+                                backgroundColor: '#171E27',
+                                color: '#ffffff', // Cor do texto,
                             }}
-                    />
-                </Box>)} 
+                        />
+                    </Box>)}
             </Box>
             <ChatTextField channel={props.channel}/>
 
