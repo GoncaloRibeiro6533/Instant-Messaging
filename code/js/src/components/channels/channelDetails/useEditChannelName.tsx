@@ -39,7 +39,7 @@ function reduce(state: State, action: Action): State {
         }
         case "editing": {
             if (action.type === "edit") {
-                return { ...state, newChannelName: action.value, error: undefined }; // Limpa o erro ao editar
+                return { ...state, newChannelName: action.value, error: undefined };
             } else if (action.type === "submit") {
                 return { name: "submitting", channel: state.channel, newChannelName: state.newChannelName };
             } else if (action.type === "cancel") {

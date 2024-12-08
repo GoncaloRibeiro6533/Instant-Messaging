@@ -2,7 +2,6 @@
 import * as React from "react"
 import { services } from "../../../App"
 import { Channel } from "../../../domain/Channel"
-import {AuthContext} from "../../auth/AuthProvider"
 import {Role} from "../../../domain/Role"
 import {useData} from "../../data/DataProvider"
 import { useError } from "../../error/errorProvider"
@@ -14,7 +13,7 @@ type State =
     | { name: "loading" }
     | { name: "loaded", channels: Map<Channel,Role> }
     | { name: "error", message: string }
-    | { name: "stopped" }    
+    | { name: "stopped" }
 
 type Action =
     | { type: "load" }
@@ -31,7 +30,7 @@ function reduce(state: State, action: Action): State {
             if (action.type === "success") {
                 return { name: "loaded", channels: action.channels }
             }
-            return state    
+            return state
         case "loading":
             if (action.type === "stop") {
                 return { name: "stopped" }
@@ -64,7 +63,7 @@ function reduce(state: State, action: Action): State {
             if (action.type === "success") {
                 return { name: "loaded", channels: action.channels }
             }
-            return state    
+            return state
         default:
             return state
     }
@@ -79,7 +78,7 @@ export function useChannelList(): [State, onChange: () => void] {
     const { clear } = useData()
     async function loadChannels() {
         if(state.name === "loading") return
-        if(channels.size > 0) { 
+        if(channels.size > 0) {
             dispatch({ type: "success", channels })
             return
         }
@@ -87,8 +86,8 @@ export function useChannelList(): [State, onChange: () => void] {
         try {
             const channels = await services.channelService.getChannelsOfUser(user.id)
             if(channels.size > 0) {
-            setChannels(channels)
-            dispatch({ type: "success", channels })
+                setChannels(channels)
+                dispatch({ type: "success", channels })
             } else {
                 dispatch ({ type: "stop" })
                 return
@@ -102,7 +101,7 @@ export function useChannelList(): [State, onChange: () => void] {
                 return
             }
             if(e.message === "Failed to fetch") {
-              //  setError("Failed to connect to the server")
+                //  setError("Failed to connect to the server")
                 dispatch({ type: "error", message: "Failed to connect to the server" })
             }
             dispatch({ type: "error", message: e.message })

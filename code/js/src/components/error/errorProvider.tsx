@@ -1,6 +1,5 @@
-import { recomposeColor } from '@mui/material'
 import * as React from 'react'
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState } from 'react'
 
 
 export type AppError = {
@@ -8,18 +7,15 @@ export type AppError = {
     message: string,
 }
 
-
 type ErrorContextType = {
-    error: AppError | undefined,    
+    error: AppError | undefined,
     setError: (error: AppError | undefined) => void
 }
-
 
 export const ErrorContext = createContext<ErrorContextType>({
     error: undefined,
     setError: () => {},
 })
-
 
 export function ErrorProvider({ children }: { children: React.ReactNode }) : React.JSX.Element {
     const [error, setError] = useState<AppError | undefined>(undefined)

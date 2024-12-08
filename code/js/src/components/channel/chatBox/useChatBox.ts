@@ -4,14 +4,13 @@ import { useData } from "../../data/DataProvider"
 import * as React from 'react'
 import { services } from "../../../App"
 
-
-type State = 
+type State =
     | { name: 'finished', nMessages: number }
     | { name:'displaying', nMessages: number }
     | { name:'loading', nMessages: number }
     | { name:'error', message: string, nMessages: number }
 
-type Action = 
+type Action =
     | { type: 'load'}
     | { type: 'error', message: string }
     | { type: 'add', nMessages: number }
@@ -45,14 +44,14 @@ function reduce(state: State, action: Action): State {
         case 'error':
             return state
     }
-}    
+}
 
 
 export function useChatBox(channel: Channel): [
     State,
     loadMessagesHandler: () => void
 ] {
-    
+
     const { messages, loadMessages } = useData()
     const channelMessages = messages.get(channel.id).length || 0
     const [state, dispatch] = React.useReducer(reduce, { name: 'displaying', nMessages:  channelMessages })
@@ -64,7 +63,7 @@ export function useChatBox(channel: Channel): [
         try {
             const retrievedMessages = await services.messageService.getMessages(channel.id, 30, state.nMessages)
             if (retrievedMessages.length === 0) {
-               dispatch({ type: 'finish' })
+                dispatch({ type: 'finish' })
                 return
             }
             loadMessages(channel, retrievedMessages)

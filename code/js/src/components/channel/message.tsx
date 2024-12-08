@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Message as MessageType } from "../../domain/Message";
 import { Box, Avatar, Typography, Paper } from '@mui/material';
-import { AuthContext, useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../auth/AuthProvider";
 
 export function Message(props: { message: MessageType }) {
-    const [ user] = useAuth() // Get current user from context
-    const isCurrentUser = user.username === props.message.sender.username; // Check if message is from current user
+    const [ user] = useAuth()
+    const isCurrentUser = user.username === props.message.sender.username
 
     return (
         <Box
@@ -36,15 +36,15 @@ export function Message(props: { message: MessageType }) {
                         padding: 1.5,
                         marginTop: 0.5,
                         wordWrap: "break-word",
-                        backgroundColor: isCurrentUser ? "#4CAF50" : "#E5E5E5", // Green for current user, gray for others
+                        backgroundColor: isCurrentUser ? "#4CAF50" : "#E5E5E5",
                         color: isCurrentUser ? "white" : "black",
                         borderRadius: 2,
                         maxWidth: "100%",
                         display: "flex",
                         flexDirection: "column",
-                        justifyContent: "flex-start", // Ensure the message content is aligned to the top
-                        position: "relative", // Ensure timestamp is absolute relative to Paper
-                        paddingBottom: "24px", // Add some bottom padding to ensure space for timestamp
+                        justifyContent: "flex-start",
+                        position: "relative",
+                        paddingBottom: "24px",
                     }}
                 >
                     {/* Sender Username */}
@@ -76,13 +76,11 @@ export function Message(props: { message: MessageType }) {
                     >
                         {props.message.content}
                     </Typography>
-
-                    {/* Timestamp positioned at the bottom-right corner */}
                     <Box
                         sx={{
-                            position: "absolute", // Position timestamp absolutely within Paper
-                            bottom: 4, // Distance from the bottom of the Paper
-                            right: 8,  // Distance from the right side of the Paper
+                            position: "absolute",
+                            bottom: 4,
+                            right: 8,
                         }}
                     >
                         <Typography
@@ -98,4 +96,4 @@ export function Message(props: { message: MessageType }) {
             </Box>
         </Box>
     );
-};
+}

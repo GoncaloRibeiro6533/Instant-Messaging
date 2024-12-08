@@ -1,10 +1,8 @@
 import { Alert, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import * as React from 'react'
-import { createContext, useState, useEffect } from 'react'
-import { AppError, useError } from '../error/errorProvider'
-
-
+import { useEffect } from 'react'
+import { useError } from './errorProvider'
 
 export function Error() {
     const [error, setError] = useError()
@@ -21,26 +19,26 @@ export function Error() {
     return (
         <>
             {error && (
-                <Alert severity="error" 
-                sx={{ 
-                    position: 'fixed', 
-                    top: 100, 
-                    left: '50%', 
-                    transform: 'translateX(-50%)', 
-                    zIndex: 1300, 
-                    width: '70%', 
-                    maxWidth: '90%', 
-                    boxShadow: 3, 
-                }}
-                    action={
-                        <IconButton
-                            size="small"
-                            color="inherit"
-                            onClick={() => setError(undefined)}
-                        >
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
-                    }>
+                <Alert severity="error"
+                       sx={{
+                           position: 'fixed',
+                           top: 100,
+                           left: '50%',
+                           transform: 'translateX(-50%)',
+                           zIndex: 1300,
+                           width: '70%',
+                           maxWidth: '90%',
+                           boxShadow: 3,
+                       }}
+                       action={
+                           <IconButton
+                               size="small"
+                               color="inherit"
+                               onClick={() => setError(undefined)}
+                           >
+                               <CloseIcon fontSize="small" />
+                           </IconButton>
+                       }>
                     {error.message}
                 </Alert>
             )}

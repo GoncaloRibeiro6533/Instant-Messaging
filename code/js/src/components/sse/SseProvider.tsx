@@ -8,10 +8,7 @@ import { Channel } from '../../domain/Channel'
 import { Visibility } from '../../domain/Visibility'
 import { ChannelMember } from '../../domain/ChannelMember'
 import { Role } from '../../domain/Role'
-import { Invitation } from '../../domain/Invitation'
 import { ChannelInvitation } from '../../domain/ChannelInvitation'
-
-
 
 type AppNotification = {
     id: number,
@@ -25,7 +22,6 @@ type SseContextType = {
     deleteNotification: (id: number) => void
 }
 
-
 export const SseContext = createContext<SseContextType>({
     sse: undefined,
     setSse: () => {},
@@ -36,31 +32,30 @@ export const SseContext = createContext<SseContextType>({
 export function SseProvider({ children }: { children: React.ReactNode }) : React.JSX.Element {
     const [sse, setSse] = useState<EventSource | undefined>(undefined)
     const [notifications, setNotifications] = useState<AppNotification[]>([])
-    const [ user ] = useAuth();	
-    const { 
-        addMessages, 
-        updateChannel, 
-        removeChannelMember, 
+    const [ user ] = useAuth();
+    const {
+        addMessages,
+        updateChannel,
+        removeChannelMember,
         addChannelMember,
         addInvitation,
     } = useData()
-    
+
     function addNotification(id:number, message: string) {
         setNotifications([...notifications, { id, message }])
     }
     function deleteNotification(id: number) {
         setNotifications(
             notifications.filter(notification => notification.id !== id)
-            )
-        }
-
+        )
+    }
 
     useEffect(() => {
         if(user === undefined) return
         const eventSource = new EventSource(`http://localhost:8080/api/sse/listen`,{
-            withCredentials: true, 
+            withCredentials: true,
         });
-        
+
         eventSource.addEventListener('NewChannelMessage', (event) => {
             const data  = JSON.parse(event.data)
             const message = messageMapper(data.message)
@@ -114,7 +109,6 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
 
     } , [user])
 
-
     return (
         <SseContext.Provider value={{ sse, setSse, notifications, deleteNotification }}>
             {children}
@@ -162,8 +156,8 @@ function userMapper(json: any): User {
 
 function memberMapper(user: any, role: any): ChannelMember {
     return {
-       user: userMapper(user), 
-       role: Role[role as keyof typeof Role]
+        user: userMapper(user),
+        role: Role[role as keyof typeof Role]
     }
 }
 
@@ -182,5 +176,4 @@ function invitationMapper(json: any): ChannelInvitation {
         isUsed: json.isUsed,
         timestamp
     } as const
-    
 }

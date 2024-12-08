@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export function InvitationOptions() {
@@ -11,20 +11,18 @@ export function InvitationOptions() {
     const handleInvitationExistingUser = () => {
         console.log('Invite existing user', { channel, token });
         navigate('/invitation/channel', { state: { channel, token } })
-
-    };
+    }
 
     const handleInvitationNewUser = () => {
         console.log('Invite new user', { channel, token });
-        navigate('/invitation/register', { state: { channel, token } });
-    };
+        navigate('/invitation/register', { state: { channel, token } })
+    }
 
     const handleBackClick = () => {
-        navigate('/channel/' + channel.id);
-    };
+        navigate('/channel/' + channel.id)
+    }
 
     return (
-
         <Box
             display="flex"
             flexDirection="column"
@@ -48,13 +46,15 @@ export function InvitationOptions() {
                     </Typography>
                 </CardContent>
                 <CardActions sx={{ flexDirection: 'column', gap: 2 }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleInvitationExistingUser}
-                    >
-                        Invite existing user to this channel
-                    </Button>
+                    {channel.visibility !== 'PUBLIC' && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleInvitationExistingUser}
+                        >
+                            Invite existing user to this channel
+                        </Button>
+                    )}
                     <Button
                         variant="contained"
                         color="secondary"

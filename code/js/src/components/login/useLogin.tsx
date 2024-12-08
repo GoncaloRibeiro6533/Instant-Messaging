@@ -3,15 +3,15 @@ import { useAuth } from "../auth/AuthProvider"
 import { services } from "../../App"
 import { useError } from "../error/errorProvider"
 
-type State = 
+type State =
     {name: "editing", error?: string, username: string, password: string, } |
-    {name: "submitting", username: string, password: string } | 
+    {name: "submitting", username: string, password: string } |
     {name: "redirecting", username: string, password: string}
 
-type Action = 
-    { type: "edit", field: "username" | "password", value: string } 
-    | { type: "submit" } 
-    | { type: "success" } 
+type Action =
+    { type: "edit", field: "username" | "password", value: string }
+    | { type: "submit" }
+    | { type: "success" }
     | { type: "error" , message: string }
     | { type: "redirect" }
 
@@ -39,19 +39,19 @@ function reduce(state: State, action: Action): State {
         case "redirecting": {
             return state
         }
-        
+
     }
 }
 
-export function useLogin() : [State, { 
-    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>, 
-    onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void 
+export function useLogin() : [State, {
+    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => Promise<void>,
+    onChange: (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }] {
-    
-   const [state, dispatch] = React.useReducer(reduce, 
-        { 
+
+    const [state, dispatch] = React.useReducer(reduce,
+        {
             name: "editing",
-            username: "", 
+            username: "",
             password: "" ,
             error: undefined
         })
@@ -61,7 +61,7 @@ export function useLogin() : [State, {
         ev.preventDefault()
         if (state.name !== "editing") {
             return
-        } 
+        }
         dispatch({ type: "submit" })
         const username = state.username
         const password = state.password
@@ -70,14 +70,14 @@ export function useLogin() : [State, {
             if (user !== undefined) {
                 setUser(user)
                 dispatch({ type: "success" })
-           } else {
+            } else {
                 dispatch({ type: "error", message: "Invalid username or password" })
             }
         } catch (e) {
             //setError(e.message)
             dispatch({ type: "error", message: e.message })
         }
-    }    
+    }
     function onChange(ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) { dispatch({ type: "edit", field: ev.currentTarget.name as "username" | "password", value: ev.currentTarget.value }) }
     return[
         state,
@@ -86,5 +86,5 @@ export function useLogin() : [State, {
             onChange: onChange
         }
     ]
-    }
+}
     

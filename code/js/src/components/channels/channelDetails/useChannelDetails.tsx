@@ -1,4 +1,3 @@
-
 import { useData } from "../../data/DataProvider";
 import { useAuth } from "../../auth/AuthProvider";
 import { Channel } from "../../../domain/Channel";
@@ -101,5 +100,4 @@ export function useChannelDetails() : [
         }
     }
     return [state, loadChannel]
-
 }

@@ -53,7 +53,7 @@ export const DataContext = React.createContext<DataContextType>({
 })
 
 export function DataProvider({ children }: { children: React.ReactNode }) : React.JSX.Element {
-   
+
     //Initial state
     const initialChannels = new Map()
     const initialMessages =  new Map()
@@ -180,7 +180,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             removeChannelMember,
             loadMessages,
             setChannelMembers
-            }}>
+        }}>
             {children}
         </DataContext.Provider>
     )

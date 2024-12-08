@@ -6,7 +6,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useRegisterFirstUser } from './useRegisterFirstUser';
 import Logo from '../../../public/logo.png';
 
-
 export function RegisterFirstUser() {
     const [state, handlers] = useRegisterFirstUser()
     if (state.name === 'redirecting') {
@@ -22,7 +21,7 @@ export function RegisterFirstUser() {
             bgcolor="#f5f5f5"
             padding={2}
         >
-             {state.name === 'submitting' && (
+            {state.name === 'submitting' && (
                 <Box
                     position="absolute"
                     top={0}
@@ -45,19 +44,17 @@ export function RegisterFirstUser() {
                     maxWidth: 400,
                     width: '100%',
                     textAlign: 'center',
-                }}
-            >
+                }}>
                 {state.name === 'editing' && state.error && (
-            <Alert 
-                severity="error" 
-                sx={{ 
-                    padding: 2,
-                    marginBottom: 2,
-                }}
-            >
-                {state.error}.
-            </Alert>
-            )}
+                    <Alert
+                        severity="error"
+                        sx={{
+                            padding: 2,
+                            marginBottom: 2,
+                        }}>
+                        {state.error}.
+                    </Alert>
+                )}
                 <img src={Logo} alt="Logo" width={250} style={{ marginBottom: 16 }} />
                 <Typography variant="h5" component="h1" gutterBottom>
                     Register
@@ -96,7 +93,7 @@ export function RegisterFirstUser() {
                                 fullWidth
                                 variant="outlined"
                             />
-                             <TextField
+                            <TextField
                                 id="confirmPassword"
                                 label="Confirm Password"
                                 type="password"

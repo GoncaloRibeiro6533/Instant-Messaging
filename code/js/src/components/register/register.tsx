@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,7 +23,7 @@ export function Register() {
             bgcolor="#f5f5f5"
             padding={2}
         >
-             {state.name === 'submitting' && (
+            {state.name === 'submitting' && (
                 <Box
                     position="absolute"
                     top={0}
@@ -49,16 +49,16 @@ export function Register() {
                 }}
             >
                 {state.name === 'editing' && state.error && (
-            <Alert 
-                severity="error" 
-                sx={{ 
-                    padding: 2,
-                    marginBottom: 2,
-                }}
-            >
-                {state.error}.
-            </Alert>
-            )}
+                    <Alert
+                        severity="error"
+                        sx={{
+                            padding: 2,
+                            marginBottom: 2,
+                        }}
+                    >
+                        {state.error}.
+                    </Alert>
+                )}
                 <img src={Logo} alt="Logo" width={250} style={{ marginBottom: 16 }} />
                 <Typography variant="h5" component="h1" gutterBottom>
                     Register
@@ -97,7 +97,7 @@ export function Register() {
                                 fullWidth
                                 variant="outlined"
                             />
-                             <TextField
+                            <TextField
                                 id="confirmPassword"
                                 label="Confirm Password"
                                 type="password"

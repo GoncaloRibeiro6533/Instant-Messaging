@@ -7,7 +7,6 @@ import { useData } from "../../data/DataProvider"
 import { Channel } from "../../../domain/Channel"
 import { Divider } from "@mui/material"
 import { useChatBox } from "./useChatBox"
-import { useRef } from "react"
 
 export function ChatBox(props : {channel: Channel}) {
     const [state, loadMessagesHandler] = useChatBox(props.channel)
@@ -94,7 +93,6 @@ export function ChatBox(props : {channel: Channel}) {
                     </Box>)}
             </Box>
             <ChatTextField channel={props.channel}/>
-
         </Box>
     )
 }

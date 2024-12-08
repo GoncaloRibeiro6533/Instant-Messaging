@@ -25,7 +25,7 @@ export function Login() {
             bgcolor="#f5f5f5"
             padding={2}
         >
-             {state.name === 'submitting' && (
+            {state.name === 'submitting' && (
                 <Box
                     position="absolute"
                     top={0}
@@ -50,17 +50,17 @@ export function Login() {
                     textAlign: 'center',
                 }}
             >
-                   {state.name === 'editing' && state.error && (
-                        <Alert 
-                            severity="error" 
-                            sx={{ 
-                                padding: 2,
-                                marginBottom: 2,
-                            }}
-                        >
-                            {state.error}.
-                        </Alert>
-                    )}
+                {state.name === 'editing' && state.error && (
+                    <Alert
+                        severity="error"
+                        sx={{
+                            padding: 2,
+                            marginBottom: 2,
+                        }}
+                    >
+                        {state.error}.
+                    </Alert>
+                )}
                 <img src={Logo} alt="Logo" width={250} style={{ marginBottom: 16 }} />
                 <Typography variant="h5" component="h1" gutterBottom>
                     Login

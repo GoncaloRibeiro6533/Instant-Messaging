@@ -48,7 +48,6 @@ export function ChannelDetails() {
         navigate('/channels/channel/' + channelId);
     };
 
-    //todo fix this, its here to show what this button does
     const handleSendInvitation = () => {
         if (state.name !== "error") {
             if (state.name !== "loading") {
@@ -237,27 +236,6 @@ export function ChannelDetails() {
                     </Box>
             </Box>
             )}
-
-            
         </Box>
     )
 }
-
-
- {/*
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/invitation', { state: { channel, token: user.token } })}
-                style={{ display: 'block', margin: '10px auto' }}
-            >
-                Send Invitation
-            </Button>
-            <Snackbar
-                open={openSnackbar}
-                message={invitationMessage}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                autoHideDuration={5000}
-                onClose={() => setOpenSnackbar(false)}
-            />
-        </Box>*/}
