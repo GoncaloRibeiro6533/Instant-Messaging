@@ -15,7 +15,6 @@ import {useLocation} from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import {Outlet} from 'react-router-dom';
 import {Role} from '../../../domain/Role';
-import {ChannelMember} from '../../../domain/ChannelMember';
 import { useData } from '../../data/DataProvider';
 import { useState } from 'react';
 
@@ -33,6 +32,7 @@ export function ChannelsList() {
     React.useEffect(() => {
         loadChannels()
     }, [user.id, channels]);
+
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const term = event.target.value;
         setSearchChannels(term);
@@ -52,7 +52,7 @@ export function ChannelsList() {
     const [open, setOpen] = useState(false);
     const [selectedChannel, setSelectedChannel] = useState<any>(null);
 
-    async function handlejoinChannel(channel: Channel) {
+    async function handleJoinChannel(channel: Channel) {
         try {
             await services.channelService.joinChannel(channel.id, Role.READ_WRITE);
             addChannel(channel, Role.READ_WRITE);
@@ -64,7 +64,8 @@ export function ChannelsList() {
     }
 
     
-    const channelsToDisplay = searchChannels.trim() ? searchResults : (state.name == 'loaded' && Array.from(channels.keys()))
+    const channelsToDisplay = searchChannels.trim()
+        ? searchResults : (state.name == 'loaded' && Array.from(channels.keys()))
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
             <Box sx={{ width: '320px', borderRight: '1px solid #ddd', padding: '10px' }}>
@@ -104,48 +105,56 @@ export function ChannelsList() {
                 {state.name === 'loaded' && (
                 <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <List>
-                        {channelsToDisplay.map((channel) => (
-                            <React.Fragment key={channel.id}>
-                                <ListItemButton onClick={() => {
-                                    if (Array.from(channels.keys()).find((c) => c.id === channel.id)) {
-                                        navigate("/channels/channel/" + String(channel.id));
-                                    } else {
-                                        <Typography variant="h6" sx={{ textAlign: 'center' }}>Click to join channel</Typography>
-                                       handlejoinChannel(channel);
-                                    }
-                                }}>
-                                    <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
-                                        {channel.name.charAt(0)}
-                                    </Avatar>
-                                    <ListItem sx={{ marginTop: 1 }}>
-                                        <Typography
-                                            variant="body1"
-                                            component="div"
-                                            sx={{
-                                                marginRight: 2,
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                maxWidth: '120px',
-                                                minWidth: '120px',
-                                            }}
-                                        >
-                                            {channel.name}
-                                        </Typography>
-                                        <Chip
-                                            label={channel.visibility}
-                                            size="small"
-                                            sx={{
-                                                marginTop: 1,
-                                                backgroundColor:
-                                                    channel.visibility === Visibility.PUBLIC ? '#32B7A3' : '#E8556D',
-                                            }}
-                                        />
-                                    </ListItem>
-                                </ListItemButton>
-                                <Divider />
-                            </React.Fragment>
-                        ))}
+                        {channelsToDisplay.map((channel) => {
+                            const isUserInChannel = Array.from(channels.keys()).some((c) => c.id === channel.id);
+                            return (
+                                <React.Fragment key={channel.id}>
+                                    <ListItemButton onClick={() => {
+                                        if (isUserInChannel) {
+                                            navigate("/channels/channel/" + String(channel.id));
+                                        } else {
+                                            handleJoinChannel(channel);
+                                        }
+                                    }}>
+                                        <Avatar sx={{ bgcolor: getRandomColor(channel.id) }}>
+                                            {channel.name.charAt(0)}
+                                        </Avatar>
+                                        <ListItem sx={{ marginTop: 1, flexDirection: 'column', alignItems: 'flex-start' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                                                <Typography
+                                                    variant="body1"
+                                                    component="div"
+                                                    sx={{
+                                                        marginRight: 2,
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        maxWidth: '120px',
+                                                        minWidth: '120px',
+                                                    }}
+                                                >
+                                                    {channel.name}
+                                                </Typography>
+                                                <Chip
+                                                    label={channel.visibility}
+                                                    size="small"
+                                                    sx={{
+                                                        backgroundColor:
+                                                            channel.visibility === Visibility.PUBLIC ? '#32B7A3' : '#E8556D',
+                                                    }}
+                                                />
+                                            </Box>
+                                            {!isUserInChannel && (
+                                                <Typography variant="body2" color="textSecondary" sx={{ marginTop: 1 }}>
+                                                    You are not in this channel
+                                                </Typography>
+                                            )}
+                                        </ListItem>
+                                    </ListItemButton>
+                                    <Divider />
+                                </React.Fragment>
+                            );
+                        })}
                     </List>
                 </Box>)}
             </Box>

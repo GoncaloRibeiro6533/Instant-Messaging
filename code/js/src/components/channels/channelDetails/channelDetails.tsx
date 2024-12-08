@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {useNavigate, useLocation, useParams} from 'react-router-dom'
-import { Box, Button, Typography, TextField, Avatar, Snackbar, Chip, Grid, Alert } from '@mui/material'
+import { Box, Button, Typography, TextField, Avatar, Chip, Grid, Alert } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import { Edit } from "@mui/icons-material"
 import {useAuth } from '../../auth/AuthProvider'
@@ -29,10 +29,7 @@ export function ChannelDetails() {
         loadChannel(channelId)
     }, [channels, channelId, channelMembers])
 
-    /*React.useEffect(() => {
-        setNewChannelName(channel.name)
-    }, [channel.name, setNewChannelName])
-
+    /*
     React.useEffect(() => {
         if (location.state?.invitedUser) {
             setInvitationMessage(`${location.state.invitedUser} invited to channel!`)

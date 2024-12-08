@@ -6,10 +6,11 @@ import { Role } from '../../domain/Role';
 import { services } from "../../App";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {useAuth} from "../auth/AuthProvider";
+import Alert from "@mui/material/Alert";
 
 export function RegisterInvitation() {
     const location = useLocation();
-    const { channel, token } = location.state;
+    const { channel } = location.state;
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -46,7 +47,8 @@ export function RegisterInvitation() {
                 setOpenSnackbar(true);
                 navigate(`/channel/${channel.id}`, { state: { invitedEmail: email } });
             } catch (error) {
-                console.error('Error sending invitation:', error);
+                setInvitationMessage(`Error sending invitation: ${error}`);
+                setOpenSnackbar(true);
             }
         }
     };
@@ -90,7 +92,7 @@ export function RegisterInvitation() {
                         Select the role wanted:
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 1 }}>
-                        <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
+                        <Button variant="contained" color="success" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
                             Read Write Role
                         </Button>
                         <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_ONLY)}>
@@ -119,11 +121,18 @@ export function RegisterInvitation() {
             </Card>
             <Snackbar
                 open={openSnackbar}
-                message={invitationMessage}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 autoHideDuration={5000}
                 onClose={() => setOpenSnackbar(false)}
             />
+            <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity="success"
+                variant="filled"
+                sx={{ width: '100%' }}
+            >
+                {invitationMessage}
+            </Alert>
         </Box>
     );
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Card, CardActions, CardContent, TextField, InputAdornment, List, ListItem, ListItemText, Paper, ButtonBase, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, TextField, InputAdornment, List, ListItem, ListItemText, Paper, ButtonBase, Typography, Snackbar } from '@mui/material';
 import { useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SearchIcon from "@mui/icons-material/Search";
@@ -8,6 +8,8 @@ import { Role } from '../../domain/Role';
 import { services } from "../../App";
 import { AuthContext } from "../auth/AuthProvider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SendIcon from '@mui/icons-material/Send';
+import Alert from "@mui/material/Alert";
 
 export function ChannelInvitation() {
     const { user } = useContext(AuthContext);
@@ -19,7 +21,8 @@ export function ChannelInvitation() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [hoveredUserId, setHoveredUserId] = useState<number | null>(null);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-    const [showPermissionError, setShowPermissionError] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     const handleSearch = async (term: string) => {
         setSearchTerm(term);
@@ -29,6 +32,7 @@ export function ChannelInvitation() {
                 if (results) {
                     const filteredResults = results.filter((result: { id: any; }) => result.id !== user.id);
                     setSearchResults(filteredResults);
+
                 }
             } catch (e) {
                 console.error('Search error:', e.message);
@@ -51,19 +55,24 @@ export function ChannelInvitation() {
         if (selectedUser && selectedRole) {
             try {
                 await services.invitationService.createChannelInvitation(selectedUser.id, channel.id, selectedRole);
-                console.log('Channel invitation created');
                 navigate(`/channel/${channel.id}`, { state: { invitedUser: selectedUser.username } });
+                setSnackbarMessage('Channel invitation created');
+                setOpenSnackbar(true);
             } catch (e) {
-                console.error('Error creating channel invitation:', e.message);
-            }
-        } else {
-            console.error('User or role not selected');
-            if (!selectedRole) {
-                setShowPermissionError(true);
-                setTimeout(() => setShowPermissionError(false), 3000);
+                if (channel.visibility === 'PUBLIC') {
+                    setSnackbarMessage('Cannot invite users to a public channel')
+
+                } /*else if(invitations.find(invitation => invitation.channel.id === channel.id && invitation.receiver.id === selectedUser.id)){
+                    setSnackbarMessage('User already invited to this channel')
+                    setOpenSnackbar(true)
+                }*/
+                else {
+                    setSnackbarMessage('Error creating channel invitation')
+                }
+                setOpenSnackbar(true)
             }
         }
-    };
+    }
 
     const handleBackClick = () => {
         navigate('/invitation', {state: {channel: channel}});
@@ -146,31 +155,42 @@ export function ChannelInvitation() {
                             {selectedRole === Role.READ_WRITE ? 'Can send and read messages' : selectedRole === Role.READ_ONLY ? 'Read Only' : 'No role selected'}
                         </Typography>
                     </Box>
-                    {showPermissionError && (
-                        <Typography variant="body2" sx={{ color: 'red', fontStyle: 'italic' }}>
-                            Role not selected yet
-                        </Typography>
-                    )}
-                    {selectedUser && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleAddToChannel}
-                            disabled={!selectedRole}
-                        >
-                            Add to channel
-                        </Button>
-                    )}
                 </CardActions>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2, gap: 2 }}>
-                    <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
+                    <Button variant="contained" color="success" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_WRITE)}>
                         Read Write Role
                     </Button>
                     <Button variant="contained" color="secondary" sx={{ textTransform: 'none' }} onClick={() => handleRoleClick(Role.READ_ONLY)}>
                         Read Only Role
                     </Button>
                 </Box>
+                {selectedUser && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleAddToChannel}
+                        disabled={!selectedRole}
+                        startIcon={<SendIcon />}
+                    >
+                        Invite to channel
+                    </Button>
+                )}
             </Card>
+            <Snackbar
+                open={openSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnackbar(false)}
+            >
+                <Alert
+                    onClose={() => setOpenSnackbar(false)}
+                    severity="error"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

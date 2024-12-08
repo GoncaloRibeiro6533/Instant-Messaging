@@ -1,4 +1,3 @@
-import { AuthenticatedUser } from '../../domain/AuthenticatedUser';
 import { User } from '../../domain/User';
 import { UserService } from '../interfaces/UserService';
 import { handleResponse } from './responseHandler';
@@ -96,7 +95,11 @@ export class UserServiceHttp implements UserService {
             credentials: 'include',
         })
         const json = await handleResponse(response);
-        return json.map((user: any) => new User(user.id, user.username, user.email));
+        if (json && Array.isArray(json.users)) {
+            return json.users.map((user: any) => new User(user.id, user.username, user.email));
+        } else {
+            throw new Error('Unexpected response format');
+        }
     }
 
     async registerFirstUser(email: string, username: string, password: string): Promise<User> {
