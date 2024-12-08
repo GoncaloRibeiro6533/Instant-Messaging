@@ -5,10 +5,11 @@ import { services } from '../../App';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useData } from "../data/DataProvider";
+import { ChannelInvitation } from '../../domain/ChannelInvitation';
 
 export function InvitationsList() {
     const [user] = useAuth();
-    const { invitations, setInvitations } = useData();
+    const { invitations, setInvitations, addChannel,addChannelMember } = useData();
 
     React.useEffect(() => {
         const fetchInvitations = async () => {
@@ -26,8 +27,13 @@ export function InvitationsList() {
 
     const handleAccept = async (invitationId: number) => {
         try {
-            await services.invitationService.acceptChannelInvitation(invitationId);
+            const channel = await services.invitationService.acceptChannelInvitation(invitationId);
+            const invitation = invitations.find((invitation: ChannelInvitation) => invitation.id === invitationId);
+            const channelMembers = await services.channelService.getChannelMembers(channel.id);
+            addChannel(invitation.channel, invitation.role);
+            addChannelMember(channel.id, channelMembers)
             setInvitations(invitations.filter(invitation => invitation.id !== invitationId));
+
         } catch (error) {
             console.error('Error accepting invitation:', error);
         }

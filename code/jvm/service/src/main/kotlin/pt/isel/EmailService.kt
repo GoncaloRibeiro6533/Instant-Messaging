@@ -14,9 +14,7 @@ interface EmailServiceInterface {
 
 @Service
 class EmailService(private val mailSender: JavaMailSender) : EmailServiceInterface {
-    /*@Autowired
-        private lateinit var mailSender: JavaMailSender
-*/
+
     private fun sendEmail(
         to: String,
         subject: String,

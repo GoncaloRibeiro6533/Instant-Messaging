@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS dbo.REGISTER_INVITATION(
 	invited_email VARCHAR(255) NOT NULL,
 	inviter_id int NOT NULL,
     timestamp timestamp not null,
+    code VARCHAR(256) UNIQUE NOT NULL,
 	CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES dbo.CHANNEL(id) ON DELETE CASCADE,
 	CONSTRAINT fk_user FOREIGN KEY(inviter_id) REFERENCES dbo.USER(id) ON DELETE CASCADE
 );
