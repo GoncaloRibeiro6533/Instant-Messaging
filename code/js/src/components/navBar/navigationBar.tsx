@@ -142,15 +142,17 @@ export default function MenuDrawer() {
                             </ListItem>
                         ))}
                     </List>
-                    <ListItem sx={{
-                        marginTop: 'auto',
-                        marginBottom: '60px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                    }}>
-                        <LogoutButton />
-                    </ListItem>
+                    {user && (
+                        <ListItem sx={{
+                            marginTop: 'auto',
+                            marginBottom: '60px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                        }}>
+                            <LogoutButton />
+                        </ListItem>
+                    )}
                 </Box>
             </Drawer>
         </Box>
