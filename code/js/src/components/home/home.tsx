@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Link, Outlet } from "react-router-dom";
-import { AuthContext, AuthProvider } from "../auth/AuthProvider";
-import { LogoutButton } from "../logout/logoutButton";
+import { Outlet } from "react-router-dom";
+import { AuthContext } from "../auth/AuthProvider";
 import { LoginButton } from "../login/loginButton";
 import Logo from "../../../public/logo.png";
 import { Typography } from "@mui/material";
@@ -13,10 +12,8 @@ export function Home() {
           <img src={Logo} alt="Application Logo" style={{width: '400px', marginBottom: '20px'}}/>
           {user ? (
               <div>
-                 <Typography variant="h5">Welcome, {user.username}!</Typography> 
-                  <p></p>
-                  <li><Link to="/about">About</Link></li>
-                  <Link to="/register/14">Register</Link>
+                 <Typography variant="h5">Welcome, {user.username}!</Typography>
+                  <Typography variant="h6">Now you can browse your channels!</Typography>
                   <Outlet/>
               </div>
           ) : (
