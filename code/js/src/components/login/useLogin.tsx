@@ -74,7 +74,7 @@ export function useLogin() : [State, {
                 dispatch({ type: "error", message: "Invalid username or password" })
             }
         } catch (e) {
-            setError(e.message)
+            //setError(e.message)
             dispatch({ type: "error", message: e.message })
         }
     }    

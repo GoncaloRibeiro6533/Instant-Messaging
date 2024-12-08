@@ -1,5 +1,6 @@
 package pt.isel.pipeline
 
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
@@ -22,7 +23,6 @@ class AuthenticationInterceptor(
             }
         ) {
             // enforce authentication
-            val cookies = request.cookies
             val cookie = request.cookies.find { it.name == NAME_AUTHORIZATION_HEADER }
             if (cookie == null) {
                 response.status = 401
@@ -34,7 +34,13 @@ class AuthenticationInterceptor(
                     .processAuthorizationHeaderValue(cookie.value)
             return if (user == null) {
                 response.status = 401
-                response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+                response.addCookie(Cookie(NAME_AUTHORIZATION_HEADER, "").apply {
+                    maxAge = 0
+                    path = "/"
+                    domain = cookie.domain
+                    isHttpOnly = cookie.isHttpOnly
+                    secure = cookie.secure
+                })
                 false
             } else {
                 AuthenticatedUserArgumentResolver.addUserTo(user, request)

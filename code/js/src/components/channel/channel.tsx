@@ -36,7 +36,9 @@ export function Channel() {
         }
     }
     return (
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: '600px'
+                
+             }}>
                  {state.name === 'loading' && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                     <CircularProgress size="60px" />

@@ -50,6 +50,17 @@ export function Login() {
                     textAlign: 'center',
                 }}
             >
+                   {state.name === 'editing' && state.error && (
+                        <Alert 
+                            severity="error" 
+                            sx={{ 
+                                padding: 2,
+                                marginBottom: 2,
+                            }}
+                        >
+                            {state.error}.
+                        </Alert>
+                    )}
                 <img src={Logo} alt="Logo" width={250} style={{ marginBottom: 16 }} />
                 <Typography variant="h5" component="h1" gutterBottom>
                     Login

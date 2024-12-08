@@ -6,6 +6,8 @@ import {AuthContext} from "../../auth/AuthProvider"
 import {Role} from "../../../domain/Role"
 import {useData} from "../../data/DataProvider"
 import { useError } from "../../error/errorProvider"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../auth/AuthProvider"
 
 type State =
     | { name: "idle" }
@@ -69,10 +71,12 @@ function reduce(state: State, action: Action): State {
 }
 
 export function useChannelList(): [State, onChange: () => void] {
-    const { user } = React.useContext(AuthContext)
     const [state, dispatch] = React.useReducer(reduce, { name: "idle" })
     const { setChannels, channels } = useData()
     const [error, setError] = useError()
+    const navigate = useNavigate()
+    const [user, setUser] = useAuth()
+    const { clear } = useData()
     async function loadChannels() {
         if(state.name === "loading") return
         if(channels.size > 0) { 
@@ -90,8 +94,15 @@ export function useChannelList(): [State, onChange: () => void] {
                 return
             }
         } catch (e) {
+            if(e.message === "Not authenticated" || e.message === "Session expired") {
+                localStorage.clear()
+                setUser(undefined)
+                clear()
+                navigate('/login')
+                return
+            }
             if(e.message === "Failed to fetch") {
-                setError("Failed to connect to the server")
+              //  setError("Failed to connect to the server")
                 dispatch({ type: "error", message: "Failed to connect to the server" })
             }
             dispatch({ type: "error", message: e.message })

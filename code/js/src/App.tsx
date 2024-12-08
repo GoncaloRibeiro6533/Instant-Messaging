@@ -38,7 +38,7 @@ const router = createBrowserRouter(
         {
             "path": "/",
             element:
-                <><MenuAppBar /><Error/><Home /></>,
+                <><MenuAppBar /><Home /></>,
             "children": []
         },
         {
@@ -53,7 +53,6 @@ const router = createBrowserRouter(
             "path": "/login",
             element:
                 <>
-                <Error/>
                 <Login />
                 </>
         },
@@ -70,7 +69,6 @@ const router = createBrowserRouter(
             element:
                 <AuthRequire>
                     <MenuAppBar/>
-                    <Error/>
                     <ChannelsList/>
                 </AuthRequire>,
             children: [
@@ -189,6 +187,6 @@ export const services: Service = mockService
 
 export function App() {
     return (
-        <RouterProvider router={router} future={{ v7_startTransition: true }}/>
+            <RouterProvider router={router} future={{ v7_startTransition: true }}/>
     )
 }

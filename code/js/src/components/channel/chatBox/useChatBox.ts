@@ -29,8 +29,11 @@ function reduce(state: State, action: Action): State {
             }
             return state
         case 'loading':
-            if (action.type === 'add') {
+            if (action.type === 'add' && action.nMessages - state.nMessages === 30) {
                 return { name: 'displaying', nMessages: action.nMessages }
+            }
+            if (action.type === 'add' && action.nMessages - state.nMessages < 30) {
+                return { name: 'finished', nMessages: action.nMessages }
             }
             if (action.type === 'error') {
                 return { name: 'error', message: action.message, nMessages: state.nMessages }

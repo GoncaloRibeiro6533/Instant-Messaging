@@ -13,13 +13,12 @@ export function ChatBox(props : {channel: Channel}) {
     const [state, loadMessagesHandler] = useChatBox(props.channel)
     const { messages } = useData()
     const channelMessages = messages.get(props.channel.id) || []
-    const messagesContainerRef = useRef<HTMLDivElement>(null)
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const container = e.currentTarget
         const previousScroll = container.scrollTop
         const previousScrollHeight = container.scrollHeight
         if (Math.abs(container.scrollHeight -container.clientHeight - Math.abs(container.scrollTop)) <= 100
-            && state.name === "displaying"){
+            && state.name === "displaying") {
             loadMessagesHandler()
             container.scrollTop = previousScroll - (container.scrollHeight - previousScrollHeight)
         }
@@ -37,7 +36,6 @@ export function ChatBox(props : {channel: Channel}) {
         >
             {/* Área de mensagens */}
             <Box
-                ref={messagesContainerRef}
                 onScroll={handleScroll}
                 sx={{
                     flex: 1,
@@ -47,7 +45,7 @@ export function ChatBox(props : {channel: Channel}) {
                     flexDirection: "column-reverse", // Coloca a última mensagem no fundo
                 }}
             >
-                {(state.name === 'displaying' || state.name === 'finished')&& (channelMessages.map((message, index) => {
+                {(channelMessages.map((message, index) => {
                     const showChip =
                         index === channelMessages.length - 1||
                         message.timestamp.getDay() !== channelMessages[index + 1].timestamp.getDay()
@@ -78,9 +76,10 @@ export function ChatBox(props : {channel: Channel}) {
                     )
                 }))}
                 {state.name === 'loading' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
                         <CircularProgress size="30px" />
-                    </Box>)}
+                    </Box>
+                )}
                 {state.name === 'finished' && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                         <Chip
