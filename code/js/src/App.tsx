@@ -19,16 +19,11 @@ import {InvitationOptions} from "./components/invitation/invitationOptions"
 import {ChannelInvitation} from "./components/invitation/channelInvitation"
 import {RegisterInvitation} from "./components/invitation/registerInvitation"
 import {InvitationRepo} from "./service/mock/repo/InvitationRepo"
-import {InvitationServiceMock} from "./service/mock/InvitationServiceMock"
 import {UserServiceHttp} from "./service/http/UserServiceHttp"
 import {ChannelServiceHttp} from "./service/http/ChannelServiceHttp"
 import {MessageServiceHttp} from "./service/http/MessageServiceHttp"
 import { InvitationServiceHttp } from './service/http/InvitationServiceHttp'
-import { UserServiceMock } from './service/mock/UserServiceMock'
-import { ChannelServiceMock } from './service/mock/ChannelServiceMock'
-import { MessageServiceMock } from './service/mock/MessageServiceMock'
 import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
-import { Error } from './components/error/error'
 
 import {InvitationsList} from "./components/invitation/invitationsList";
 
