@@ -49,51 +49,47 @@ export function ChannelDetails() {
     };
 
     const handleSendInvitation = () => {
-        if (state.name !== "error") {
-            if (state.name !== "loading") {
-                if (state.name !== "idle") {
-                    navigate('/invitation', {state: {channel: state.channel}});
-                }
-            }
+        if (state.name !== "error" && state.name !== "loading" && state.name !== "idle") {
+            navigate('/invitation', {state: {channel: state.channel}});
         }
     };
 
     return (
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {(state.name === 'error' || leaveState.name === 'error' || editState.name === 'error' || editState.name === 'editing' && editState.error !== undefined) &&(
-            <Alert severity="error" sx={{
-                mb: 2,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: 30,
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxHeight: '87vh', overflowY: 'auto' }}>
+            {(state.name === 'error' || leaveState.name === 'error' || editState.name === 'error' || editState.name === 'editing' && editState.error !== undefined) &&(
+                <Alert severity="error" sx={{
+                    mb: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 30,
                 }}>
-                {state.name === 'error' && state.error}
-                {leaveState.name === 'error' && leaveState.message}
-                {editState.name === 'error' && editState.error}
-                {editState.name === 'editing' && editState.error}
-            </Alert>
-        )}
-         {state.name === 'displaying' &&  leaveState.name === 'idle' &&
+                    {state.name === 'error' && state.error}
+                    {leaveState.name === 'error' && leaveState.message}
+                    {editState.name === 'error' && editState.error}
+                    {editState.name === 'editing' && editState.error}
+                </Alert>
+            )}
+            {state.name === 'displaying' &&  leaveState.name === 'idle' &&
                 (
                     <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
-                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
-                        sx={{ textTransform: 'none', margin: 2 }}>
-                    Back
-                </Button>
-            </Box>)}  
-        { state.name === 'loading' || leaveState.name === 'leaving' && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
-                <CircularProgress size="60px" />
-                {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
-            </Box>)}
+                        <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
+                                sx={{ textTransform: 'none', margin: 2 }}>
+                            Back
+                        </Button>
+                    </Box>)}
+            { state.name === 'loading' || leaveState.name === 'leaving' && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                    <CircularProgress size="60px" />
+                    {leaveState.name === 'leaving' && <Typography variant="h6" mt={2}>Leaving channel...</Typography> }
+                </Box>)}
             {state.name === 'displaying' &&  leaveState.name === 'idle' &&
                 (
                     <Box textAlign="center" mt={5}>
                         <Avatar sx={{ bgcolor: getRandomColor(state.channel.id), width: 100, height: 100, margin: '0 auto', fontSize: 50 }}>
                             {state.channel.name.charAt(0)}
                         </Avatar>
-                    </Box>)}      
+                    </Box>)}
             {state.name === 'displaying' && (editState.name === 'displaying' || editState.name === 'editing') && (
                 <Box
                     sx={{
@@ -234,7 +230,7 @@ export function ChannelDetails() {
                             <ExitToAppIcon sx={{ ml: 1 }} />
                         </Button>
                     </Box>
-            </Box>
+                </Box>
             )}
         </Box>
     )

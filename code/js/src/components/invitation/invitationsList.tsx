@@ -49,7 +49,7 @@ export function InvitationsList() {
     };
 
     return (
-        <Box flexDirection="column" sx={{ padding: 2, maxHeight: '90vh', overflowY: 'auto'  }}>
+        <Box flexDirection="column" sx={{ padding: 2, maxHeight: '90vh', overflowY: 'auto' }}>
             <Typography variant="h4" gutterBottom>
                 Invitations
             </Typography>

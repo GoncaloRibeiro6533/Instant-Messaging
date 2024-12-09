@@ -87,6 +87,7 @@ export function ChannelInvitation() {
             height="100vh"
             bgcolor="#f5f5f5"
             padding={2}
+            sx = {{maxHeight: '87vh', overflowY: 'auto'}}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
                 <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}

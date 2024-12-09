@@ -66,6 +66,7 @@ export function RegisterInvitation() {
             height="100vh"
             bgcolor="#f5f5f5"
             padding={2}
+            sx = {{maxHeight: '87vh', overflowY: 'auto'}}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
                 <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
@@ -122,9 +123,10 @@ export function RegisterInvitation() {
             <Snackbar
                 open={openSnackbar}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                autoHideDuration={5000}
+                autoHideDuration={3000}
                 onClose={() => setOpenSnackbar(false)}
             />
+            {openSnackbar && (
             <Alert
                 onClose={() => setOpenSnackbar(false)}
                 severity="success"
@@ -133,6 +135,7 @@ export function RegisterInvitation() {
             >
                 {invitationMessage}
             </Alert>
+            )}
         </Box>
     );
 }
