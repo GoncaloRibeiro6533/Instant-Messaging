@@ -126,3 +126,4 @@ dist
 #### NODE ###
 node_modules/
 dist/
+bundle.js
