@@ -71,6 +71,17 @@ task<Exec>("buildImageJvm") {
 task<Exec>("buildImageNginx") {
     commandLine("docker", "build", "-t", dockerImageNginx, "-f", "test-infra/Dockerfile-nginx", ".")
 }
+/*
+task<Exec>("buildBundle") {
+    workingDir("../js")
+    commandLine("npm", "run", "build")
+}*/
+/*
+task<Copy>("copyBundle") {
+    dependsOn("buildBundle")
+    from("../js/dist/bundle.js")
+    into("static-content")
+}*/
 
 task<Exec>("buildImagePostgresTest") {
     commandLine(
@@ -95,6 +106,7 @@ task("buildImageAll") {
     dependsOn("buildImageJvm")
     dependsOn("buildImageNginx")
     dependsOn("buildImagePostgresTest")
+   // dependsOn("copyBundle")
    // dependsOn("buildImageUbuntu")
 }
 
