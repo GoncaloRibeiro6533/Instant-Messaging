@@ -10,7 +10,7 @@
 ---
 
 ## Introduction
-The backend server is an API that provides the functionality for the TalkRooms app.
+The backend server is an API that provides the functionality for the ChImp app.
 It is written in Kotlin in a JVM gradle project.
 
 The JVM application is a simple Spring Boot application, built with Spring Initializer. Some used dependencies are:
