@@ -42,7 +42,7 @@ class PipelineConfigurer(
         registry.addMapping("/**")
             .allowCredentials(true)
             .allowedMethods("GET", "POST", "PUT", "DELETE")
-            .allowedOrigins("http://localhost:8000", "http://localhost")
+            .allowedOrigins("http://localhost:8080", "http://localhost")
     }
 }
 
