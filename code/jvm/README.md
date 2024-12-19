@@ -11,8 +11,40 @@ After this you can run the project by two ways:
 ```bash 
 cd code/jvm
  ``` 
-- To start the docker:
-```bash 
-docker-compose up
- ``` 
 
+## Build the docker images:
+- Builds the JVM image with ChImp backend HTTP API:
+  ```bash
+  ./gradlew buildImageJvm
+  ```
+- Builds the Postgres image for testing:
+  ```bash
+  ./gradlew buildImagePostgresTest
+  ```
+- Builds the Nginx image:
+  ```bash
+  ./gradlew buildImageNginx
+  ```
+- Builds all images:
+  ```bash
+  ./gradlew buildImageAll
+  ```
+
+## Start, scale, and stop services:
+- Starts all services:
+  ```bash
+  ./gradlew allUp
+  ```
+- Stops all services:
+  ```bash
+  ./gradlew allDown
+  ```
+- To scale the dynamic JVM service:
+  - First move to host folder:
+    ```bash
+    cd host
+    ```
+    - Then run the following command:
+    ```bash
+      docker-compose up --scale talkrooms-jvm=3
+    ```
