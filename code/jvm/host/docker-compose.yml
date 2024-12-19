@@ -1,0 +1,47 @@
+name: "daw"
+
+services:
+
+  # Nginx service, running the load balancer, listening on port 8080
+  talkrooms-nginx:
+    container_name: talkrooms-nginx
+    image: talkrooms-nginx
+    depends_on:
+      - talkrooms-jvm
+    ports:
+      - 8080:8080
+    networks:
+      - frontnet
+
+    # JVM service, running the application, listening on port 8080
+  talkrooms-jvm:
+    image: talkrooms-jvm
+    hostname: talkrooms-jvm
+    depends_on:
+      - talkrooms-postgres-test
+    environment:
+      - JDBC_DATABASE_URL=jdbc:postgresql://talkrooms-postgres-test:5432/db?user=dbuser&password=changeit
+      - port=8080
+    networks:
+      - backnet
+      - frontnet
+
+    # PostgreSQL service, running the database, listening on port 5432
+  talkrooms-postgres-test:
+    image: talkrooms-postgres-test
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=changeit
+      - POSTGRES_DB=db
+    ports:
+        - 5432:5432
+    networks:
+        - backnet
+
+networks:
+    frontnet: {}
+    backnet: {}
+
+
+
+

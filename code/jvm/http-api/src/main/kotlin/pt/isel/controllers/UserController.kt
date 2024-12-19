@@ -87,6 +87,8 @@ class UserController(
                         .httpOnly(true) // not accessible via JavaScript
                         .secure(true) // only sent over HTTPS - except for localhost
                         .path("/") // available in all paths
+                        .domain("localhost") // available in all subdomains of localhost
+                        .sameSite("Strict") // not sent in cross-site requests
                         .build()
                 return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(result.value.user)
             }

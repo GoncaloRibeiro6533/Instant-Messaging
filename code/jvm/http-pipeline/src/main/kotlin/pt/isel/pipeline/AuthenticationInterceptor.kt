@@ -22,7 +22,14 @@ class AuthenticationInterceptor(
                 it.parameterType == AuthenticatedUser::class.java
             }
         ) {
+            // TODO if getCookies is null, it launches an exception
             // enforce authentication
+            if(request.cookies == null || request.cookies.isEmpty()) {
+                response.status = 401
+                response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+                return false
+            }
+
             val cookie = request.cookies.find { it.name == NAME_AUTHORIZATION_HEADER }
             if (cookie == null) {
                 response.status = 401

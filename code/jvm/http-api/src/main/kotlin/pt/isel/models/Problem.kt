@@ -96,4 +96,6 @@ sealed class Problem(
     data object InvitationNotFound : Problem(URI("$PROBLEM_URI_PATH/invitation-not-found"))
 
     data object MessageTooLong : Problem(URI("$PROBLEM_URI_PATH/message-too-long"))
+
+    data object InvalidRequestContent : Problem(URI("$PROBLEM_URI_PATH/invalid-request-content"))
 }
