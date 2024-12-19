@@ -24,7 +24,7 @@ class AuthenticationInterceptor(
         ) {
             // TODO if getCookies is null, it launches an exception
             // enforce authentication
-            if(request.cookies == null || request.cookies.isEmpty()) {
+            if (request.cookies == null || request.cookies.isEmpty()) {
                 response.status = 401
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
                 return false

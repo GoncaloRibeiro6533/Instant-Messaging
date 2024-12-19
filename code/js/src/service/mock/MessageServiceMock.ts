@@ -2,6 +2,7 @@ import { MessageService } from '../interfaces/MessageService';
 import { Repo } from '../../App';
 import { Message } from '../../domain/Message';
 import { delay } from './utils';
+import { tokenHandler } from './tokenHandler';
 
 export class MessageServiceMock implements MessageService {
     repo: Repo;
@@ -9,17 +10,12 @@ export class MessageServiceMock implements MessageService {
   constructor(repo: Repo) {
     this.repo = repo;
   }
-    getMessages(channelId: number, limit?: number, skip?: number): Promise<Message[]> {
-        throw new Error('Method not implemented.');
-    }
-    sendMessage(channelId: number, message: string): Promise<Message> | Promise<void> {
-        throw new Error('Method not implemented.');
-    }
 
-}
-   /* 
-        async sendMessage(token: string, channelId: number, content: string): Promise<Message> {
+        async sendMessage(channelId: number, content: string): Promise<Message> {
             await delay(500)
+            const token = tokenHandler().getToken();
+            if(!token) throw new Error("Invalid token");
+            if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
             const user = this.repo.userRepo.getUserByToken(token)
             if (!user) {
                 throw new Error("Invalid token");
@@ -42,8 +38,11 @@ export class MessageServiceMock implements MessageService {
 
         }
     
-        async getMessages(token: string, channelId: number, limit: number, skip: number): Promise<Message[]> {
+        async getMessages(channelId: number, limit: number, skip: number): Promise<Message[]> {
             await delay(500)
+            const token = tokenHandler().getToken();
+            if(!token) throw new Error("Invalid token");
+            if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
             const user = this.repo.userRepo.getUserByToken(token)
             if (!user) {
                 throw new Error("Invalid token");
@@ -58,4 +57,4 @@ export class MessageServiceMock implements MessageService {
             }
             return this.repo.messageRepo.getMessages(ch, limit, skip);
     }
-}*/
+}

@@ -26,6 +26,11 @@ import { InvitationServiceHttp } from './service/http/InvitationServiceHttp'
 import { RegisterFirstUser } from './components/registerFirstUser/registerFirstUser'
 
 import {InvitationsList} from "./components/invitation/invitationsList";
+import {UserServiceMock} from "./service/mock/UserServiceMock";
+import {ChannelServiceMock} from "./service/mock/ChannelServiceMock";
+import {MessageServiceMock} from "./service/mock/MessageServiceMock";
+import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
+
 
 
 const router = createBrowserRouter(
@@ -167,18 +172,23 @@ export const repo: Repo = {
 }
 
 export const mockService: Service = {
+    userService: new UserServiceMock(repo),
+    channelService: new ChannelServiceMock(repo),
+    messageService: new MessageServiceMock(repo),
+    invitationService: new InvitationServiceMock(repo)
+}
+
+export const httpService: Service = {
     userService: new UserServiceHttp(),
     channelService: new ChannelServiceHttp(),
     messageService: new MessageServiceHttp(),
     invitationService: new InvitationServiceHttp(),
-
-    //userService: new UserServiceMock(repo),
-    //channelService: new ChannelServiceMock(repo),
-    //messageService: new MessageServiceMock(repo),
-    //invitationService: new InvitationServiceMock(repo)
 }
 
-export const services: Service = mockService
+export const useMock = false //TODO improve this
+
+
+export const services: Service = useMock ? mockService : httpService
 
 export function App() {
     return (

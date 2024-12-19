@@ -9,6 +9,7 @@ import { Visibility } from '../../domain/Visibility'
 import { ChannelMember } from '../../domain/ChannelMember'
 import { Role } from '../../domain/Role'
 import { ChannelInvitation } from '../../domain/ChannelInvitation'
+import { useMock } from '../../App'
 
 type AppNotification = {
     id: number,
@@ -51,7 +52,7 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
     }
 
     useEffect(() => {
-        if(user === undefined) return
+        if(user === undefined || useMock) return
         const eventSource = new EventSource(`http://localhost:8080/api/sse/listen`,{
             withCredentials: true,
         });

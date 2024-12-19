@@ -43,7 +43,9 @@ tasks.bootRun {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost/postgres?user=postgres&password=postgres")
+    environment("JDBC_DATABASE_URL", "jdbc:postgresql://localhost:5434/db?user=dbuser&password=changeit")
+    dependsOn(":repository-jdbi:dbTestsWait")
+    finalizedBy(":repository-jdbi:dbTestsDown")
 }
 
 kotlin {
@@ -61,7 +63,7 @@ task<Copy>("extractUberJar") {
 val dockerImageJvm = "talkrooms-jvm"
 val dockerImageNginx = "talkrooms-nginx"
 val dockerImagePostgresTest = "talkrooms-postgres-test"
-//val dockerImageUbuntu = "agendify-ubuntu"
+// val dockerImageUbuntu = "agendify-ubuntu"
 
 task<Exec>("buildImageJvm") {
     dependsOn("extractUberJar")
@@ -74,18 +76,21 @@ task<Exec>("buildImageNginx") {
 
 task<Exec>("buildBundle") {
     workingDir("../../js")
-    commandLine("npm.cmd", "run", "build")
+
+    // Use the correct command depending on the operating system
+    commandLine(
+        if (System.getProperty("os.name").lowercase().contains("win")) "npm.cmd" else "npm",
+        "run",
+        "build",
+    )
 }
 
 task<Copy>("copyBundle") {
     dependsOn("buildBundle")
     from("../../js/dist/bundle.js")
     into("./static-content")
-    outputs.upToDateWhen { file("../../js/dist/bundle.js").lastModified() > file("./static-content/bundle.js").lastModified()}
-    }
-
-
-
+    outputs.upToDateWhen { file("../../js/dist/bundle.js").lastModified() > file("./static-content/bundle.js").lastModified() }
+}
 
 task<Exec>("buildImagePostgresTest") {
     commandLine(
@@ -111,7 +116,7 @@ task("buildImageAll") {
     dependsOn("buildImageNginx")
     dependsOn("buildImagePostgresTest")
     dependsOn("copyBundle")
-   //dependsOn("buildImageUbuntu")
+    // dependsOn("buildImageUbuntu")
 }
 
 task<Exec>("allUp") {

@@ -1,7 +1,8 @@
 import * as React from "react"
 import { useAuth } from "../../auth/AuthProvider"
-import { services } from "../../../App"
+import { services, useMock } from "../../../App"
 import { Channel } from "../../../domain/Channel"
+import { useData } from "../../data/DataProvider"
 
 type State =
     { name: "editing", error?: string, content: string}
@@ -55,6 +56,7 @@ export function useTextField() : [State, {
             name: "idle",
         })
     const [userAuth, setUser] = useAuth()
+    const {addMessages} = useData()
     async function onSubmit(ev: React.FormEvent<HTMLFormElement>, channel: Channel) {
         ev.preventDefault()
         if (state.name !== "editing") {
@@ -63,6 +65,7 @@ export function useTextField() : [State, {
         dispatch({ type: "send", channel: channel })
         try {
             const message = await services.messageService.sendMessage(channel.id, state.content)
+            useMock && message && addMessages(channel, [message])
             dispatch({ type: "success" })
         } catch (e) {
             dispatch({ type: "error", message: e.message })

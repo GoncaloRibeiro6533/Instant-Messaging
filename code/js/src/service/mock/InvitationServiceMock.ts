@@ -5,6 +5,8 @@ import { Role } from "../../domain/Role";
 import { ChannelInvitation } from "../../domain/ChannelInvitation";
 import { RegisterInvitation } from "../../domain/RegisterInvitation";
 import {ChannelRepo} from "./repo/ChannelRepo";
+import { tokenHandler } from "./tokenHandler";
+
 
 export class InvitationServiceMock implements InvitationService {
     repo: Repo;
@@ -13,31 +15,21 @@ export class InvitationServiceMock implements InvitationService {
     constructor(repo: Repo) {
         this.repo = repo;
     }
-    getInvitationsOfUser(): Promise<Array<ChannelInvitation>> {
-        throw new Error("Method not implemented.");
-    }
-    createRegisterInvitation(email: string, channelId: number, role: Role): Promise<RegisterInvitation> {
-        throw new Error("Method not implemented.");
-    }
-    createChannelInvitation(receiverId: number, channelId: number, role: Role): Promise<ChannelInvitation> {
-        throw new Error("Method not implemented.");
-    }
-    acceptChannelInvitation(invitationId: number): Promise<Channel> {
-        throw new Error("Method not implemented.");
-    }
-    declineChannelInvitation(invitationId: number): Promise<Boolean> {
-        throw new Error("Method not implemented.");
-    }
-}
-/*
-    async getInvitationsOfUser(token: string): Promise<Array<ChannelInvitation>> {
+
+    async getInvitationsOfUser(): Promise<Array<ChannelInvitation>> {
+        const token = tokenHandler().getToken();
+        if(!token) throw new Error("Invalid token");
+        if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
         }
         return this.repo.invitationRepo.getInvitationsOfUser(user);
     }
-    async createRegisterInvitation(token: string, email: string, channelId: number, role: Role): Promise<RegisterInvitation> {
+    async createRegisterInvitation(email: string, channelId: number, role: Role): Promise<RegisterInvitation> {
+        const token = tokenHandler().getToken();
+        if(!token) throw new Error("Invalid token");
+        if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
@@ -45,7 +37,10 @@ export class InvitationServiceMock implements InvitationService {
         return this.repo.invitationRepo.createRegisterInvitation(user, email, this.repo.channelRepo.channels.find(channel => channel.id === channelId)!, role);
     }
 
-    async createChannelInvitation(token: string, receiverId: number, channelId: number, role: Role): Promise<ChannelInvitation> {
+    async createChannelInvitation(receiverId: number, channelId: number, role: Role): Promise<ChannelInvitation> {
+        const token = tokenHandler().getToken();
+        if(!token) throw new Error("Invalid token");
+        if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
@@ -53,7 +48,10 @@ export class InvitationServiceMock implements InvitationService {
         return this.repo.invitationRepo.createChannelInvitation(user, receiverId, this.repo.channelRepo.channels.find(channel => channel.id === channelId)!, role);
     }
 
-    async acceptChannelInvitation(token: string, invitationId: number): Promise<Channel> {
+    async acceptChannelInvitation(invitationId: number): Promise<Channel> {
+        const token = tokenHandler().getToken();
+        if(!token) throw new Error("Invalid token");
+        if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
         const user = this.repo.userRepo.getUserByToken(token);
         if (!user) {
             throw new Error("Invalid token");
@@ -71,10 +69,14 @@ export class InvitationServiceMock implements InvitationService {
         return invitation.channel;
     }
 
-    async declineChannelInvitation(token: string, invitationId: number): Promise<Boolean> {
+    async declineChannelInvitation(invitationId: number): Promise<Boolean> {
+        const token = tokenHandler().getToken();
+        if(!token) throw new Error("Invalid token");
+        if(!this.repo.userRepo.getUserByToken(token)) throw new Error("Invalid token");
         const user = this.repo.userRepo.getUserByToken(token)
         if (!user) {
             throw new Error("Invalid token");
         }
         return this.repo.invitationRepo.declineChannelInvitation(user, invitationId);
-}*/
+    }
+}

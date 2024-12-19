@@ -126,4 +126,5 @@ dist
 #### NODE ###
 node_modules/
 dist/
+static-content/
 bundle.js
