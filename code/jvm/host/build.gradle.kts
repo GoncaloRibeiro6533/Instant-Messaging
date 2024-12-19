@@ -80,8 +80,8 @@ task<Exec>("buildBundle") {
 task<Copy>("copyBundle") {
     dependsOn("buildBundle")
     from("../../js/dist/bundle.js")
-    into("../../jvm/host/static-content")
-    outputs.upToDateWhen { file("../../js/dist/bundle.js").lastModified() > file("../jvm/host/static-content/bundle.js").lastModified()}
+    into("./static-content")
+    outputs.upToDateWhen { file("../../js/dist/bundle.js").lastModified() > file("./static-content/bundle.js").lastModified()}
     }
 
 
