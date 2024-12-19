@@ -30,3 +30,10 @@ The JVM application is a simple Spring Boot application, built with Spring Initi
 - `user_channel_role` : Contains user role in a channel information: user_id, channel_id, role.
 
 ![Data Model with types](db-types-tables.png)
+
+## Spring Diagrams
+### Beans Dependency Diagram
+![Beans Dependency Diagram](beans-dependency-diagram.png)
+
+### Context Dependencies Diagram
+![Context Dependencies Diagram](context-dependencies-diagram.png)
