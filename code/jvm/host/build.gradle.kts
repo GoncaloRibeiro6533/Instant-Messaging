@@ -71,17 +71,21 @@ task<Exec>("buildImageJvm") {
 task<Exec>("buildImageNginx") {
     commandLine("docker", "build", "-t", dockerImageNginx, "-f", "test-infra/Dockerfile-nginx", ".")
 }
-/*
+
 task<Exec>("buildBundle") {
-    workingDir("../js")
-    commandLine("npm", "run", "build")
-}*/
-/*
+    workingDir("../../js")
+    commandLine("npm.cmd", "run", "build")
+}
+
 task<Copy>("copyBundle") {
     dependsOn("buildBundle")
-    from("../js/dist/bundle.js")
-    into("static-content")
-}*/
+    from("../../js/dist/bundle.js")
+    into("../../jvm/host/static-content")
+    outputs.upToDateWhen { file("../../js/dist/bundle.js").lastModified() > file("../jvm/host/static-content/bundle.js").lastModified()}
+    }
+
+
+
 
 task<Exec>("buildImagePostgresTest") {
     commandLine(
@@ -106,8 +110,8 @@ task("buildImageAll") {
     dependsOn("buildImageJvm")
     dependsOn("buildImageNginx")
     dependsOn("buildImagePostgresTest")
-   // dependsOn("copyBundle")
-   // dependsOn("buildImageUbuntu")
+    dependsOn("copyBundle")
+   //dependsOn("buildImageUbuntu")
 }
 
 task<Exec>("allUp") {
