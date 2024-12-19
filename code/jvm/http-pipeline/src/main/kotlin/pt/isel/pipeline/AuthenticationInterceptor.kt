@@ -34,13 +34,16 @@ class AuthenticationInterceptor(
                     .processAuthorizationHeaderValue(cookie.value)
             return if (user == null) {
                 response.status = 401
-                response.addCookie(Cookie(NAME_AUTHORIZATION_HEADER, "").apply {
-                    maxAge = 0
-                    path = "/"
-                    domain = cookie.domain
-                    isHttpOnly = cookie.isHttpOnly
-                    secure = cookie.secure
-                })
+                response.addCookie(
+                    Cookie(NAME_AUTHORIZATION_HEADER, "").apply {
+                        maxAge = 0
+                        path = "/"
+                        domain = cookie.domain
+                        isHttpOnly = cookie.isHttpOnly
+                        secure = cookie.secure
+                    },
+                )
+
                 false
             } else {
                 AuthenticatedUserArgumentResolver.addUserTo(user, request)

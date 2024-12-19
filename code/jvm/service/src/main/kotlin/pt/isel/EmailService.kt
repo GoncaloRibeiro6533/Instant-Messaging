@@ -14,7 +14,6 @@ interface EmailServiceInterface {
 
 @Service
 class EmailService(private val mailSender: JavaMailSender) : EmailServiceInterface {
-
     private fun sendEmail(
         to: String,
         subject: String,
