@@ -63,7 +63,6 @@ task<Copy>("extractUberJar") {
 val dockerImageJvm = "talkrooms-jvm"
 val dockerImageNginx = "talkrooms-nginx"
 val dockerImagePostgresTest = "talkrooms-postgres-test"
-// val dockerImageUbuntu = "agendify-ubuntu"
 
 task<Exec>("buildImageJvm") {
     dependsOn("extractUberJar")
