@@ -9,6 +9,13 @@ and then [run the javascript code](../js/README.md).
 
 ## Build the docker images:
 - To run the docker version you should move to jvm folder:
+ 
+- Install the npm dependencies:
+```bash
+cd code/jvm
+npm install
+```
+
 ```bash 
 cd code/jvm
  ``` 
