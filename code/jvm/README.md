@@ -12,7 +12,7 @@ and then [run the javascript code](../js/README.md).
  
 - Install the npm dependencies:
 ```bash
-cd code/jvm
+cd code/js
 npm install
 ```
 
