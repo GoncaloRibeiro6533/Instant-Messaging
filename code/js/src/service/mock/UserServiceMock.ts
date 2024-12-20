@@ -1,4 +1,3 @@
-import {AuthenticatedUser} from "../../domain/AuthenticatedUser";
 import {User} from "../../domain/User";
 import {UserService} from "../interfaces/UserService";
 import {delay} from "./utils";
