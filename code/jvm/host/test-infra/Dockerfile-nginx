@@ -1,2 +1,3 @@
 FROM nginx
 COPY ./test-infra/nginx/nginx.conf /etc/nginx
+COPY ./static-content /app/static

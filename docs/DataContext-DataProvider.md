@@ -17,7 +17,9 @@ This implementation manages the application's state related to channels, message
 State is managed using React's `useState` for the following:
 
 - **Channels**:
-    - Stored as a `Map<Channel, Role>` to associate each channel with a user's role.
+    - Stored as a `Map<Number, Channel>` to associate each channel with it's id.
+- **Roles**:
+    - Stored as a `Map<Number,Role>` to associate each channel with a user's role.
 - **Messages**:
     - Stored as a `Map<Number, Message[]>` to group messages by channel ID.
 - **Invitations**:
