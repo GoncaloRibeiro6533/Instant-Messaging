@@ -61,7 +61,7 @@ export function useChannelDetails() : [
 ]{
     const [state, dispatch] = React.useReducer(reduce, { name: 'idle' });
     const [auth] = useAuth();
-    const { channels, channelMembers, setChannelMembers, setChannels } = useData();
+    const { channels, channelMembers, setChannelMembers, addChannels } = useData();
     const selectedChannelIdRef = React.useRef<number | null>(null);
     async function loadChannel(channelId: string) {
         try {
@@ -74,9 +74,8 @@ export function useChannelDetails() : [
                 return;
             }
             selectedChannelIdRef.current = parsedId;
-
-            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null;
-            const loadedMembers = channelMembers.get(parsedId) || null;
+            const loadedChannel = channels.get(parsedId);
+            const loadedMembers = channelMembers.get(parsedId);
 
             if (loadedChannel && loadedMembers) {
                 if (selectedChannelIdRef.current === parsedId) {
@@ -84,14 +83,14 @@ export function useChannelDetails() : [
                 }
                 return;
             }
-            const loadedChannels = loadedChannel === null &&  await services.channelService.getChannelsOfUser(auth.id);
-
-            const channel = loadedChannel || Array.from(loadedChannels.keys()).find(channel => channel.id === parsedId) || null;
-            const members =loadedMembers === null && await services.channelService.getChannelMembers(parsedId) || loadedMembers
             dispatch({ type: 'load', channelId: parsedId });
-            if(loadedChannel === null)  setChannels(loadedChannels)
-            if(loadedMembers === null) setChannelMembers(new Map([[parsedId, members]]))
+            const loadedChannels = loadedChannel === undefined &&  await services.channelService.getChannelsOfUser(auth.id) || loadedChannel
+            const members = loadedMembers === undefined && await services.channelService.getChannelMembers(parsedId) || loadedMembers
+            if(loadedChannel === undefined && loadedChannels instanceof Map)  addChannels(loadedChannels)
+            if(loadedMembers === undefined) setChannelMembers(new Map([[parsedId, members]]))
             if (selectedChannelIdRef.current === parsedId) {
+                const channel = !(loadedChannels instanceof Channel) && Array.from(loadedChannels.keys()).find((channel: Channel) => channel.id === parsedId)
+                || loadedChannel
                 dispatch({ type: 'success', channel:channel , members, previouslyLoaded: false });
             }
         } catch (error: any) {

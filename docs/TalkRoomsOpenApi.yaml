@@ -83,10 +83,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthenticatedUser'
+              $ref: '#/components/schemas/UserLoginCredentialsInput'
       responses:
         '200':
           description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          headers:
+            Set-Cookie:
+              description: >
+                Contains the session cookie named `token`.
+                Pass this cookie back in subsequent requests.
+              schema:
+                type: string
         '400':
           description: Username missing or invalid
         '404':
@@ -100,7 +111,7 @@ paths:
       tags:
         - Users
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       summary: Logout a user
       responses:
         '200':
@@ -118,7 +129,7 @@ paths:
       tags:
         - Users
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       summary: Change username
       requestBody:
         description: New username
@@ -143,7 +154,7 @@ paths:
   /user/{id}:
     get:
       security:
-        - bearerAuth: []
+        - cookieAuth: []
       tags:
         - Users
       summary: Get details of a user
@@ -177,7 +188,7 @@ paths:
   /user/search/{username}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Users
       summary: Search user by username
@@ -223,7 +234,7 @@ paths:
   /invitation/register:
     post:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Invitations
       summary: Create a new register invitation
@@ -249,7 +260,7 @@ paths:
   /invitation/channel:
     post:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Invitations
       summary: Create a new channel invitation
@@ -276,7 +287,7 @@ paths:
   /invitation/accept/{invitationId}:
     put:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Invitations
       summary: accept invitation
@@ -304,7 +315,7 @@ paths:
   /invitation/decline/{invitationId}:
     put:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Invitations
       summary: Decline
@@ -327,7 +338,7 @@ paths:
   /invitation/user/invitations:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Invitations
       summary: Get user invitations
@@ -345,7 +356,7 @@ paths:
   /channels:
     post:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Create a channel
@@ -375,7 +386,7 @@ paths:
   /channels/{channelId}/add/{userId}/{role}:
     put:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Add a user to a channel
@@ -422,7 +433,7 @@ paths:
   /channels/{id}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Get details of a channel
@@ -454,7 +465,7 @@ paths:
   /channels/search/{name}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Search channel by name
@@ -502,7 +513,7 @@ paths:
   /channels/{channelId}/members:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Get channels by user id
@@ -534,7 +545,7 @@ paths:
   /channels/user/{userId}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Get channels by user id
@@ -566,7 +577,7 @@ paths:
   /channels/{channelId}/{name}:
     put:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Update channel name
@@ -603,7 +614,7 @@ paths:
   /channels/{channelId}/leave/{userId}:
     put:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Channels
       summary: Remove user from channel
@@ -641,7 +652,7 @@ paths:
   /messages:
     post:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Messages
       summary: Create new message
@@ -670,7 +681,7 @@ paths:
   /messages/{id}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Messages
       summary: Get message by  id
@@ -702,7 +713,7 @@ paths:
   /messages/history/{channelId}:
     get:
       security:
-        - bearerAuth: [ ]
+        - cookieAuth: []
       tags:
         - Messages
       summary: Get message by channel id
@@ -750,7 +761,10 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
 
   schemas:
 
@@ -1132,20 +1146,6 @@ components:
           type: string
           description: user email
           example: bob@example.pt
-
-    AuthenticatedUser:
-      type: object
-      description: User details
-      required:
-        - user
-        - token
-      properties:
-        user:
-          $ref: '#/components/schemas/User'
-        token:
-          type: string
-          description: session token
-          example: absbadbdaksjdad_aksdjakld1223
 
 
     Channel:

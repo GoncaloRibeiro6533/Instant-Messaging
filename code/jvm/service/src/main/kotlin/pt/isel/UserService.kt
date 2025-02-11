@@ -1,7 +1,11 @@
 package pt.isel
 
 import jakarta.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+
 
 sealed class UserError {
     data object UserNotFound : UserError()
@@ -48,6 +52,7 @@ class UserService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
     private val clock: Clock,
+    private val emitter: UpdatesEmitter,
 ) {
     fun addFirstUser(
         username: String,
@@ -157,10 +162,18 @@ class UserService(
         trxManager.run {
             val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
             if (newUsername.isBlank()) return@run failure(UserError.UsernameCannotBeBlank)
+            if(newUsername.length < User.MIN_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             if (newUsername.length > User.MAX_USERNAME_LENGTH) return@run failure(UserError.UsernameToLong)
             val matches = userRepo.findUserMatchesUsername(newUsername.trim())
             if (matches != null) return@run failure(UserError.UsernameAlreadyExists)
             val userEdited = userRepo.updateUsername(user, newUsername)
+            val channels = channelRepo.getChannelsOfUser(user)
+            val members = channels.map {
+                channelRepo.getChannelMembers(it.key).keys
+            }.flatten().distinct().toSet()
+            CoroutineScope(Dispatchers.IO).launch {
+                emitter.sendEventOfUsernameUpdate(members, userEdited)
+            }
             return@run success(userEdited)
         }
 

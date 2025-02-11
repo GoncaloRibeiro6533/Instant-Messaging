@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { Box, Chip, CircularProgress } from "@mui/material"
+import { Box, Chip, CircularProgress, Typography } from "@mui/material"
 import { Message } from "../message"
 import { ChatTextField } from "../chatTextField/chatTextfield"
 import { useData } from "../../data/DataProvider"
@@ -28,7 +28,7 @@ export function ChatBox(props : {channel: Channel}) {
                 display: "flex",
                 flexDirection: "column",
                 height: "80vh",
-                width: "100%",
+                minWidth: "600px",
                 margin: "0 auto",
                 backgroundColor: "#fafafa",
             }}
@@ -79,7 +79,7 @@ export function ChatBox(props : {channel: Channel}) {
                         <CircularProgress size="30px" />
                     </Box>
                 )}
-                {state.name === 'finished' && (
+                {(state.name === 'finished' || messages.size === 0)   && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                         <Chip
                             label="Start of the conversation"

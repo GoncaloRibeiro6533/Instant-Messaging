@@ -58,7 +58,7 @@ class JdbiChannelRepository(
             if (limit == 1 && skip == 0) {
                 """
             SELECT c.*, u.username, u.email FROM dbo.CHANNEL c 
-            JOIN dbo.USER u ON c.creator_id = u.id WHERE c.name LIKE :name || '%' LIMIT :limit OFFSET :skip;
+            JOIN dbo.USER u ON c.creator_id = u.id WHERE c.name= :name || '%' LIMIT :limit OFFSET :skip;
             """
             } else {
                 """

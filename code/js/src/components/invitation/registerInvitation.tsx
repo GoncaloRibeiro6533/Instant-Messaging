@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, TextField, Typography, Snackbar } from '@mui/material';
 import { useState } from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Role } from '../../domain/Role';
 import { services } from "../../App";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {useAuth} from "../auth/AuthProvider";
 import Alert from "@mui/material/Alert";
+import { useData } from '../data/DataProvider';
 
 export function RegisterInvitation() {
-    const location = useLocation();
-    const { channel } = location.state;
     const navigate = useNavigate();
+    const {channelId} = useParams();
     const [email, setEmail] = useState('');
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const [showPermissionError, setShowPermissionError] = useState(false);
@@ -19,6 +19,8 @@ export function RegisterInvitation() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [invitationMessage, setInvitationMessage] = useState('');
     const [user ] = useAuth()
+    const { channels} = useData();
+    const channel = channels.get(parseInt(channelId));
 
     const handleRoleClick = (role: Role) => {
         setSelectedRole(role);
@@ -54,7 +56,7 @@ export function RegisterInvitation() {
     };
 
     const handleBackClick = () => {
-        navigate('/invitation', {state: {channel: channel}});
+        navigate(`/channel/${channelId}`);
     };
 
     return (

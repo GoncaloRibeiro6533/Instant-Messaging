@@ -59,7 +59,6 @@ export function useChatBox(channel: Channel): [
     async function loadMessagesHandler() {
         if (state.name === 'loading' || state.name === 'finished') return
         dispatch({ type: 'load' })
-        console.log('loading messages')
         try {
             const retrievedMessages = await services.messageService.getMessages(channel.id, 30, state.nMessages)
             if (retrievedMessages.length === 0) {

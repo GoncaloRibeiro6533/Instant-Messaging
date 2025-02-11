@@ -43,6 +43,11 @@ class SseEmitterAdapter(
                         .id(signal.id.toString())
                         .name("InvitationAcceptedUpdate")
                         .data(signal.invitation)
+                is SseEvent.MemberUsernameUpdate ->
+                    SseEmitter.event()
+                        .id(signal.id.toString())
+                        .name("MemberUsernameUpdate")
+                        .data(signal.updatedMember)
                 is SseEvent.KeepAlive -> SseEmitter.event().comment(signal.timestamp.epochSeconds.toString())
             }
         sseEmitter.send(msg)

@@ -36,9 +36,15 @@ export function Channel() {
         }
     }
     return (
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: '600px'
-                
-             }}>
+            <Box   sx={{
+                maxWidth: '100%',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minWidth: '100px', // Define um limite mínimo para a largura
+                overflow: 'auto', // Garante que não ocorra estouro de conteúdo
+                height: '100vh'
+            }}>
                  {state.name === 'loading' && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                     <CircularProgress size="60px" />

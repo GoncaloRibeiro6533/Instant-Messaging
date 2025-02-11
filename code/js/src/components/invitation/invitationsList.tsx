@@ -6,10 +6,12 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useData } from "../data/DataProvider";
 import { ChannelInvitation } from '../../domain/ChannelInvitation';
+import { useNavigate } from 'react-router-dom';
 
 export function InvitationsList() {
     const [user] = useAuth();
     const { invitations, setInvitations, addChannel,addChannelMember } = useData();
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         const fetchInvitations = async () => {
@@ -33,7 +35,7 @@ export function InvitationsList() {
             addChannel(invitation.channel, invitation.role);
             addChannelMember(channel.id, channelMembers)
             setInvitations(invitations.filter(invitation => invitation.id !== invitationId));
-
+            navigate(`/channels/channel/${channel.id}`);
         } catch (error) {
             console.error('Error accepting invitation:', error);
         }

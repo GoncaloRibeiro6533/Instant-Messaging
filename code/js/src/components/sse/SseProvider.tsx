@@ -11,23 +11,26 @@ import { Role } from '../../domain/Role'
 import { ChannelInvitation } from '../../domain/ChannelInvitation'
 import { useMock } from '../../App'
 
-type AppNotification = {
+export type AppNotification = {
     id: number,
     message: string,
+    read: boolean
 }
 
 type SseContextType = {
     sse: EventSource | undefined,
     setSse: (sse: EventSource | null) => void
     notifications: AppNotification[],
-    deleteNotification: (id: number) => void
+    deleteNotification: (id: number) => void,
+    markAsRead: (id: number) => void
 }
 
 export const SseContext = createContext<SseContextType>({
     sse: undefined,
     setSse: () => {},
     notifications: [],
-    deleteNotification: () => {}
+    deleteNotification: () => {},
+    markAsRead: () => {}
 })
 
 export function SseProvider({ children }: { children: React.ReactNode }) : React.JSX.Element {
@@ -40,14 +43,25 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
         removeChannelMember,
         addChannelMember,
         addInvitation,
+        orderByMessages
     } = useData()
 
     function addNotification(id:number, message: string) {
-        setNotifications([...notifications, { id, message }])
+        setNotifications((prevNotifications) => [...prevNotifications, { id, message, read: false }])
     }
     function deleteNotification(id: number) {
-        setNotifications(
-            notifications.filter(notification => notification.id !== id)
+        setNotifications( (prevNotifications) =>   
+            prevNotifications.filter(notification => notification.id !== id)
+        )
+    }
+    function markAsRead(id: number) {
+        setNotifications( (prevNotifications) =>   
+            prevNotifications.map(notification => {
+                if(notification.id === id) {
+                    return { ...notification, read: true }
+                }
+                return notification
+            })
         )
     }
 
@@ -61,20 +75,15 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
             const data  = JSON.parse(event.data)
             const message = messageMapper(data.message)
             addMessages(message.channel, [message]);
+            orderByMessages()
+            /*if(message.sender.id !== user.id)*/ addNotification(data.id, `${message.channel.name}: ${message.content.slice(0, 20)}`)
         })
 
         eventSource.addEventListener('ChannelNameUpdate', (event) => {
             const data  = JSON.parse(event.data)
             const channel = channelMapper(data)
             updateChannel(channel)
-            addNotification(data.id, `Channel ${channel.name} has been updated`)
-        })
-
-        eventSource.addEventListener('NewMemberUpdate', (event) => {
-            const data  = JSON.parse(event.data)
-            const removedMeber = userMapper(data.removedMember)
-            const channel = channelMapper(data.channel)
-            removeChannelMember(channel.id, removedMeber)
+            if(channel.creator.id !== user.id) addNotification(data.id, `Channel ${channel.name} has been updated`)
         })
 
         eventSource.addEventListener('ChannelNewMemberUpdate', (event) => {
@@ -82,6 +91,8 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
             const channel = channelMapper(data.channel)
             const newMember = memberMapper(data.newMember, data.role)
             addChannelMember(channel.id, [newMember])
+            if(newMember.user.id !== user.id) 
+                addNotification(data.id, `New member ${newMember.user.username} joined channel ${channel.name}`)
         })
 
         eventSource.addEventListener('ChannelMemberExitedUpdate', (event) => {
@@ -89,6 +100,8 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
             const channel = channelMapper(data.channel)
             const removedMember = userMapper(data.removedMember)
             removeChannelMember(channel.id, removedMember)
+            if(removedMember.id !== user.id) 
+                addNotification(data.id, `Member ${removedMember.username} exited channel ${channel.name}`)
         })
 
         eventSource.addEventListener('NewInvitationUpdate', (event) => {
@@ -111,7 +124,7 @@ export function SseProvider({ children }: { children: React.ReactNode }) : React
     } , [user])
 
     return (
-        <SseContext.Provider value={{ sse, setSse, notifications, deleteNotification }}>
+        <SseContext.Provider value={{ sse, setSse, notifications, deleteNotification, markAsRead }}>
             {children}
         </SseContext.Provider>
     )
@@ -130,7 +143,8 @@ export function useSse() {
             }
         },
         state.notifications,
-        state.deleteNotification
+        state.deleteNotification,
+        state.markAsRead
     ] as const
 }
 

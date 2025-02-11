@@ -35,6 +35,11 @@ sealed interface SseEvent {
         val invitation: ChannelInvitation, // Accepted invitation
     ) : SseEvent
 
+    data class MemberUsernameUpdate(
+        val id: Long,
+        val updatedMember: User
+    ): SseEvent
+
     data class KeepAlive(
         val timestamp: Instant,
     ) : SseEvent
@@ -50,3 +55,4 @@ data class RemovedMember(
     val channel: Channel, // Channel with updated members
     val removedMember: User
 )
+

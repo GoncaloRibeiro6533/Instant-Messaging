@@ -1,6 +1,10 @@
 package pt.isel
 
 import jakarta.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 sealed class MessageError {
@@ -61,7 +65,9 @@ class MessageService(
             val members = channelRepo.getChannelMembers(channel)
             if (!members.containsKey(user)) return@run failure(MessageError.UserNotInChannel)
             val message = messageRepo.createMessage(user, channel, text, LocalDateTime.now())
-            emitter.sendEventOfNewMessage(message, members.keys)
+            CoroutineScope(Dispatchers.IO).launch {
+                emitter.sendEventOfNewMessage(message, members.keys)
+            }
             return@run success(message)
         }
 

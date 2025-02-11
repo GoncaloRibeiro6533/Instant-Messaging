@@ -11,10 +11,11 @@ const MESSAGES_KEY = 'messages'
 const INVITATIONS_KEY = 'invitations'
 
 type DataContextType = {
-    channels : Map<Channel,Role>,
+    channels: Map<Number, Channel>,
+    roles : Map<Number,Role>,
     messages : Map<Number,Message[]>,
     invitations: Array<ChannelInvitation>,
-    setChannels: (channels : Map<Channel,Role>) => void,
+    setChannels: (channels : Map<Number,Channel>) => void,
     updateChannel: (channel : Channel) => void
     setMessages: (messages : Map<Number,Message[]>) => void,
     setInvitations: (invitations : Array<ChannelInvitation>) => void,
@@ -28,11 +29,14 @@ type DataContextType = {
     addChannelMember: (channelId : Number, user : ChannelMember[]) => void,
     removeChannelMember: (channelId : Number, user:User) => void,
     setChannelMembers: (channelMembers : Map<Number, ChannelMember[]>) => void,
+    addChannels: (channels : Map<Channel,Role>) => void,
+    orderByMessages: () => void,
     clear : () => void
 }
 
 export const DataContext = React.createContext<DataContextType>({
     channels: new Map(),
+    roles: new Map(),
     messages: new Map(),
     invitations: [],
     setChannels: () => {},
@@ -49,6 +53,8 @@ export const DataContext = React.createContext<DataContextType>({
     addChannelMember: () => {},
     removeChannelMember: () => {},
     setChannelMembers: () => {},
+    addChannels: () => {},
+    orderByMessages: () => {},
     clear : () => {}
 })
 
@@ -56,11 +62,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
 
     //Initial state
     const initialChannels = new Map()
+    const initialRoles = new Map()
     const initialMessages =  new Map()
     const initialInvitations: ChannelInvitation[] = []
     const initialChannelMembers = new Map<Number, ChannelMember[]>()
     //Hooks
-    const [channels, setChannels] = React.useState<Map<Channel,Role>>(initialChannels)
+    const [channels, setChannels] = React.useState<Map<Number,Channel>>(initialChannels)
+    const [roles, setRoles] = React.useState<Map<Number,Role>>(initialRoles)
     const [messages, setMessages] = React.useState<Map<Number,Message[]>>(initialMessages)
     const [invitations, setInvitations] = React.useState<Array<ChannelInvitation>>(initialInvitations)
     const [channelMembers, setChannelMembers] = React.useState<Map<Number, ChannelMember[]>>(initialChannelMembers)
@@ -68,16 +76,25 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     const addChannel = (channel : Channel, role : Role) => {
         setChannels((prevChannels) => {
             const newChannels = new Map(prevChannels)
-            newChannels.set(channel,role)
+            newChannels.set(channel.id, channel)
             return newChannels
+        })
+        setRoles((prevRoles) => {
+            const newRoles = new Map(prevRoles)
+            newRoles.set(channel.id, role)
+            return newRoles
         })
     }
     const removeChannel = (channel : Channel) => {
         setChannels((prevChannels) => {
             const newChannels = new Map(prevChannels)
-            const oldChannel = Array.from(newChannels.keys()).find((c) => c.id === channel.id)
-            newChannels.delete(oldChannel)
+            newChannels.delete(channel.id)
             return newChannels
+        })
+        setRoles((prevRoles) => {
+            const newRoles = new Map(prevRoles)
+            newRoles.delete(channel.id)
+            return newRoles
         })
 
         setMessages((prevMessages) => {
@@ -90,10 +107,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
     const updateChannel = (channel : Channel) => {
         setChannels((prevChannels) => {
             const newChannels = new Map(prevChannels)
-            const oldChannel = Array.from(newChannels.keys()).find((c) => c.id === channel.id)
-            newChannels.delete(oldChannel)
-            const role = prevChannels.get(oldChannel)
-            newChannels.set(channel,role)
+            newChannels.set(channel.id, channel)
             return newChannels
         })
     }
@@ -151,18 +165,44 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
         })
     }
 
+    const addChannels = (channels : Map<Channel,Role>) => {
+        setChannels((prevChannels) => {
+            const newChannels = new Map(prevChannels)
+            Array.from(channels.keys()).forEach((channel) => {
+                newChannels.set(channel.id, channel)
+            })
+            return newChannels
+        })
+        setRoles((prevRoles) => {
+            const newRoles = new Map(prevRoles)
+            Array.from(channels.keys()).forEach((channel) => {
+                newRoles.set(channel.id, channels.get(channel))
+            })
+            return newRoles
+        })
+    }
+
+    const orderByMessages = () => {
+        setChannels((prevChannels) => {
+            const newChannels = new Map([...prevChannels.entries()].sort((a, b) => {
+                const messagesA = messages.get(a[0]) || []
+                const messagesB = messages.get(b[0]) || []
+                return messagesB.length - messagesA.length
+            }))
+            return newChannels
+    })}
+
 
     const clear = () => {
         setChannels(new Map())
         setMessages(new Map())
         setInvitations([])
-        localStorage.removeItem(CHANNELS_KEY)
-        localStorage.removeItem(MESSAGES_KEY)
-        localStorage.removeItem(INVITATIONS_KEY)
     }
+    
     return (
         <DataContext.Provider value={{
             channels,
+            roles,
             messages,
             invitations,
             setChannels,
@@ -179,7 +219,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) : Reac
             addChannelMember,
             removeChannelMember,
             loadMessages,
-            setChannelMembers
+            setChannelMembers,
+            addChannels,
+            orderByMessages
         }}>
             {children}
         </DataContext.Provider>
@@ -190,9 +232,10 @@ export function useData() {
     const state =  React.useContext(DataContext)
     return {
         channels: state.channels,
+        roles: state.roles,
         messages: state.messages,
         invitations: state.invitations,
-        setChannels: (channels: Map<Channel,Role>) => {
+        setChannels: (channels: Map<Number,Channel>) => {
             state.setChannels(channels)
         },
         updateChannel: state.updateChannel,
@@ -214,7 +257,9 @@ export function useData() {
         addChannelMember: state.addChannelMember,
         removeChannelMember: state.removeChannelMember,
         clear: state.clear,
-        loadMessages: state.loadMessages
+        loadMessages: state.loadMessages,
+        addChannels: state.addChannels,
+        orderByMessages: state.orderByMessages
     }
 
 }

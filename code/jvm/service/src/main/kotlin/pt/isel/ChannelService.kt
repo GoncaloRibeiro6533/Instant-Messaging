@@ -2,6 +2,10 @@
 package pt.isel
 
 import jakarta.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 sealed class ChannelError {
     data object ChannelNotFound : ChannelError()
@@ -119,7 +123,9 @@ class ChannelService(
                 return@run failure(ChannelError.UserAlreadyInChannel)
             }
             val updatedChannel = channelRepo.joinChannel(userToAddInfo, channel, role)
-            emitter.sendEventOfNewMember(channel, userToAddInfo, role, members.keys)
+            CoroutineScope(Dispatchers.IO).launch {
+                emitter.sendEventOfNewMember(channel, userToAddInfo, role, members.keys)
+            }
             return@run success(updatedChannel)
         }
 
@@ -135,9 +141,12 @@ class ChannelService(
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(user)) return@run failure(ChannelError.Unauthorized)
             if (name.isBlank()) return@run failure(ChannelError.InvalidChannelName)
-            if (channelRepo.getChannelByName(name, 1, 0).isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
+            val c = channelRepo.getChannelByName(name, 1, 0)
+            if (c.isNotEmpty()) return@run failure(ChannelError.ChannelNameAlreadyExists)
             val updatedChannel = channelRepo.updateChannelName(channel, name)
-            emitter.sendEventOfChannelNameUpdated(updatedChannel, members.keys)
+            CoroutineScope(Dispatchers.IO).launch {
+                emitter.sendEventOfChannelNameUpdated(updatedChannel, members.keys)
+            }
             return@run success(updatedChannel)
         }
 
@@ -152,7 +161,9 @@ class ChannelService(
             val members = channelRepo.getChannelMembers(channel)
             if (!members.contains(user)) return@run failure(ChannelError.UserNotInChannel)
             val result = channelRepo.leaveChannel(user, channel) // TODO rename to removeUserFromChannel
-            emitter.sendEventOfMemberExited(channel, user, members.keys)
+            CoroutineScope(Dispatchers.IO).launch {
+                emitter.sendEventOfMemberExited(channel, user, members.keys)
+            }
             return@run success(result)
         }
 

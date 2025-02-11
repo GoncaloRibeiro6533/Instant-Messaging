@@ -1,69 +1,114 @@
 import * as React from 'react';
-import { Box, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
+import { Box, Button, Typography, Modal, Card, CardActions, CardContent } from '@mui/material';
 import { useLocation, useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-export function InvitationOptions() {
-    const location = useLocation();
-    const { channel, token } = location.state;
+export function InvitationOptions(props: { onClose: () => void, channelId: string }) {
+    const [open, setOpen] = React.useState(true);
     const navigate = useNavigate();
 
+
     const handleInvitationExistingUser = () => {
-        console.log('Invite existing user', { channel, token });
-        navigate('/invitation/channel', { state: { channel, token } })
-    }
+        navigate(`/invitation/channel/${props.channelId}`);	
+        setOpen(false);
+        props.onClose();
+    };
 
     const handleInvitationNewUser = () => {
-        console.log('Invite new user', { channel, token });
-        navigate('/invitation/register', { state: { channel, token } })
-    }
+        navigate(`/invitation/register/${props.channelId}`);
+        setOpen(false);
+        props.onClose();
 
-    const handleBackClick = () => {
-        navigate('/channel/' + channel.id)
-    }
-
+    };
+   
     return (
-        <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            height="100vh"
-            bgcolor="#f5f5f5"
-            padding={2}
-        >
-            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                <Button variant="contained" color="primary" onClick={handleBackClick} startIcon={<ArrowBackIcon />}
-                        sx={{ textTransform: 'none', margin: 2 }}>
-                    Back
-                </Button>
-            </Box>
-
-            <Card sx={{ width: 400, height: 250, textAlign: 'center' }}>
-                <CardContent>
-                    <Typography variant="h4" component="h1" gutterBottom fontFamily="Arial">
-                        Invitation Options
-                    </Typography>
-                </CardContent>
-                <CardActions sx={{ flexDirection: 'column', gap: 2 }}>
-                    {channel.visibility !== 'PUBLIC' && (
+        <Modal open={open} onClose={()=> props.onClose} aria-labelledby="invitation-options-title">
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                height="100vh"
+            >
+                <Card
+                    sx={{
+                        width: 400,
+                        padding: 3,
+                        textAlign: "center",
+                        borderRadius: "12px",
+                        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                        backgroundColor: "#fff"
+                    }}
+                >
+                    <CardContent>
+                        <Typography 
+                            id="invitation-options-title"
+                            variant="h4"
+                            component="h1"
+                            gutterBottom
+                            sx={{
+                                fontFamily: "Arial",
+                                fontWeight: "bold",
+                                color: "#333"
+                            }}
+                        >
+                            Invitation Options
+                        </Typography>
+                    </CardContent>
+                    <CardActions sx={{ flexDirection: 'column', gap: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleInvitationExistingUser}
+                                sx={{
+                                    width: "90%",
+                                    borderRadius: "20px",
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#007bff",
+                                    '&:hover': {
+                                        backgroundColor: "#0056b3",
+                                    }
+                                }}
+                            >
+                                Invite Existing User
+                            </Button>
                         <Button
                             variant="contained"
-                            color="primary"
-                            onClick={handleInvitationExistingUser}
+                            color="secondary"
+                            onClick={handleInvitationNewUser}
+                            sx={{
+                                width: "90%",
+                                borderRadius: "20px",
+                                fontSize: "1rem",
+                                fontWeight: "bold",
+                                backgroundColor: "#28a745",
+                                '&:hover': {
+                                    backgroundColor: "#218838",
+                                }
+                            }}
                         >
-                            Invite existing user to this channel
+                            Invite New User
                         </Button>
-                    )}
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleInvitationNewUser}
-                    >
-                        Invite new user to this channel
-                    </Button>
-                </CardActions>
-            </Card>
-        </Box>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => {
+                                props.onClose()
+                                setOpen(false)
+                               }
+                            }
+                            sx={{
+                                width: "90%",
+                                borderRadius: "20px",
+                                fontSize: "1rem",
+                                fontWeight: "bold",
+                                mt: 2
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                    </CardActions>
+                </Card>
+            </Box>
+        </Modal>
     );
 }

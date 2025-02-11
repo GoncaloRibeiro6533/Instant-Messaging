@@ -30,7 +30,7 @@ import {UserServiceMock} from "./service/mock/UserServiceMock";
 import {ChannelServiceMock} from "./service/mock/ChannelServiceMock";
 import {MessageServiceMock} from "./service/mock/MessageServiceMock";
 import {InvitationServiceMock} from "./service/mock/InvitationServiceMock";
-
+import {Notification} from "./components/notifications/notification";
 
 
 const router = createBrowserRouter(
@@ -38,7 +38,11 @@ const router = createBrowserRouter(
         {
             "path": "/",
             element:
-                <><MenuAppBar /><Home /></>,
+                <>
+                    <MenuAppBar /> 
+                    <Notification/> 
+                    <Home />
+                </>,
             "children": []
         },
         {
@@ -51,16 +55,14 @@ const router = createBrowserRouter(
         },
         {
             "path": "/login",
-            element:
-                <>
-                <Login />
-                </>
+            element:<Login />
         },
         {
             "path": "/about",
             element:
                 <>
                     <MenuAppBar/>
+                    <Notification/> 
                     <About />
                 </>
         },
@@ -69,6 +71,7 @@ const router = createBrowserRouter(
             element:
                 <AuthRequire>
                     <MenuAppBar/>
+                    <Notification/> 
                     <ChannelsList/>
                 </AuthRequire>,
             children: [
@@ -88,10 +91,11 @@ const router = createBrowserRouter(
             ),
         },
         {
-            path: "/createChannel",
+            path: "/channels/create",
             element:
                 <AuthRequire>
                     <MenuAppBar />
+                    <Notification/> 
                     <CreateChannel />
                 </AuthRequire>
         },
@@ -100,6 +104,7 @@ const router = createBrowserRouter(
             element:
                 <AuthRequire>
                     <MenuAppBar/>
+                    <Notification/> 
                     <Profile />
                 </AuthRequire>
         },
@@ -109,33 +114,27 @@ const router = createBrowserRouter(
             element: (
                 <AuthRequire>
                     <MenuAppBar />
+                    <Notification/> 
                     <ChannelDetails />
                 </AuthRequire>
             ),
         },
         {
-            path: "/invitation",
-            element: (
-                <AuthRequire>
-                    <MenuAppBar />
-                    <InvitationOptions />
-                </AuthRequire>
-            ),
-        },
-        {
-            "path": "/invitation/channel",
+            "path": "/invitation/channel/:channelId",
             "element": (
                 <AuthRequire>
                     <MenuAppBar />
+                    <Notification/> 
                     <ChannelInvitation />
                 </AuthRequire>
             )
         },
         {
-            "path": "/invitation/register",
+            "path": "/invitation/register/:channelId",
             "element": (
                 <AuthRequire>
                     <MenuAppBar />
+                    <Notification/> 
                     <RegisterInvitation />
                 </AuthRequire>
             )
@@ -145,6 +144,7 @@ const router = createBrowserRouter(
             "element": (
                 <AuthRequire>
                     <MenuAppBar />
+                    <Notification/> 
                     <InvitationsList />
                 </AuthRequire>
             )
@@ -185,7 +185,7 @@ export const httpService: Service = {
     invitationService: new InvitationServiceHttp(),
 }
 
-export const useMock = false //TODO improve this
+export const useMock = true
 
 
 export const services: Service = useMock ? mockService : httpService

@@ -45,29 +45,24 @@ export function ChannelsList() {
             setSearchResults([]);
         }
     };
-
-
-    const [open, setOpen] = useState(false);
-    const [selectedChannel, setSelectedChannel] = useState<any>(null);
-
     async function handleJoinChannel(channel: Channel) {
         try {
-            await services.channelService.joinChannel(channel.id, Role.READ_WRITE);
-            addChannel(channel, Role.READ_WRITE);
+            const result = await services.channelService.joinChannel(channel.id, Role.READ_WRITE);
+            addChannel(result, Role.READ_WRITE);
             addChannelMember(channel.id, [{user: user, role: Role.READ_WRITE}])
+            setSearchChannels('');
             navigate(`/channels/channel/${channel.id}`);
         } catch (e) {
             console.error(e.message);
         }
     }
 
-
     const channelsToDisplay = searchChannels.trim()
-        ? searchResults : (state.name == 'loaded' && Array.from(channels.keys()))
+        ? searchResults : (state.name == 'loaded' && Array.from(channels.values())) || [];
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
             <Box sx={{ width: '320px', borderRight: '1px solid #ddd', padding: '10px' }}>
-                <ListItemButton onClick={() => navigate('/createChannel')} sx={{ marginBottom: '16px' }}>
+                <ListItemButton onClick={() => navigate('/channels/create')} sx={{ marginBottom: '16px' }}>
                     <ListItemIcon>
                         <Add />
                     </ListItemIcon>
@@ -104,7 +99,7 @@ export function ChannelsList() {
                     <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                         <List>
                             {channelsToDisplay.map((channel) => {
-                                const isUserInChannel = Array.from(channels.keys()).some((c) => c.id === channel.id);
+                                const isUserInChannel = Array.from(channels.values()).some((c) => c.id === channel.id);
                                 return (
                                     <React.Fragment key={channel.id}>
                                         <ListItemButton onClick={() => {
@@ -157,7 +152,13 @@ export function ChannelsList() {
                     </Box>)}
             </Box>
             {location.pathname === '/channels' && (
-                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Box sx={{ 
+                    flex: 1,
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center',
+                    background: "linear-gradient(to right,rgba(247, 92, 100, 0.2),rgba(247, 184, 49, 0.31),rgba(38, 197, 218, 0.28),rgba(13, 13, 13, 0.27))",
+                }}>
                     <img
                         src={Logo}
                         alt="Logo"

@@ -11,13 +11,13 @@ import { useAuth } from "../../auth/AuthProvider"
 type State =
     | { name: "idle" }
     | { name: "loading" }
-    | { name: "loaded", channels: Map<Channel,Role> }
+    | { name: "loaded", channels: Map<Number,Channel> }
     | { name: "error", message: string }
     | { name: "stopped" }
 
 type Action =
     | { type: "load" }
-    | { type: "success", channels: Map<Channel,Role> }
+    | { type: "success", channels: Map<Number,Channel> }
     | { type: "error", message: string }
     | { type: "stop"}
 
@@ -71,7 +71,7 @@ function reduce(state: State, action: Action): State {
 
 export function useChannelList(): [State, onChange: () => void] {
     const [state, dispatch] = React.useReducer(reduce, { name: "idle" })
-    const { setChannels, channels } = useData()
+    const { addChannels, channels, orderByMessages } = useData()
     const [error, setError] = useError()
     const navigate = useNavigate()
     const [user, setUser] = useAuth()
@@ -84,14 +84,15 @@ export function useChannelList(): [State, onChange: () => void] {
         }
         dispatch({ type: "load" })
         try {
-            const channels = await services.channelService.getChannelsOfUser(user.id)
-            if(channels.size > 0) {
-                setChannels(channels)
+            const channelsRemote = await services.channelService.getChannelsOfUser(user.id)
+            //if(channels.size > 0) {
+                addChannels(channelsRemote)
+                orderByMessages()
                 dispatch({ type: "success", channels })
-            } else {
+            /*} else {
                 dispatch ({ type: "stop" })
                 return
-            }
+            }*/
         } catch (e) {
             if(e.message === "Not authenticated" || e.message === "Session expired") {
                 localStorage.clear()

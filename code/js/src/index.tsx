@@ -14,7 +14,7 @@ root.render(<AuthProvider>
                 <DataProvider>
                     <SseProvider>
                         <ErrorProvider>
-                        <App/>
+                                <App/>
                         </ErrorProvider>
                     </SseProvider>
                 </DataProvider>

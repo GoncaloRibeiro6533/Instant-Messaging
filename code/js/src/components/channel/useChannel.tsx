@@ -77,7 +77,7 @@ export function useChannel(): [
             }
             selectedChannelIdRef.current = parsedId
 
-            const loadedChannel = Array.from(channels.keys()).find(channel => channel.id === parsedId) || null
+            const loadedChannel = channels.get(parsedId)
             if (loadedChannel && messages.get(loadedChannel.id)) {
                 if (selectedChannelIdRef.current === parsedId) {
                     dispatch({ type: 'success', channel: loadedChannel, previouslyLoaded: true })

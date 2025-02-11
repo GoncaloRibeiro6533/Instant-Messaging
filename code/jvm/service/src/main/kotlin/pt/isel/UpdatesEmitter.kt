@@ -1,6 +1,7 @@
 package pt.isel
 import jakarta.annotation.PreDestroy
 import jakarta.inject.Named
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -65,7 +66,7 @@ class UpdatesEmitter(
 
     private fun keepAlive() =
         lock.withLock {
-            // logger.info("keepAlive, sending to {} listeners", listeners.values.size)
+            logger.info("keepAlive, sending to {} listeners", listeners.values.size)
             val signal = SseEvent.KeepAlive(Clock.System.now())
             listeners.values.forEach {
                 try {
@@ -78,10 +79,12 @@ class UpdatesEmitter(
 
     private fun sendEventToAll(
         users: Set<User>,
-        signal: SseEvent,
+        signal: SseEvent,   
     ) {
-        listeners.filter { it.key.user in users }.values.forEach {
+        val ids = users.map{ it.id}
+        listeners.filter { it -> it.key.user.id in ids }.values.forEach {
             try {
+                logger.info("sending event to $users of type $signal")
                 it.emit(signal)
             } catch (ex: Exception) {
                 logger.info("Exception while sending Message signal - {}", ex.message)
@@ -122,9 +125,15 @@ class UpdatesEmitter(
 
     fun sendEventOfInvitationAccepted(invitation: ChannelInvitation) =
         sendEventToAll(
-            setOf(invitation.sender, invitation.receiver),
+            setOf(invitation.receiver),
             SseEvent.InvitationAcceptedUpdate(currentId++, invitation),
         )
+
+    fun sendEventOfUsernameUpdate(users: Set<User>, newMember: User){
+        sendEventToAll(users,
+            SseEvent.MemberUsernameUpdate(currentId++, newMember)
+            )
+    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(UpdatesEmitter::class.java)

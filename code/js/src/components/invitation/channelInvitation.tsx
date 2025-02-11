@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, TextField, InputAdornment, List, ListItem, ListItemText, Paper, ButtonBase, Typography, Snackbar } from '@mui/material';
 import { useState, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import SearchIcon from "@mui/icons-material/Search";
 import { User } from '../../domain/User';
 import { Role } from '../../domain/Role';
@@ -10,12 +10,13 @@ import { AuthContext } from "../auth/AuthProvider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendIcon from '@mui/icons-material/Send';
 import Alert from "@mui/material/Alert";
+import { useData } from '../data/DataProvider';
 
 export function ChannelInvitation() {
     const { user } = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
-    const { channel } = location.state;
+    const { channelId } = useParams();
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -23,7 +24,8 @@ export function ChannelInvitation() {
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-
+    const { channels} = useData();
+    const channel = channels.get(parseInt(channelId));
     const handleSearch = async (term: string) => {
         setSearchTerm(term);
         if (term && user) {
@@ -75,7 +77,7 @@ export function ChannelInvitation() {
     }
 
     const handleBackClick = () => {
-        navigate('/invitation', {state: {channel: channel}});
+        navigate(`/channel/${channel.id}`);
     };
 
     return (

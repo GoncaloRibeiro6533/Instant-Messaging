@@ -20,6 +20,15 @@ export function RegisterFirstUser() {
             height="100vh"
             bgcolor="#f5f5f5"
             padding={2}
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "100vh",
+                background: "linear-gradient(to right, #F75C64, #F7B731, #26C6DA, #0D0D0D)",
+                padding: 3,
+            }}
         >
             {state.name === 'submitting' && (
                 <Box

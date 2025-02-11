@@ -1,6 +1,10 @@
 package pt.isel
 
 import jakarta.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 sealed class InvitationError {
@@ -81,7 +85,10 @@ class InvitationService(
                     LocalDateTime.now(),
                     code,
                 )
-            emailService.sendInvitationEmail(email, createdInvitation)
+            CoroutineScope(Dispatchers.IO).launch {
+                emailService.sendInvitationEmail(email, createdInvitation)
+                emailService.sendInvitationEmail(email, createdInvitation)
+            }
             return@run success(createdInvitation)
         }
 
@@ -112,7 +119,11 @@ class InvitationService(
                     role,
                     LocalDateTime.now(),
                 )
-            emitter.sendEventOfNewInvitation(createdInvitation)
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching{
+                    emitter.sendEventOfNewInvitation(createdInvitation)
+                }
+            }
             return@run success(createdInvitation)
         }
 
@@ -135,7 +146,12 @@ class InvitationService(
             val channel =
                 channelRepo.joinChannel(invitation.receiver, invitation.channel, invitation.role)
             invitationRepo.updateChannelInvitation(invitation)
-            emitter.sendEventOfNewMember(channel, invitation.receiver, invitation.role, members.keys)
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching{
+                    emitter.sendEventOfInvitationAccepted(invitation)
+                    emitter.sendEventOfNewMember(channel, invitation.receiver, invitation.role, members.keys)
+                }
+            }
             return@run success(channel)
         }
 
@@ -152,6 +168,7 @@ class InvitationService(
 
             if (invitation.receiver.id != userId) return@run failure(InvitationError.Unauthorized)
             if (invitation.timestamp.plusDays(1).isBefore(LocalDateTime.now())) {
+                invitationRepo.deleteChannelInvitationById(invitationId)
                 return@run failure(InvitationError.InvitationExpired)
             }
             val declined = invitationRepo.deleteChannelInvitationById(invitationId)
