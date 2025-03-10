@@ -61,3 +61,14 @@ For testing purposes, use the following credentials:
   **Password:** `Strong_password1234`
 - **User:** `user3`  
   **Password:** `Strong_password1234`
+## Authors
+
+- Gonçalo Ribeiro
+- João Marques
+- Tiago Silva
+
+@ISEL<br>
+Bachelor in Computer Science and Computer Engineering<br>
+Web Application Developmentg<br>
+Winter Semester of 2024/2025
+  
