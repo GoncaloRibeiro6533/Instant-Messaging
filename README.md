@@ -64,7 +64,7 @@ For testing purposes, use the following credentials:
 ## Authors
 
 - Gonçalo Ribeiro
-- João Marques
+- Rosário Machado
 - Tiago Silva
 
 @ISEL<br>
