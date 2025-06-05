@@ -39,7 +39,7 @@ TalkRooms allows users to exchange messages in real-time through dedicated chann
 
 - **Other Tools**
   - REST API for real-time communication.
-  - WebSocket and/or Server-Sent Events (SSE) for live updates.
+  - Server-Sent Events (SSE) for live updates.
 
 ## Documentation
 
