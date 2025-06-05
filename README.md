@@ -69,6 +69,6 @@ For testing purposes, use the following credentials:
 
 @ISEL<br>
 Bachelor in Computer Science and Computer Engineering<br>
-Web Application Developmentg<br>
+Web Application Development<br>
 Winter Semester of 2024/2025
   
