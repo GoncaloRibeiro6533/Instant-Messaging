@@ -40,7 +40,7 @@ sealed class ChannelError {
 @Named
 class ChannelService(
     private val trxManager: TransactionManager,
-    private val emitter: UpdatesEmitter,
+    private val emitter: Emitter,
 ) {
     fun getChannelById(user: User, id: Int): Either<ChannelError, Channel> =
         trxManager.run {

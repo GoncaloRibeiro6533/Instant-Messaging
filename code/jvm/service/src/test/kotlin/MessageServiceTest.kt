@@ -44,6 +44,7 @@ class MessageServiceTest {
             ),
         ),
         testClock,
+        TestEmitter(trxManager)
     )
 
     private fun createInvitationService(

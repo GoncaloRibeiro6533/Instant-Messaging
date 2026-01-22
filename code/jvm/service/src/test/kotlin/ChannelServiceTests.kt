@@ -35,6 +35,7 @@ class ChannelServiceTests {
             ),
         ),
         testClock,
+        TestEmitter(trxManager)
     )
 
     private fun createInvitationService(

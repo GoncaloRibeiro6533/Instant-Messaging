@@ -52,7 +52,7 @@ class UserService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
     private val clock: Clock,
-    private val emitter: UpdatesEmitter,
+    private val emitter: Emitter,
 ) {
     fun addFirstUser(
         username: String,

@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import pt.isel.AuthenticatedUser
-import pt.isel.UpdatesEmitter
+import pt.isel.Emitter
 import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("/api/sse")
 class SseController(
-    private val emitter: UpdatesEmitter,
+    private val emitter: Emitter,
 ) {
     @GetMapping("/listen")
     fun listen(user: AuthenticatedUser): Any {

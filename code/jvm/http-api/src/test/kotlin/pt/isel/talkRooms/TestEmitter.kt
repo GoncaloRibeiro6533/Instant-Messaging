@@ -1,17 +1,25 @@
-package pt.isel
-import jakarta.annotation.PreDestroy
-import jakarta.inject.Named
-import kotlinx.coroutines.delay
+package pt.isel.talkRooms
 import kotlinx.datetime.Clock
 import org.slf4j.LoggerFactory
+import pt.isel.AuthenticatedUser
+import pt.isel.Channel
+import pt.isel.ChannelInvitation
+import pt.isel.Emitter
+import pt.isel.Message
+import pt.isel.NewMember
+import pt.isel.RemovedMember
+import pt.isel.Role
+import pt.isel.SseEvent
+import pt.isel.TransactionManager
+import pt.isel.UpdateEmitter
+import pt.isel.User
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-@Named
-class UpdatesEmitter(
+class TestEmitter(
     private val trxManager: TransactionManager,
 ): Emitter {
     // Important: mutable state on a singleton service
@@ -24,10 +32,7 @@ class UpdatesEmitter(
         Executors.newScheduledThreadPool(1).also {
             it.scheduleAtFixedRate({ keepAlive() }, 2, 2, TimeUnit.SECONDS)
         }
-
-    @PreDestroy
     override fun shutdown() {
-        logger.info("shutting down")
         scheduler.shutdown()
     }
 
@@ -40,17 +45,13 @@ class UpdatesEmitter(
                 userRepo.findById(authenticatedUser.user.id)
             }
         requireNotNull(user)
-        logger.info("adding listener")
         val oldListener = listeners.getOrDefault(authenticatedUser, listener)
         val newListener = if (oldListener == listener) oldListener else listener
         listeners[authenticatedUser] = newListener
-        logger.info("listeners: {}", listeners)
         listener.onCompletion {
-            logger.info("onCompletion")
             removeEmitter(authenticatedUser)
         }
         listener.onError {
-            logger.info("onError")
             removeEmitter(authenticatedUser)
         }
         listener
@@ -58,7 +59,6 @@ class UpdatesEmitter(
 
     private fun removeEmitter(authenticatedUser: AuthenticatedUser) =
         lock.withLock {
-            logger.info("removing listener")
             val oldListener = listeners[authenticatedUser]
             requireNotNull(oldListener)
             listeners.remove(authenticatedUser)
@@ -66,28 +66,24 @@ class UpdatesEmitter(
 
     private fun keepAlive() =
         lock.withLock {
-            logger.info("keepAlive, sending to {} listeners", listeners.values.size)
             val signal = SseEvent.KeepAlive(Clock.System.now())
             listeners.values.forEach {
                 try {
                     it.emit(signal)
                 } catch (ex: Exception) {
-                    logger.info("Exception while sending keepAlive signal - {}", ex.message)
                 }
             }
         }
 
     private fun sendEventToAll(
         users: Set<User>,
-        signal: SseEvent,   
+        signal: SseEvent,
     ) {
         val ids = users.map{ it.id}
         listeners.filter { it -> it.key.user.id in ids }.values.forEach {
             try {
-                logger.info("sending event to $users of type $signal")
                 it.emit(signal)
             } catch (ex: Exception) {
-                logger.info("Exception while sending Message signal - {}", ex.message)
             }
         }
     }
@@ -136,6 +132,6 @@ class UpdatesEmitter(
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(UpdatesEmitter::class.java)
+        private val logger = LoggerFactory.getLogger(TestEmitter::class.java)
     }
 }

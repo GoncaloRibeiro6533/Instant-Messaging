@@ -41,7 +41,7 @@ sealed class InvitationError {
 class InvitationService(
     private val trxManager: TransactionManager,
     private val usersDomain: UsersDomain,
-    private val emitter: UpdatesEmitter,
+    private val emitter: Emitter,
     private val emailService: EmailServiceInterface,
 ) {
     fun getInvitationsOfUser(userId: Int): Either<InvitationError, List<ChannelInvitation>> =

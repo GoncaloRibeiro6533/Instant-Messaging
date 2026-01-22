@@ -36,7 +36,7 @@ sealed class MessageError {
 @Named
 class MessageService(
     private val trxManager: TransactionManager,
-    private val emitter: UpdatesEmitter,
+    private val emitter: Emitter,
 ) {
     fun findMessageById(
         id: Int,

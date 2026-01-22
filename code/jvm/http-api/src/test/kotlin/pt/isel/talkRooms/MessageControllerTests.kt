@@ -72,6 +72,7 @@ class MessageControllerTests {
                 ),
             ),
             testClock,
+            TestEmitter(trxManager)
         )
 
         private fun createEmitters(trxManager: TransactionManager) = UpdatesEmitter(trxManager)

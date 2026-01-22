@@ -72,6 +72,7 @@ class InvitationControllerTests {
                 ),
             ),
             testClock,
+            TestEmitter(trxManager)
         )
 
         private fun createInvitationService(

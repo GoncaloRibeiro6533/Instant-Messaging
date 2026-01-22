@@ -74,6 +74,7 @@ class UserControllerTests {
             ),
         ),
         testClock,
+        TestEmitter(trxManager)
     )
     private fun createEmitters(trxManager: TransactionManager) = UpdatesEmitter(trxManager)
     private fun createChannelService(trxManager: TransactionManager, emitter: UpdatesEmitter) =
@@ -223,7 +224,6 @@ class UserControllerTests {
         val receiverUser = receiver.body as User
         val headerR= receiver.headers["Set-Cookie"].toString()
         assertNotNull(headerR)
-        val cookieR = header.split(";")[0]
         assertEquals("receiver", receiverUser.username)
         assertEquals("receiver@test.com", receiverUser.email)
     }

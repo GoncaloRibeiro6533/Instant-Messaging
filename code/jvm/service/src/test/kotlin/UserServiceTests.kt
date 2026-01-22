@@ -35,6 +35,7 @@ class UserServiceTests {
             ),
         ),
         testClock,
+        TestEmitter(trxManager)
     )
 
     private fun createInvitationService(

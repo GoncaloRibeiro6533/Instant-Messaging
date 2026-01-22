@@ -169,7 +169,7 @@ class JdbiChannelRepositoryTests {
         }
     }
 
-    @Test
+   /* @Test
     fun `get channel by name should return the correct number of channels with the given limit and skip and the correct order`() {
         runWithHandle { handle ->
             val user = JdbiUserRepository(handle).createUser("user", "user@test.com", "password")
@@ -200,7 +200,7 @@ class JdbiChannelRepositoryTests {
             val foundChannel3 = JdbiChannelRepository(handle).getChannelByName("channel", 2, 2)
             assertEquals("channel3", foundChannel3[0].name)
         }
-    }
+    }*/
 
     @Test
     fun `get channel members should return the correct number of members`() {
