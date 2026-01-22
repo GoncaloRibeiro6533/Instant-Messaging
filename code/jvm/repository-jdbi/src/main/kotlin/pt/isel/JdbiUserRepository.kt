@@ -5,6 +5,9 @@ import org.jdbi.v3.core.Handle
 class JdbiUserRepository(
     private val handle: Handle,
 ) : UserRepository {
+    /*
+     *Creates a new user in the database
+     */
     override fun createUser(
         username: String,
         email: String,
