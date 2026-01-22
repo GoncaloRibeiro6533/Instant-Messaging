@@ -7,6 +7,9 @@ import org.jdbi.v3.core.statement.StatementContext
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
 
+/*
+ * Jdbi implementation of SessionRepository
+ */
 class JdbiSessionRepository(
     private val handle: Handle,
 ) : SessionRepository {
