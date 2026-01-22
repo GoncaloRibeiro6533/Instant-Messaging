@@ -22,6 +22,9 @@ class JdbiUserRepository(
             .one()
     }
 
+    /*
+        *Updates the username of an existing user
+     */
     override fun updateUsername(
         user: User,
         newUsername: String,
