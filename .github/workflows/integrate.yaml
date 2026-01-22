@@ -34,8 +34,8 @@ jobs:
 
       - name: Conceder permissão ao Gradle
         run: chmod +x ./gradlew
-        working-directory: jvm
+        working-directory: code/jvm
 
       - name: Rodar testes com Gradle
         run: ./gradlew test
-        working-directory: jvm
+        working-directory: code/jvm
